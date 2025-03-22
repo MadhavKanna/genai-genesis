@@ -26,6 +26,7 @@ export default function NewPatientCase() {
   const [showAiAnalysis, setShowAiAnalysis] = useState(false)
   const [aiAnalysisResult, setAiAnalysisResult] = useState<any>(null)
   const [inputMethod, setInputMethod] = useState<"manual" | "guided">("manual")
+  const [isSubmitting, setIsSubmitting] = useState(false)
 
   // Form data
   const [primaryConcern, setPrimaryConcern] = useState("")
@@ -42,9 +43,12 @@ export default function NewPatientCase() {
     }
   }
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
+    setIsSubmitting(true)
     // In a real app, this would submit the form data to the server
+    // Simulate API call
+    await new Promise(resolve => setTimeout(resolve, 2000))
     router.push("/patient/confirmation")
   }
 
@@ -154,380 +158,401 @@ export default function NewPatientCase() {
       </div>
 
       <form onSubmit={handleSubmit}>
-        {step === 1 && (
+        {isSubmitting ? (
           <Card>
-            <CardHeader>
-              <CardTitle>Describe Your Symptoms</CardTitle>
-              <CardDescription>Please provide detailed information about your current health concerns.</CardDescription>
-            </CardHeader>
-            <CardContent className="space-y-6">
-              <Tabs
-                value={inputMethod}
-                onValueChange={(value) => setInputMethod(value as "manual" | "guided")}
-                className="w-full"
-              >
-                <TabsList className="grid w-full grid-cols-2 mb-6">
-                  <TabsTrigger value="manual" className="flex items-center gap-2">
-                    <LucideMessageSquare className="h-4 w-4" />
-                    Manual Input
-                  </TabsTrigger>
-                  <TabsTrigger value="guided" className="flex items-center gap-2">
-                    <LucideBrain className="h-4 w-4" />
-                    AI-Guided
-                  </TabsTrigger>
-                </TabsList>
-
-                <TabsContent value="manual" className="space-y-6">
-                  <div className="space-y-2">
-                    <Label htmlFor="primary-concern">What is your primary health concern?</Label>
-                    <VoiceInput
-                      id="primary-concern"
-                      placeholder="Describe your main symptom or concern"
-                      rows={3}
-                      value={primaryConcern}
-                      onChange={setPrimaryConcern}
-                    />
+            <CardContent className="py-12">
+              <div className="text-center">
+                <div className="mb-4">
+                  <div className="gemini-stars mb-2">
+                    <div className="gemini-star"></div>
+                    <div className="gemini-star"></div>
+                    <div className="gemini-star"></div>
                   </div>
-
-                  <div className="space-y-2">
-                    <Label htmlFor="symptom-duration">How long have you been experiencing these symptoms?</Label>
-                    <div className="grid grid-cols-2 gap-4">
-                      <Input
-                        id="symptom-duration"
-                        type="number"
-                        placeholder="Duration"
-                        min="1"
-                        value={symptomDuration}
-                        onChange={(e) => setSymptomDuration(e.target.value)}
-                        required
-                      />
-                      <RadioGroup
-                        defaultValue="days"
-                        className="flex"
-                        value={durationUnit}
-                        onValueChange={setDurationUnit}
-                      >
-                        <div className="flex items-center space-x-2">
-                          <RadioGroupItem value="days" id="days" />
-                          <Label htmlFor="days">Days</Label>
-                        </div>
-                        <div className="flex items-center space-x-2 ml-4">
-                          <RadioGroupItem value="weeks" id="weeks" />
-                          <Label htmlFor="weeks">Weeks</Label>
-                        </div>
-                        <div className="flex items-center space-x-2 ml-4">
-                          <RadioGroupItem value="months" id="months" />
-                          <Label htmlFor="months">Months</Label>
-                        </div>
-                      </RadioGroup>
-                    </div>
-                  </div>
-
-                  <div className="space-y-2">
-                    <Label htmlFor="additional-symptoms">Do you have any additional symptoms?</Label>
-                    <VoiceInput
-                      id="additional-symptoms"
-                      placeholder="List any other symptoms you're experiencing"
-                      rows={3}
-                      value={additionalSymptoms}
-                      onChange={setAdditionalSymptoms}
-                    />
-                  </div>
-                </TabsContent>
-
-                <TabsContent value="guided">
-                  <AIConversationGuide onComplete={handleConversationComplete} />
-                </TabsContent>
-              </Tabs>
-
-              <div className="space-y-2">
-                <Label>Upload relevant images (optional)</Label>
-                <div className="border-2 border-dashed rounded-lg p-6 text-center">
-                  <LucideUpload className="h-8 w-8 mx-auto mb-2 text-muted-foreground" />
-                  <p className="text-sm text-muted-foreground mb-2">Drag and drop images or click to browse</p>
-                  <Input
-                    id="image-upload"
-                    type="file"
-                    accept="image/*"
-                    multiple
-                    className="hidden"
-                    ref={fileInputRef}
-                    onChange={handleImageUpload}
-                  />
-                  <Button type="button" variant="outline" onClick={() => fileInputRef.current?.click()}>
-                    Select Files
-                  </Button>
+                  <p className="text-gray-600 text-lg">Gemini is thinking</p>
                 </div>
+                <p className="text-sm text-gray-500">Analyzing your request...</p>
+              </div>
+            </CardContent>
+          </Card>
+        ) : (
+          <>
+            {step === 1 && (
+              <Card>
+                <CardHeader>
+                  <CardTitle>Describe Your Symptoms</CardTitle>
+                  <CardDescription>Please provide detailed information about your current health concerns.</CardDescription>
+                </CardHeader>
+                <CardContent className="space-y-6">
+                  <Tabs
+                    value={inputMethod}
+                    onValueChange={(value) => setInputMethod(value as "manual" | "guided")}
+                    className="w-full"
+                  >
+                    <TabsList className="grid w-full grid-cols-2 mb-6">
+                      <TabsTrigger value="manual" className="flex items-center gap-2">
+                        <LucideMessageSquare className="h-4 w-4" />
+                        Manual Input
+                      </TabsTrigger>
+                      <TabsTrigger value="guided" className="flex items-center gap-2">
+                        <LucideBrain className="h-4 w-4" />
+                        AI-Guided
+                      </TabsTrigger>
+                    </TabsList>
 
-                {uploadedImages.length > 0 && (
-                  <div className="grid grid-cols-3 gap-4 mt-4">
-                    {uploadedImages.map((img, index) => (
-                      <div key={index} className="relative aspect-square rounded-md overflow-hidden">
-                        <img
-                          src={URL.createObjectURL(img) || "/placeholder.svg"}
-                          alt={`Uploaded image ${index + 1}`}
-                          className="object-cover w-full h-full"
+                    <TabsContent value="manual" className="space-y-6">
+                      <div className="space-y-2">
+                        <Label htmlFor="primary-concern">What is your primary health concern?</Label>
+                        <VoiceInput
+                          id="primary-concern"
+                          placeholder="Describe your main symptom or concern"
+                          rows={3}
+                          value={primaryConcern}
+                          onChange={setPrimaryConcern}
                         />
                       </div>
-                    ))}
-                  </div>
-                )}
-              </div>
 
-              {primaryConcern && (
-                <div className="rounded-lg border p-4">
-                  <div className="flex items-center gap-2 mb-3">
-                    <LucideBrain className="h-5 w-5 text-primary" />
-                    <h3 className="font-medium">AI Preliminary Analysis</h3>
-                  </div>
-
-                  {!showAiAnalysis ? (
-                    <div className="space-y-3">
-                      <p className="text-sm text-muted-foreground">
-                        Our AI can analyze your symptoms to provide preliminary insights before your case is reviewed by
-                        medical professionals.
-                      </p>
-                      <Button type="button" variant="outline" size="sm" onClick={handleAiAnalysis} className="w-full">
-                        <LucideBrain className="mr-2 h-4 w-4" />
-                        Run AI Analysis
-                      </Button>
-                    </div>
-                  ) : (
-                    <AIAnalysisService
-                      symptoms={primaryConcern}
-                      additionalInfo={additionalSymptoms}
-                      images={uploadedImages}
-                      onAnalysisComplete={handleAnalysisComplete}
-                    />
-                  )}
-                </div>
-              )}
-            </CardContent>
-            <CardFooter className="flex justify-end">
-              <Button type="button" onClick={() => setStep(2)}>
-                Continue to Medical History
-              </Button>
-            </CardFooter>
-          </Card>
-        )}
-
-        {step === 2 && (
-          <Card>
-            <CardHeader>
-              <CardTitle>Medical History</CardTitle>
-              <CardDescription>This information helps clinicians provide more accurate guidance.</CardDescription>
-            </CardHeader>
-            <CardContent className="space-y-6">
-              <div className="space-y-2">
-                <Label htmlFor="age">Age</Label>
-                <Input id="age" type="number" placeholder="Your age" min="0" max="120" required />
-              </div>
-
-              <div className="space-y-2">
-                <Label htmlFor="gender">Gender</Label>
-                <RadioGroup defaultValue="female">
-                  <div className="flex flex-wrap gap-4">
-                    <div className="flex items-center space-x-2">
-                      <RadioGroupItem value="female" id="female" />
-                      <Label htmlFor="female">Female</Label>
-                    </div>
-                    <div className="flex items-center space-x-2">
-                      <RadioGroupItem value="male" id="male" />
-                      <Label htmlFor="male">Male</Label>
-                    </div>
-                    <div className="flex items-center space-x-2">
-                      <RadioGroupItem value="non-binary" id="non-binary" />
-                      <Label htmlFor="non-binary">Non-binary</Label>
-                    </div>
-                    <div className="flex items-center space-x-2">
-                      <RadioGroupItem value="other" id="other" />
-                      <Label htmlFor="other">Other</Label>
-                    </div>
-                  </div>
-                </RadioGroup>
-              </div>
-
-              <div className="space-y-2">
-                <Label>Do you have any of the following conditions?</Label>
-                <div className="grid grid-cols-2 gap-2">
-                  <div className="flex items-center space-x-2">
-                    <Checkbox id="diabetes" />
-                    <Label htmlFor="diabetes">Diabetes</Label>
-                  </div>
-                  <div className="flex items-center space-x-2">
-                    <Checkbox id="hypertension" />
-                    <Label htmlFor="hypertension">Hypertension</Label>
-                  </div>
-                  <div className="flex items-center space-x-2">
-                    <Checkbox id="heart-disease" />
-                    <Label htmlFor="heart-disease">Heart Disease</Label>
-                  </div>
-                  <div className="flex items-center space-x-2">
-                    <Checkbox id="asthma" />
-                    <Label htmlFor="asthma">Asthma</Label>
-                  </div>
-                  <div className="flex items-center space-x-2">
-                    <Checkbox id="cancer" />
-                    <Label htmlFor="cancer">Cancer</Label>
-                  </div>
-                  <div className="flex items-center space-x-2">
-                    <Checkbox id="autoimmune" />
-                    <Label htmlFor="autoimmune">Autoimmune Disorder</Label>
-                  </div>
-                </div>
-              </div>
-
-              <div className="space-y-2">
-                <Label htmlFor="medications">Current Medications</Label>
-                <Textarea id="medications" placeholder="List any medications you're currently taking" rows={3} />
-              </div>
-
-              <div className="space-y-2">
-                <Label htmlFor="allergies">Allergies</Label>
-                <Textarea id="allergies" placeholder="List any allergies you have" rows={2} />
-              </div>
-            </CardContent>
-            <CardFooter className="flex justify-between">
-              <Button type="button" variant="outline" onClick={() => setStep(1)}>
-                Back
-              </Button>
-              <Button type="button" onClick={() => setStep(3)}>
-                Continue to Review
-              </Button>
-            </CardFooter>
-          </Card>
-        )}
-
-        {step === 3 && (
-          <Card>
-            <CardHeader>
-              <CardTitle>Review Your Information</CardTitle>
-              <CardDescription>Please review the information you've provided before submitting.</CardDescription>
-            </CardHeader>
-            <CardContent className="space-y-6">
-              <div className="rounded-lg bg-muted p-4 flex items-start gap-3">
-                <LucideInfo className="h-5 w-5 text-primary flex-shrink-0 mt-0.5" />
-                <div>
-                  <p className="text-sm font-medium">Important Information</p>
-                  <p className="text-sm text-muted-foreground mt-1">
-                    The guidance you receive is not a medical diagnosis. Always consult with your healthcare provider
-                    for official medical advice.
-                  </p>
-                </div>
-              </div>
-
-              <div className="space-y-4">
-                <div>
-                  <h3 className="text-sm font-medium mb-2">Symptoms</h3>
-                  <div className="rounded-lg border p-3">
-                    <p className="text-sm">Primary concern: {primaryConcern || "[Sample symptom description]"}</p>
-                    <p className="text-sm mt-2">
-                      Duration: {symptomDuration || "2"} {durationUnit || "weeks"}
-                    </p>
-                    <p className="text-sm mt-2">
-                      Additional symptoms: {additionalSymptoms || "[Sample additional symptoms]"}
-                    </p>
-                  </div>
-                </div>
-
-                <div>
-                  <h3 className="text-sm font-medium mb-2">Medical History</h3>
-                  <div className="rounded-lg border p-3">
-                    <p className="text-sm">Age: 35</p>
-                    <p className="text-sm mt-2">Gender: Female</p>
-                    <p className="text-sm mt-2">Conditions: Asthma</p>
-                    <p className="text-sm mt-2">Medications: [Sample medications]</p>
-                    <p className="text-sm mt-2">Allergies: [Sample allergies]</p>
-                  </div>
-                </div>
-
-                {uploadedImages.length > 0 && (
-                  <div>
-                    <h3 className="text-sm font-medium mb-2">Uploaded Images ({uploadedImages.length})</h3>
-                    <div className="grid grid-cols-4 gap-2">
-                      {uploadedImages.map((img, index) => (
-                        <div key={index} className="relative aspect-square rounded-md overflow-hidden">
-                          <img
-                            src={URL.createObjectURL(img) || "/placeholder.svg"}
-                            alt={`Uploaded image ${index + 1}`}
-                            className="object-cover w-full h-full"
+                      <div className="space-y-2">
+                        <Label htmlFor="symptom-duration">How long have you been experiencing these symptoms?</Label>
+                        <div className="grid grid-cols-2 gap-4">
+                          <Input
+                            id="symptom-duration"
+                            type="number"
+                            placeholder="Duration"
+                            min="1"
+                            value={symptomDuration}
+                            onChange={(e) => setSymptomDuration(e.target.value)}
+                            required
                           />
+                          <RadioGroup
+                            defaultValue="days"
+                            className="flex"
+                            value={durationUnit}
+                            onValueChange={setDurationUnit}
+                          >
+                            <div className="flex items-center space-x-2">
+                              <RadioGroupItem value="days" id="days" />
+                              <Label htmlFor="days">Days</Label>
+                            </div>
+                            <div className="flex items-center space-x-2 ml-4">
+                              <RadioGroupItem value="weeks" id="weeks" />
+                              <Label htmlFor="weeks">Weeks</Label>
+                            </div>
+                            <div className="flex items-center space-x-2 ml-4">
+                              <RadioGroupItem value="months" id="months" />
+                              <Label htmlFor="months">Months</Label>
+                            </div>
+                          </RadioGroup>
                         </div>
-                      ))}
-                    </div>
-                  </div>
-                )}
-
-                {aiAnalysisResult && (
-                  <div>
-                    <h3 className="text-sm font-medium mb-2">AI Analysis Results</h3>
-                    <div className="rounded-lg border p-3">
-                      <div className="flex items-center gap-2 mb-2">
-                        <LucideBrain className="h-4 w-4 text-primary" />
-                        <p className="text-sm font-medium">Preliminary Assessment</p>
                       </div>
 
-                      {aiAnalysisResult.differentialDiagnosis && (
-                        <div className="mt-2">
-                          <p className="text-xs text-muted-foreground mb-1">Possible conditions:</p>
-                          <ul className="text-sm space-y-1">
-                            {aiAnalysisResult.differentialDiagnosis.slice(0, 3).map((diagnosis: any, index: number) => (
-                              <li key={index} className="flex items-center gap-1">
-                                <div className="h-1.5 w-1.5 rounded-full bg-primary"></div>
-                                <span>
-                                  {diagnosis.condition} ({diagnosis.confidence})
-                                </span>
-                              </li>
-                            ))}
-                          </ul>
-                        </div>
-                      )}
+                      <div className="space-y-2">
+                        <Label htmlFor="additional-symptoms">Do you have any additional symptoms?</Label>
+                        <VoiceInput
+                          id="additional-symptoms"
+                          placeholder="List any other symptoms you're experiencing"
+                          rows={3}
+                          value={additionalSymptoms}
+                          onChange={setAdditionalSymptoms}
+                        />
+                      </div>
+                    </TabsContent>
 
-                      {aiAnalysisResult.suggestedTests && (
-                        <div className="mt-2">
-                          <p className="text-xs text-muted-foreground">
-                            This is a preliminary AI assessment only. Medical professionals will review your case.
+                    <TabsContent value="guided">
+                      <AIConversationGuide onComplete={handleConversationComplete} />
+                    </TabsContent>
+                  </Tabs>
+
+                  <div className="space-y-2">
+                    <Label>Upload relevant images (optional)</Label>
+                    <div className="border-2 border-dashed rounded-lg p-6 text-center">
+                      <LucideUpload className="h-8 w-8 mx-auto mb-2 text-muted-foreground" />
+                      <p className="text-sm text-muted-foreground mb-2">Drag and drop images or click to browse</p>
+                      <Input
+                        id="image-upload"
+                        type="file"
+                        accept="image/*"
+                        multiple
+                        className="hidden"
+                        ref={fileInputRef}
+                        onChange={handleImageUpload}
+                      />
+                      <Button type="button" variant="outline" onClick={() => fileInputRef.current?.click()}>
+                        Select Files
+                      </Button>
+                    </div>
+
+                    {uploadedImages.length > 0 && (
+                      <div className="grid grid-cols-3 gap-4 mt-4">
+                        {uploadedImages.map((img, index) => (
+                          <div key={index} className="relative aspect-square rounded-md overflow-hidden">
+                            <img
+                              src={URL.createObjectURL(img) || "/placeholder.svg"}
+                              alt={`Uploaded image ${index + 1}`}
+                              className="object-cover w-full h-full"
+                            />
+                          </div>
+                        ))}
+                      </div>
+                    )}
+                  </div>
+
+                  {primaryConcern && (
+                    <div className="rounded-lg border p-4">
+                      <div className="flex items-center gap-2 mb-3">
+                        <LucideBrain className="h-5 w-5 text-primary" />
+                        <h3 className="font-medium">AI Preliminary Analysis</h3>
+                      </div>
+
+                      {!showAiAnalysis ? (
+                        <div className="space-y-3">
+                          <p className="text-sm text-muted-foreground">
+                            Our AI can analyze your symptoms to provide preliminary insights before your case is reviewed by
+                            medical professionals.
                           </p>
+                          <Button type="button" variant="outline" size="sm" onClick={handleAiAnalysis} className="w-full">
+                            <LucideBrain className="mr-2 h-4 w-4" />
+                            Run AI Analysis
+                          </Button>
                         </div>
+                      ) : (
+                        <AIAnalysisService
+                          symptoms={primaryConcern}
+                          additionalInfo={additionalSymptoms}
+                          images={uploadedImages}
+                          onAnalysisComplete={handleAnalysisComplete}
+                        />
                       )}
                     </div>
-                  </div>
-                )}
-              </div>
+                  )}
+                </CardContent>
+                <CardFooter className="flex justify-end">
+                  <Button type="button" onClick={() => setStep(2)}>
+                    Continue to Medical History
+                  </Button>
+                </CardFooter>
+              </Card>
+            )}
 
-              <div className="space-y-2">
-                <div className="flex items-center space-x-2">
-                  <Checkbox id="consent" required />
-                  <Label htmlFor="consent" className="text-sm">
-                    I consent to sharing this anonymized information with medical professionals for guidance purposes.
-                  </Label>
-                </div>
-                <div className="flex items-center space-x-2">
-                  <Checkbox id="terms" required />
-                  <Label htmlFor="terms" className="text-sm">
-                    I agree to the{" "}
-                    <Link href="/terms" className="text-primary underline">
-                      Terms of Service
-                    </Link>{" "}
-                    and{" "}
-                    <Link href="/privacy" className="text-primary underline">
-                      Privacy Policy
-                    </Link>
-                    .
-                  </Label>
-                </div>
-              </div>
-            </CardContent>
-            <CardFooter className="flex justify-between">
-              <Button type="button" variant="outline" onClick={() => setStep(2)}>
-                Back
-              </Button>
-              <Button type="submit">Submit Case</Button>
-            </CardFooter>
-          </Card>
+            {step === 2 && (
+              <Card>
+                <CardHeader>
+                  <CardTitle>Medical History</CardTitle>
+                  <CardDescription>This information helps clinicians provide more accurate guidance.</CardDescription>
+                </CardHeader>
+                <CardContent className="space-y-6">
+                  <div className="space-y-2">
+                    <Label htmlFor="age">Age</Label>
+                    <Input id="age" type="number" placeholder="Your age" min="0" max="120" required />
+                  </div>
+
+                  <div className="space-y-2">
+                    <Label htmlFor="gender">Gender</Label>
+                    <RadioGroup defaultValue="female">
+                      <div className="flex flex-wrap gap-4">
+                        <div className="flex items-center space-x-2">
+                          <RadioGroupItem value="female" id="female" />
+                          <Label htmlFor="female">Female</Label>
+                        </div>
+                        <div className="flex items-center space-x-2">
+                          <RadioGroupItem value="male" id="male" />
+                          <Label htmlFor="male">Male</Label>
+                        </div>
+                        <div className="flex items-center space-x-2">
+                          <RadioGroupItem value="non-binary" id="non-binary" />
+                          <Label htmlFor="non-binary">Non-binary</Label>
+                        </div>
+                        <div className="flex items-center space-x-2">
+                          <RadioGroupItem value="other" id="other" />
+                          <Label htmlFor="other">Other</Label>
+                        </div>
+                      </div>
+                    </RadioGroup>
+                  </div>
+
+                  <div className="space-y-2">
+                    <Label>Do you have any of the following conditions?</Label>
+                    <div className="grid grid-cols-2 gap-2">
+                      <div className="flex items-center space-x-2">
+                        <Checkbox id="diabetes" />
+                        <Label htmlFor="diabetes">Diabetes</Label>
+                      </div>
+                      <div className="flex items-center space-x-2">
+                        <Checkbox id="hypertension" />
+                        <Label htmlFor="hypertension">Hypertension</Label>
+                      </div>
+                      <div className="flex items-center space-x-2">
+                        <Checkbox id="heart-disease" />
+                        <Label htmlFor="heart-disease">Heart Disease</Label>
+                      </div>
+                      <div className="flex items-center space-x-2">
+                        <Checkbox id="asthma" />
+                        <Label htmlFor="asthma">Asthma</Label>
+                      </div>
+                      <div className="flex items-center space-x-2">
+                        <Checkbox id="cancer" />
+                        <Label htmlFor="cancer">Cancer</Label>
+                      </div>
+                      <div className="flex items-center space-x-2">
+                        <Checkbox id="autoimmune" />
+                        <Label htmlFor="autoimmune">Autoimmune Disorder</Label>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className="space-y-2">
+                    <Label htmlFor="medications">Current Medications</Label>
+                    <Textarea id="medications" placeholder="List any medications you're currently taking" rows={3} />
+                  </div>
+
+                  <div className="space-y-2">
+                    <Label htmlFor="allergies">Allergies</Label>
+                    <Textarea id="allergies" placeholder="List any allergies you have" rows={2} />
+                  </div>
+                </CardContent>
+                <CardFooter className="flex justify-between">
+                  <Button type="button" variant="outline" onClick={() => setStep(1)}>
+                    Back
+                  </Button>
+                  <Button type="button" onClick={() => setStep(3)}>
+                    Continue to Review
+                  </Button>
+                </CardFooter>
+              </Card>
+            )}
+
+            {step === 3 && (
+              <Card>
+                <CardHeader>
+                  <CardTitle>Review Your Information</CardTitle>
+                  <CardDescription>Please review the information you've provided before submitting.</CardDescription>
+                </CardHeader>
+                <CardContent className="space-y-6">
+                  <div className="rounded-lg bg-muted p-4 flex items-start gap-3">
+                    <LucideInfo className="h-5 w-5 text-primary flex-shrink-0 mt-0.5" />
+                    <div>
+                      <p className="text-sm font-medium">Important Information</p>
+                      <p className="text-sm text-muted-foreground mt-1">
+                        The guidance you receive is not a medical diagnosis. Always consult with your healthcare provider
+                        for official medical advice.
+                      </p>
+                    </div>
+                  </div>
+
+                  <div className="space-y-4">
+                    <div>
+                      <h3 className="text-sm font-medium mb-2">Symptoms</h3>
+                      <div className="rounded-lg border p-3">
+                        <p className="text-sm">Primary concern: {primaryConcern || "[Sample symptom description]"}</p>
+                        <p className="text-sm mt-2">
+                          Duration: {symptomDuration || "2"} {durationUnit || "weeks"}
+                        </p>
+                        <p className="text-sm mt-2">
+                          Additional symptoms: {additionalSymptoms || "[Sample additional symptoms]"}
+                        </p>
+                      </div>
+                    </div>
+
+                    <div>
+                      <h3 className="text-sm font-medium mb-2">Medical History</h3>
+                      <div className="rounded-lg border p-3">
+                        <p className="text-sm">Age: 35</p>
+                        <p className="text-sm mt-2">Gender: Female</p>
+                        <p className="text-sm mt-2">Conditions: Asthma</p>
+                        <p className="text-sm mt-2">Medications: [Sample medications]</p>
+                        <p className="text-sm mt-2">Allergies: [Sample allergies]</p>
+                      </div>
+                    </div>
+
+                    {uploadedImages.length > 0 && (
+                      <div>
+                        <h3 className="text-sm font-medium mb-2">Uploaded Images ({uploadedImages.length})</h3>
+                        <div className="grid grid-cols-4 gap-2">
+                          {uploadedImages.map((img, index) => (
+                            <div key={index} className="relative aspect-square rounded-md overflow-hidden">
+                              <img
+                                src={URL.createObjectURL(img) || "/placeholder.svg"}
+                                alt={`Uploaded image ${index + 1}`}
+                                className="object-cover w-full h-full"
+                              />
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+                    )}
+
+                    {aiAnalysisResult && (
+                      <div>
+                        <h3 className="text-sm font-medium mb-2">AI Analysis Results</h3>
+                        <div className="rounded-lg border p-3">
+                          <div className="flex items-center gap-2 mb-2">
+                            <LucideBrain className="h-4 w-4 text-primary" />
+                            <p className="text-sm font-medium">Preliminary Assessment</p>
+                          </div>
+
+                          {aiAnalysisResult.differentialDiagnosis && (
+                            <div className="mt-2">
+                              <p className="text-xs text-muted-foreground mb-1">Possible conditions:</p>
+                              <ul className="text-sm space-y-1">
+                                {aiAnalysisResult.differentialDiagnosis.slice(0, 3).map((diagnosis: any, index: number) => (
+                                  <li key={index} className="flex items-center gap-1">
+                                    <div className="h-1.5 w-1.5 rounded-full bg-primary"></div>
+                                    <span>
+                                      {diagnosis.condition} ({diagnosis.confidence})
+                                    </span>
+                                  </li>
+                                ))}
+                              </ul>
+                            </div>
+                          )}
+
+                          {aiAnalysisResult.suggestedTests && (
+                            <div className="mt-2">
+                              <p className="text-xs text-muted-foreground">
+                                This is a preliminary AI assessment only. Medical professionals will review your case.
+                              </p>
+                            </div>
+                          )}
+                        </div>
+                      </div>
+                    )}
+                  </div>
+
+                  <div className="space-y-2">
+                    <div className="flex items-center space-x-2">
+                      <Checkbox id="consent" required />
+                      <Label htmlFor="consent" className="text-sm">
+                        I consent to sharing this anonymized information with medical professionals for guidance purposes.
+                      </Label>
+                    </div>
+                    <div className="flex items-center space-x-2">
+                      <Checkbox id="terms" required />
+                      <Label htmlFor="terms" className="text-sm">
+                        I agree to the{" "}
+                        <Link href="/terms" className="text-primary underline">
+                          Terms of Service
+                        </Link>{" "}
+                        and{" "}
+                        <Link href="/privacy" className="text-primary underline">
+                          Privacy Policy
+                        </Link>
+                        .
+                      </Label>
+                    </div>
+                  </div>
+                </CardContent>
+                <CardFooter className="flex justify-between">
+                  <Button type="button" variant="outline" onClick={() => setStep(2)}>
+                    Back
+                  </Button>
+                  <Button type="submit">Submit Case</Button>
+                </CardFooter>
+              </Card>
+            )}
+          </>
         )}
       </form>
     </div>
   )
 }
+
 

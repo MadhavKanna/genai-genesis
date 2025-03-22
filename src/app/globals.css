@@ -59,6 +59,7 @@ body {
     --sidebar-border: 220 13% 91%;
     --sidebar-ring: 217.2 91.2% 59.8%;
   }
+
   .dark {
     --background: 0 0% 3.9%;
     --foreground: 0 0% 98%;
@@ -99,6 +100,7 @@ body {
   * {
     @apply border-border;
   }
+
   body {
     @apply bg-background text-foreground;
     font-family: "Inter", system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial,
@@ -197,9 +199,11 @@ body {
   0% {
     box-shadow: 9984px 0 0 -5px;
   }
+
   30% {
     box-shadow: 9984px 0 0 2px;
   }
+
   60%,
   100% {
     box-shadow: 9984px 0 0 -5px;
@@ -210,9 +214,11 @@ body {
   0% {
     box-shadow: 9999px 0 0 -5px;
   }
+
   30% {
     box-shadow: 9999px 0 0 2px;
   }
+
   60%,
   100% {
     box-shadow: 9999px 0 0 -5px;
@@ -223,9 +229,11 @@ body {
   0% {
     box-shadow: 10014px 0 0 -5px;
   }
+
   30% {
     box-shadow: 10014px 0 0 2px;
   }
+
   60%,
   100% {
     box-shadow: 10014px 0 0 -5px;
@@ -261,3 +269,91 @@ body {
   }
 }
 
+/* Gemini Loading Animation */
+.gemini-stars {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  position: relative;
+  width: 24px;
+  height: 48px;
+  margin: 0 auto;
+}
+
+.gemini-star {
+  width: 12px;
+  height: 12px;
+  position: relative;
+  animation: gemini-shine 1.5s infinite;
+}
+
+.gemini-star::before,
+.gemini-star::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: currentColor;
+  clip-path: polygon(50% 0%,
+      /* Top point */
+      60% 35%,
+      /* Upper right */
+      100% 50%,
+      /* Right point */
+      60% 65%,
+      /* Lower right */
+      50% 100%,
+      /* Bottom point */
+      40% 65%,
+      /* Lower left */
+      0% 50%,
+      /* Left point */
+      40% 35%
+      /* Upper left */
+    );
+  border-radius: 50%;
+  /* Softens the edges for a rounded look */
+}
+
+/* Position the stars in a triangular arrangement */
+.gemini-star:nth-child(1) {
+  color: #ea4335;
+  /* Google Red */
+  animation-delay: 0s;
+  margin-left: 6px;
+  /* Offset the top star slightly to the right */
+}
+
+.gemini-star:nth-child(2) {
+  color: #8e2de2;
+  /* Purple */
+  animation-delay: 0.2s;
+  margin-left: -6px;
+  /* Offset the center star slightly to the left */
+}
+
+.gemini-star:nth-child(3) {
+  color: #4285f4;
+  /* Google Blue */
+  animation-delay: 0.4s;
+  margin-left: 6px;
+  /* Offset the bottom star slightly to the right */
+}
+
+@keyframes gemini-shine {
+
+  0%,
+  100% {
+    opacity: 0.2;
+    transform: scale(0.8);
+  }
+
+  50% {
+    opacity: 1;
+    transform: scale(1.2);
+  }
+}

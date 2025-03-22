@@ -6,6 +6,7 @@ import { Textarea } from "@/components/ui/textarea"
 import { LucideMic, LucideStopCircle, LucideVolume2 } from "lucide-react"
 
 interface VoiceInputProps {
+  id?: string
   placeholder?: string
   value: string
   onChange: (value: string) => void
@@ -15,6 +16,7 @@ interface VoiceInputProps {
 }
 
 export function VoiceInput({
+  id,
   placeholder = "Speak or type your message...",
   value,
   onChange,
@@ -152,4 +154,5 @@ export function VoiceInput({
     </div>
   )
 }
+
 
