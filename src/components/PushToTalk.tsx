@@ -5,7 +5,6 @@ import { Box, Typography, CircularProgress, Alert } from "@mui/material";
 import MicIcon from "@mui/icons-material/Mic";
 import StopIcon from "@mui/icons-material/Stop";
 import { functions } from "@/firebase";
-import { httpsCallable } from "firebase/functions";
 
 interface PushToTalkProps {
   languageCode?: string;
@@ -21,8 +20,6 @@ const PushToTalk: React.FC<PushToTalkProps> = ({ languageCode = "en-US" }) => {
   const audioChunksRef = useRef<Blob[]>([]);
   const audioRef = useRef<HTMLAudioElement | null>(null);
   const buttonRef = useRef<HTMLButtonElement>(null);
-
-  const processAudioFunction = httpsCallable(functions, "processAudio");
 
   useEffect(() => {
     return () => {
@@ -89,29 +86,50 @@ const PushToTalk: React.FC<PushToTalkProps> = ({ languageCode = "en-US" }) => {
         const base64Audio = reader.result as string;
         const base64Data = base64Audio.split(",")[1];
 
-        console.log("Sending audio to Firebase Function...");
-        const result = await processAudioFunction({
-          audioBase64: base64Data,
-          languageCode,
-        });
+        console.log("Audio data size:", base64Data.length);
+        console.log("Language code:", languageCode);
 
-        console.log("Received response from Firebase Function");
-        const data = result.data as {
-          transcription: string;
-          aiResponse: string;
-          audioResponse: string;
-        };
+        try {
+          // Get the function URL from the Firebase Functions instance
+          const functionUrl = `http://localhost:5001/${functions.app.options.projectId}/us-central1/processAudio`;
+          console.log("Calling function at:", functionUrl);
 
-        setTranscription(data.transcription);
-        setAiResponse(data.aiResponse);
+          const response = await fetch(functionUrl, {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+              audioBase64: base64Data,
+              languageCode: languageCode,
+            }),
+          });
 
-        // Play the audio response
-        if (data.audioResponse) {
-          const audio = new Audio(
-            `data:audio/mp3;base64,${data.audioResponse}`
-          );
-          audioRef.current = audio;
-          await audio.play();
+          if (!response.ok) {
+            const errorData = await response.json();
+            throw new Error(errorData.error || "Failed to process audio");
+          }
+
+          const data = await response.json();
+          console.log("Function call successful:", data);
+
+          setTranscription(data.transcription);
+          setAiResponse(data.aiResponse);
+
+          if (data.audioResponse) {
+            const audio = new Audio(
+              `data:audio/mp3;base64,${data.audioResponse}`
+            );
+            audioRef.current = audio;
+            await audio.play();
+          }
+        } catch (functionError: any) {
+          console.error("Firebase Function error details:", {
+            code: functionError.code,
+            message: functionError.message,
+            details: functionError.details,
+          });
+          throw functionError;
         }
       };
     } catch (error) {

@@ -1,16 +1,16 @@
 // Import the Genkit core libraries and plugins.
-import {genkit, z} from "genkit";
-import {vertexAI} from "@genkit-ai/vertexai";
+import { genkit, z } from "genkit";
+import { vertexAI } from "@genkit-ai/vertexai";
 
 // Import models from the Vertex AI plugin. The Vertex AI API provides access to
 // several generative models. Here, we import Gemini 1.5 Flash.
-import {gemini15Flash} from "@genkit-ai/vertexai";
+import { gemini15Flash } from "@genkit-ai/vertexai";
 
 // Cloud Functions for Firebase supports Genkit natively. The onCallGenkit function creates a callable
 // function from a Genkit action. It automatically implements streaming if your flow does.
 // The https library also has other utility methods such as hasClaim, which verifies that
 // a caller's token has a specific claim (optionally matching a specific value)
-import { onCallGenkit, hasClaim } from "firebase-functions/https";
+import { onCallGenkit } from "firebase-functions/https";
 
 // Genkit models generally depend on an API key. APIs should be stored in Cloud Secret Manager so that
 // access to these sensitive values can be controlled. defineSecret does this for you automatically.
@@ -23,20 +23,21 @@ const ai = genkit({
     // Load the Vertex AI plugin. You can optionally specify your project ID
     // by passing in a config object; if you don't, the Vertex AI plugin uses
     // the value from the GCLOUD_PROJECT environment variable.
-    vertexAI({location: "us-central1"}),
+    vertexAI(),
   ],
 });
 
 // Define a simple flow that prompts an LLM to generate menu suggestions.
-const menuSuggestionFlow = ai.defineFlow({
+const menuSuggestionFlow = ai.defineFlow(
+  {
     name: "menuSuggestionFlow",
     inputSchema: z.string().describe("A restaurant theme").default("seafood"),
     outputSchema: z.string(),
     streamSchema: z.string(),
-  }, async (subject, { sendChunk }) => {
+  },
+  async (subject, { sendChunk }) => {
     // Construct a request and send it to the model API.
-    const prompt =
-      `Suggest an item for the menu of a ${subject} themed restaurant`;
+    const prompt = `Suggest an item for the menu of a ${subject} themed restaurant`;
     const { response, stream } = ai.generateStream({
       model: gemini15Flash,
       prompt: prompt,
@@ -57,16 +58,19 @@ const menuSuggestionFlow = ai.defineFlow({
   }
 );
 
-export const menuSuggestion = onCallGenkit({
-  // Uncomment to enable AppCheck. This can reduce costs by ensuring only your Verified
-  // app users can use your API. Read more at https://firebase.google.com/docs/app-check/cloud-functions
-  // enforceAppCheck: true,
+export const menuSuggestion = onCallGenkit(
+  {
+    // Uncomment to enable AppCheck. This can reduce costs by ensuring only your Verified
+    // app users can use your API. Read more at https://firebase.google.com/docs/app-check/cloud-functions
+    // enforceAppCheck: true,
 
-  // authPolicy can be any callback that accepts an AuthData (a uid and tokens dictionary) and the
-  // request data. The isSignedIn() and hasClaim() helpers can be used to simplify. The following
-  // will require the user to have the email_verified claim, for example.
-  // authPolicy: hasClaim("email_verified"),
+    // authPolicy can be any callback that accepts an AuthData (a uid and tokens dictionary) and the
+    // request data. The isSignedIn() and hasClaim() helpers can be used to simplify. The following
+    // will require the user to have the email_verified claim, for example.
+    // authPolicy: hasClaim("email_verified"),
 
-  // Grant access to the API key to this function:
-  secrets: [apiKey],
-}, menuSuggestionFlow);
+    // Grant access to the API key to this function:
+    secrets: [apiKey],
+  },
+  menuSuggestionFlow
+);
