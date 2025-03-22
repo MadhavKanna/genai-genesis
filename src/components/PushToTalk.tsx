@@ -1,57 +1,208 @@
 "use client";
 
 import React, { useState, useRef, useEffect } from "react";
-import { Box, Typography, CircularProgress, Alert } from "@mui/material";
+import {
+  Box,
+  Typography,
+  CircularProgress,
+  Alert,
+  Select,
+  MenuItem,
+  FormControl,
+  InputLabel,
+} from "@mui/material";
 import MicIcon from "@mui/icons-material/Mic";
 import StopIcon from "@mui/icons-material/Stop";
 import { functions } from "@/firebase";
+
+// Add Web Speech API type definitions
+declare global {
+  interface Window {
+    webkitSpeechRecognition: any;
+  }
+}
+
+interface SpeechRecognitionEvent {
+  results: SpeechRecognitionResultList;
+}
+
+interface SpeechRecognitionResultList {
+  [key: number]: SpeechRecognitionResult;
+  length: number;
+  item(index: number): SpeechRecognitionResult;
+  [Symbol.iterator](): Iterator<SpeechRecognitionResult>;
+}
+
+interface SpeechRecognitionResult {
+  [key: number]: SpeechRecognitionAlternative;
+  isFinal: boolean;
+  length: number;
+  item(index: number): SpeechRecognitionResult;
+  [Symbol.iterator](): Iterator<SpeechRecognitionResult>;
+}
+
+interface SpeechRecognitionAlternative {
+  transcript: string;
+  confidence: number;
+}
+
+interface SpeechRecognitionError {
+  error: string;
+}
+
+interface SpeechRecognition {
+  continuous: boolean;
+  interimResults: boolean;
+  lang: string;
+  start: () => void;
+  stop: () => void;
+  onresult: (event: SpeechRecognitionEvent) => void;
+  onerror: (event: SpeechRecognitionError) => void;
+}
 
 interface PushToTalkProps {
   languageCode?: string;
 }
 
+// Add supported languages
+const SUPPORTED_LANGUAGES = [
+  { code: "en-US", name: "English (US)" },
+  { code: "es-ES", name: "Spanish (Spain)" },
+  { code: "fr-FR", name: "French" },
+  { code: "de-DE", name: "German" },
+  { code: "it-IT", name: "Italian" },
+  { code: "pt-BR", name: "Portuguese (Brazil)" },
+  { code: "ja-JP", name: "Japanese" },
+  { code: "ko-KR", name: "Korean" },
+  { code: "zh-CN", name: "Chinese (Simplified)" },
+  { code: "ru-RU", name: "Russian" },
+  { code: "hi-IN", name: "Hindi" },
+  { code: "ar-SA", name: "Arabic" },
+  { code: "nl-NL", name: "Dutch" },
+  { code: "pl-PL", name: "Polish" },
+  { code: "tr-TR", name: "Turkish" },
+  { code: "vi-VN", name: "Vietnamese" },
+  { code: "th-TH", name: "Thai" },
+  { code: "id-ID", name: "Indonesian" },
+  { code: "ms-MY", name: "Malay" },
+  { code: "fil-PH", name: "Filipino" },
+];
+
 const PushToTalk: React.FC<PushToTalkProps> = ({ languageCode = "en-US" }) => {
+  const [selectedLanguage, setSelectedLanguage] = useState(languageCode);
   const [isRecording, setIsRecording] = useState(false);
   const [isProcessing, setIsProcessing] = useState(false);
   const [transcription, setTranscription] = useState("");
   const [aiResponse, setAiResponse] = useState("");
+  const [streamingResponse, setStreamingResponse] = useState("");
   const [error, setError] = useState<string | null>(null);
   const mediaRecorderRef = useRef<MediaRecorder | null>(null);
   const audioChunksRef = useRef<Blob[]>([]);
   const audioRef = useRef<HTMLAudioElement | null>(null);
   const buttonRef = useRef<HTMLButtonElement>(null);
+  const recognitionRef = useRef<SpeechRecognition | null>(null);
 
   useEffect(() => {
+    // Initialize speech recognition
+    if (typeof window !== "undefined" && "webkitSpeechRecognition" in window) {
+      console.log("Initializing speech recognition...");
+      const recognition = new (window.webkitSpeechRecognition as any)();
+      recognition.continuous = true;
+      recognition.interimResults = true;
+      recognition.lang = languageCode;
+
+      recognition.onstart = () => {
+        console.log("Speech recognition started");
+      };
+
+      recognition.onend = () => {
+        console.log("Speech recognition ended");
+      };
+
+      recognition.onresult = (event: SpeechRecognitionEvent) => {
+        console.log("Speech recognition result:", event.results);
+        const results = Array.from(event.results);
+        const lastResult = results[results.length - 1];
+        const transcript = lastResult[0].transcript;
+
+        console.log("Current transcript:", transcript);
+        console.log("Is final:", lastResult.isFinal);
+
+        setTranscription(transcript);
+      };
+
+      recognition.onerror = (event: SpeechRecognitionError) => {
+        console.error("Speech recognition error:", event.error);
+        setError("Speech recognition error occurred");
+      };
+
+      recognitionRef.current = recognition;
+    } else {
+      console.error("Speech recognition not supported in this browser");
+      setError(
+        "Speech recognition is not supported in your browser. Please use Chrome or Edge."
+      );
+    }
+
     return () => {
-      if (
-        mediaRecorderRef.current &&
-        mediaRecorderRef.current.state === "recording"
-      ) {
+      if (recognitionRef.current) {
+        recognitionRef.current.stop();
+      }
+      if (mediaRecorderRef.current?.state === "recording") {
         mediaRecorderRef.current.stop();
       }
     };
-  }, []);
+  }, [languageCode]);
 
   const startRecording = async () => {
     try {
       setError(null);
-      const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
-      const mediaRecorder = new MediaRecorder(stream);
+      setTranscription("");
+      setAiResponse("");
+      setStreamingResponse("");
+
+      // Start speech recognition
+      if (recognitionRef.current) {
+        console.log("Starting speech recognition...");
+        recognitionRef.current.start();
+      } else {
+        console.error("Speech recognition not initialized");
+        setError("Speech recognition not initialized");
+        return;
+      }
+
+      // Start audio recording
+      const stream = await navigator.mediaDevices.getUserMedia({
+        audio: {
+          channelCount: 1,
+          sampleRate: 48000,
+          sampleSize: 16,
+          echoCancellation: true,
+          noiseSuppression: true,
+        },
+      });
+      const mediaRecorder = new MediaRecorder(stream, {
+        mimeType: "audio/webm;codecs=opus",
+        audioBitsPerSecond: 48000,
+      });
       mediaRecorderRef.current = mediaRecorder;
       audioChunksRef.current = [];
 
       mediaRecorder.ondataavailable = (event) => {
-        audioChunksRef.current.push(event.data);
+        if (event.data.size > 0) {
+          audioChunksRef.current.push(event.data);
+        }
       };
 
       mediaRecorder.onstop = async () => {
         const audioBlob = new Blob(audioChunksRef.current, {
-          type: "audio/webm",
+          type: "audio/webm;codecs=opus",
         });
         await processAudio(audioBlob);
       };
 
-      mediaRecorder.start();
+      // Request data every 100ms
+      mediaRecorder.start(100);
       setIsRecording(true);
       buttonRef.current?.classList.add("recording");
     } catch (error) {
@@ -63,6 +214,10 @@ const PushToTalk: React.FC<PushToTalkProps> = ({ languageCode = "en-US" }) => {
   };
 
   const stopRecording = () => {
+    if (recognitionRef.current) {
+      recognitionRef.current.stop();
+    }
+
     if (
       mediaRecorderRef.current &&
       mediaRecorderRef.current.state === "recording"
@@ -87,12 +242,13 @@ const PushToTalk: React.FC<PushToTalkProps> = ({ languageCode = "en-US" }) => {
         const base64Data = base64Audio.split(",")[1];
 
         console.log("Audio data size:", base64Data.length);
-        console.log("Language code:", languageCode);
+        console.log("Audio format:", audioBlob.type);
+        console.log("Audio blob size:", audioBlob.size);
 
         try {
-          // Get the function URL from the Firebase Functions instance
           const functionUrl = `http://localhost:5001/${functions.app.options.projectId}/us-central1/processAudio`;
-          console.log("Calling function at:", functionUrl);
+          console.log("Sending request to:", functionUrl);
+          console.log("Language code:", selectedLanguage);
 
           const response = await fetch(functionUrl, {
             method: "POST",
@@ -101,27 +257,24 @@ const PushToTalk: React.FC<PushToTalkProps> = ({ languageCode = "en-US" }) => {
             },
             body: JSON.stringify({
               audioBase64: base64Data,
-              languageCode: languageCode,
+              languageCode: selectedLanguage,
             }),
           });
 
           if (!response.ok) {
             const errorData = await response.json();
+            console.error("Server error response:", errorData);
             throw new Error(errorData.error || "Failed to process audio");
           }
 
           const data = await response.json();
-          console.log("Function call successful:", data);
-
-          setTranscription(data.transcription);
           setAiResponse(data.aiResponse);
 
+          // Start audio playback immediately
           if (data.audioResponse) {
-            // The audioResponse is already a complete data URL from the server
             const audio = new Audio(data.audioResponse);
             audioRef.current = audio;
 
-            // Add error handling for audio playback
             audio.onerror = (e) => {
               console.error("Audio playback error:", e);
               setError("Failed to play audio response");
@@ -133,6 +286,16 @@ const PushToTalk: React.FC<PushToTalkProps> = ({ languageCode = "en-US" }) => {
               console.error("Error playing audio:", playError);
               setError("Failed to play audio response");
             }
+          }
+
+          // Simulate streaming response
+          const words = data.aiResponse.split(" ");
+          setStreamingResponse("");
+          for (let i = 0; i < words.length; i++) {
+            setStreamingResponse(
+              (prev) => prev + (i > 0 ? " " : "") + words[i]
+            );
+            await new Promise((resolve) => setTimeout(resolve, 100)); // Adjust timing as needed
           }
         } catch (functionError: any) {
           console.error("Firebase Function error details:", {
@@ -155,6 +318,14 @@ const PushToTalk: React.FC<PushToTalkProps> = ({ languageCode = "en-US" }) => {
     }
   };
 
+  const handleLanguageChange = (event: any) => {
+    const newLanguage = event.target.value;
+    setSelectedLanguage(newLanguage);
+    if (recognitionRef.current) {
+      recognitionRef.current.lang = newLanguage;
+    }
+  };
+
   return (
     <Box
       sx={{
@@ -164,6 +335,22 @@ const PushToTalk: React.FC<PushToTalkProps> = ({ languageCode = "en-US" }) => {
         gap: 3,
       }}
     >
+      <FormControl sx={{ minWidth: 200 }}>
+        <InputLabel>Language</InputLabel>
+        <Select
+          value={selectedLanguage}
+          label="Language"
+          onChange={handleLanguageChange}
+          disabled={isRecording}
+        >
+          {SUPPORTED_LANGUAGES.map((lang) => (
+            <MenuItem key={lang.code} value={lang.code}>
+              {lang.name}
+            </MenuItem>
+          ))}
+        </Select>
+      </FormControl>
+
       {error && (
         <Alert severity="error" sx={{ width: "100%" }}>
           {error}
@@ -208,7 +395,7 @@ const PushToTalk: React.FC<PushToTalkProps> = ({ languageCode = "en-US" }) => {
         </Box>
       )}
 
-      {aiResponse && (
+      {streamingResponse && (
         <Box
           sx={{
             mt: 2,
@@ -222,7 +409,7 @@ const PushToTalk: React.FC<PushToTalkProps> = ({ languageCode = "en-US" }) => {
           <Typography variant="h6" sx={{ mb: 1, color: "secondary.main" }}>
             AI Response:
           </Typography>
-          <Typography>{aiResponse}</Typography>
+          <Typography>{streamingResponse}</Typography>
         </Box>
       )}
 

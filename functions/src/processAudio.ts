@@ -85,41 +85,84 @@ export const processAudio = functions.https.onRequest(async (req, res) => {
       // Process with Gemini
       console.log("Starting Gemini processing");
       const { text } = await ai.generate(transcription);
-      const aiResponse = text;
-      console.log("Gemini processing completed", { aiResponse });
+      const aiResponse = text?.trim();
+
+      if (!aiResponse) {
+        console.error("No response generated from Gemini");
+        res.status(400).json({
+          error: "No response generated from AI",
+          details: "The AI model returned an empty response",
+        });
+        return;
+      }
+
+      console.log("Gemini processing completed", {
+        aiResponse,
+        aiResponseLength: aiResponse.length,
+        aiResponseType: typeof aiResponse,
+      });
 
       // Text-to-Speech
       console.log("Starting text-to-speech conversion");
-      const [ttsResponse] = await ttsClient.synthesizeSpeech({
-        input: { text: aiResponse },
-        voice: {
-          languageCode: languageCode.split("-")[0],
-          ssmlGender: "NEUTRAL",
-        },
-        audioConfig: { audioEncoding: "MP3" },
-      });
+      try {
+        // Clean the text while preserving Hindi characters
+        const ttsText = aiResponse
+          .replace(/[\u0000-\u001F\u007F-\u009F]/g, "") // Remove control characters
+          .replace(/\n/g, " ") // Replace newlines with spaces
+          .replace(/\s+/g, " ") // Replace multiple spaces with single space
+          .replace(/[*_]/g, "") // Remove markdown formatting
+          .trim();
 
-      console.log("Text-to-speech completed", {
-        audioContentLength: ttsResponse.audioContent?.length,
-      });
+        if (!ttsText) {
+          throw new Error("Invalid text for text-to-speech conversion");
+        }
 
-      // Convert audio content to base64 and create a data URL
-      const audioContent = ttsResponse.audioContent;
-      if (!audioContent) {
-        throw new Error(
-          "No audio content received from text-to-speech service"
+        console.log("Preparing TTS request with text:", {
+          textLength: ttsText.length,
+          textPreview: ttsText.substring(0, 100) + "...",
+          languageCode: languageCode,
+        });
+
+        const [ttsResponse] = await ttsClient.synthesizeSpeech({
+          input: { text: ttsText },
+          voice: {
+            languageCode: languageCode,
+            ssmlGender: "NEUTRAL",
+          },
+          audioConfig: { audioEncoding: "MP3" },
+        });
+
+        console.log("Text-to-speech completed", {
+          audioContentLength: ttsResponse.audioContent?.length,
+        });
+
+        // Convert audio content to base64 and create a data URL
+        const audioContent = ttsResponse.audioContent;
+        if (!audioContent) {
+          throw new Error(
+            "No audio content received from text-to-speech service"
+          );
+        }
+        const ttsAudioBase64 = Buffer.from(audioContent as Uint8Array).toString(
+          "base64"
         );
-      }
-      const ttsAudioBase64 = Buffer.from(audioContent as Uint8Array).toString(
-        "base64"
-      );
-      const audioDataUrl = `data:audio/mp3;base64,${ttsAudioBase64}`;
+        const audioDataUrl = `data:audio/mp3;base64,${ttsAudioBase64}`;
 
-      res.json({
-        transcription,
-        aiResponse,
-        audioResponse: audioDataUrl,
-      });
+        res.json({
+          transcription,
+          aiResponse: ttsText, // Send the cleaned text back
+          audioResponse: audioDataUrl,
+        });
+      } catch (ttsError) {
+        console.error("Text-to-speech error:", ttsError);
+        res.status(500).json({
+          error: "Error generating speech",
+          details:
+            ttsError instanceof Error
+              ? ttsError.message
+              : "Failed to generate speech",
+        });
+      }
     } catch (error) {
       console.error("Error processing audio:", error);
       res.status(500).json({
