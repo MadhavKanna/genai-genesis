@@ -117,11 +117,22 @@ const PushToTalk: React.FC<PushToTalkProps> = ({ languageCode = "en-US" }) => {
           setAiResponse(data.aiResponse);
 
           if (data.audioResponse) {
-            const audio = new Audio(
-              `data:audio/mp3;base64,${data.audioResponse}`
-            );
+            // The audioResponse is already a complete data URL from the server
+            const audio = new Audio(data.audioResponse);
             audioRef.current = audio;
-            await audio.play();
+
+            // Add error handling for audio playback
+            audio.onerror = (e) => {
+              console.error("Audio playback error:", e);
+              setError("Failed to play audio response");
+            };
+
+            try {
+              await audio.play();
+            } catch (playError) {
+              console.error("Error playing audio:", playError);
+              setError("Failed to play audio response");
+            }
           }
         } catch (functionError: any) {
           console.error("Firebase Function error details:", {

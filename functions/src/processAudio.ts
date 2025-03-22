@@ -103,10 +103,22 @@ export const processAudio = functions.https.onRequest(async (req, res) => {
         audioContentLength: ttsResponse.audioContent?.length,
       });
 
+      // Convert audio content to base64 and create a data URL
+      const audioContent = ttsResponse.audioContent;
+      if (!audioContent) {
+        throw new Error(
+          "No audio content received from text-to-speech service"
+        );
+      }
+      const ttsAudioBase64 = Buffer.from(audioContent as Uint8Array).toString(
+        "base64"
+      );
+      const audioDataUrl = `data:audio/mp3;base64,${ttsAudioBase64}`;
+
       res.json({
         transcription,
         aiResponse,
-        audioResponse: ttsResponse.audioContent?.toString(),
+        audioResponse: audioDataUrl,
       });
     } catch (error) {
       console.error("Error processing audio:", error);
