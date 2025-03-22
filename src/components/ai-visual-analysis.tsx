@@ -1,25 +1,40 @@
-"use client"
+"use client";
 
-import { useState } from "react"
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import { Badge } from "@/components/ui/badge"
-import { Button } from "@/components/ui/button"
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
-import { LucideBrain, LucideZoomIn, LucideInfo } from "lucide-react"
+import { useState } from "react";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/src/components/ui/card";
+import { Badge } from "@/src/components/ui/badge";
+import { Button } from "@/src/components/ui/button";
+import {
+  Tabs,
+  TabsContent,
+  TabsList,
+  TabsTrigger,
+} from "@/src/components/ui/tabs";
+import { LucideBrain, LucideZoomIn, LucideInfo } from "lucide-react";
 
 interface AIVisualAnalysisProps {
   images: Array<{
-    id: string | number
-    url: string
-    description?: string
-  }>
-  symptoms: string[]
-  className?: string
+    id: string | number;
+    url: string;
+    description?: string;
+  }>;
+  symptoms: string[];
+  className?: string;
 }
 
-export function AIVisualAnalysis({ images, symptoms, className = "" }: AIVisualAnalysisProps) {
-  const [activeTab, setActiveTab] = useState("summary")
-  const [selectedImage, setSelectedImage] = useState(images[0]?.id || null)
+export function AIVisualAnalysis({
+  images,
+  symptoms,
+  className = "",
+}: AIVisualAnalysisProps) {
+  const [activeTab, setActiveTab] = useState("summary");
+  const [selectedImage, setSelectedImage] = useState(images[0]?.id || null);
 
   // Mock AI analysis data - in a real app, this would come from an API call to a model
   const aiAnalysis = {
@@ -33,11 +48,24 @@ export function AIVisualAnalysis({ images, symptoms, className = "" }: AIVisualA
         {
           name: "Atopic Dermatitis",
           probability: 0.65,
-          description: "Chronic skin condition characterized by itchy, inflamed skin",
+          description:
+            "Chronic skin condition characterized by itchy, inflamed skin",
         },
-        { name: "Urticaria (Hives)", probability: 0.45, description: "Skin reaction causing red, itchy, raised welts" },
-        { name: "Drug Eruption", probability: 0.35, description: "Adverse reaction to medication causing skin rash" },
-        { name: "Psoriasis", probability: 0.25, description: "Chronic skin condition causing rapid skin cell buildup" },
+        {
+          name: "Urticaria (Hives)",
+          probability: 0.45,
+          description: "Skin reaction causing red, itchy, raised welts",
+        },
+        {
+          name: "Drug Eruption",
+          probability: 0.35,
+          description: "Adverse reaction to medication causing skin rash",
+        },
+        {
+          name: "Psoriasis",
+          probability: 0.25,
+          description: "Chronic skin condition causing rapid skin cell buildup",
+        },
       ],
       keyFindings: [
         "Erythematous (red) raised lesions consistent with inflammatory reaction",
@@ -59,21 +87,25 @@ export function AIVisualAnalysis({ images, symptoms, className = "" }: AIVisualA
         { x: 60, y: 70, label: "Papular lesions" },
       ],
     })),
-  }
+  };
 
   const getImageAnalysis = (imageId: string | number) => {
-    return aiAnalysis.imageAnalysis.find((analysis) => analysis.imageId === imageId) || aiAnalysis.imageAnalysis[0]
-  }
+    return (
+      aiAnalysis.imageAnalysis.find(
+        (analysis) => analysis.imageId === imageId
+      ) || aiAnalysis.imageAnalysis[0]
+    );
+  };
 
   const getProbabilityColor = (probability: number) => {
-    if (probability >= 0.7) return "bg-primary text-primary-foreground"
-    if (probability >= 0.4) return "bg-warning text-warning-foreground"
-    return "bg-muted-foreground text-primary-foreground"
-  }
+    if (probability >= 0.7) return "bg-primary text-primary-foreground";
+    if (probability >= 0.4) return "bg-warning text-warning-foreground";
+    return "bg-muted-foreground text-primary-foreground";
+  };
 
   const formatProbability = (probability: number) => {
-    return `${Math.round(probability * 100)}%`
-  }
+    return `${Math.round(probability * 100)}%`;
+  };
 
   return (
     <Card className={`${className}`}>
@@ -84,12 +116,18 @@ export function AIVisualAnalysis({ images, symptoms, className = "" }: AIVisualA
           </div>
           <div>
             <CardTitle>AI Visual Analysis</CardTitle>
-            <CardDescription>Google Gemini's analysis of images and symptoms</CardDescription>
+            <CardDescription>
+              Google Gemini's analysis of images and symptoms
+            </CardDescription>
           </div>
         </div>
       </CardHeader>
       <CardContent>
-        <Tabs defaultValue="summary" className="w-full" onValueChange={setActiveTab}>
+        <Tabs
+          defaultValue="summary"
+          className="w-full"
+          onValueChange={setActiveTab}
+        >
           <TabsList className="grid w-full grid-cols-2 mb-6">
             <TabsTrigger value="summary">Analysis Summary</TabsTrigger>
             <TabsTrigger value="images">Image Details</TabsTrigger>
@@ -99,17 +137,23 @@ export function AIVisualAnalysis({ images, symptoms, className = "" }: AIVisualA
             <div className="space-y-4">
               <h3 className="text-sm font-medium">Possible Conditions</h3>
               <div className="space-y-3">
-                {aiAnalysis.summary.possibleConditions.map((condition, index) => (
-                  <div key={index} className="rounded-lg border p-3">
-                    <div className="flex items-center justify-between mb-2">
-                      <div className="font-medium">{condition.name}</div>
-                      <Badge className={getProbabilityColor(condition.probability)}>
-                        {formatProbability(condition.probability)}
-                      </Badge>
+                {aiAnalysis.summary.possibleConditions.map(
+                  (condition, index) => (
+                    <div key={index} className="rounded-lg border p-3">
+                      <div className="flex items-center justify-between mb-2">
+                        <div className="font-medium">{condition.name}</div>
+                        <Badge
+                          className={getProbabilityColor(condition.probability)}
+                        >
+                          {formatProbability(condition.probability)}
+                        </Badge>
+                      </div>
+                      <p className="text-sm text-muted-foreground">
+                        {condition.description}
+                      </p>
                     </div>
-                    <p className="text-sm text-muted-foreground">{condition.description}</p>
-                  </div>
-                ))}
+                  )
+                )}
               </div>
             </div>
 
@@ -133,8 +177,9 @@ export function AIVisualAnalysis({ images, symptoms, className = "" }: AIVisualA
                 <div>
                   <p className="text-sm font-medium">AI Analysis Disclaimer</p>
                   <p className="text-sm text-muted-foreground mt-1">
-                    This analysis is generated by Google Gemini based on the provided images and symptoms. It is not a
-                    medical diagnosis and should be used for informational purposes only.
+                    This analysis is generated by Google Gemini based on the
+                    provided images and symptoms. It is not a medical diagnosis
+                    and should be used for informational purposes only.
                   </p>
                 </div>
               </div>
@@ -164,20 +209,28 @@ export function AIVisualAnalysis({ images, symptoms, className = "" }: AIVisualA
               <div className="space-y-4">
                 <div className="relative aspect-video rounded-lg overflow-hidden border">
                   <img
-                    src={images.find((img) => img.id === selectedImage)?.url || ""}
+                    src={
+                      images.find((img) => img.id === selectedImage)?.url || ""
+                    }
                     alt="Selected image"
                     className="w-full h-full object-contain"
                   />
-                  {getImageAnalysis(selectedImage).annotations.map((annotation, index) => (
-                    <div
-                      key={index}
-                      className="absolute h-6 w-6 rounded-full bg-primary/50 flex items-center justify-center"
-                      style={{ left: `${annotation.x}%`, top: `${annotation.y}%`, transform: "translate(-50%, -50%)" }}
-                      title={annotation.label}
-                    >
-                      <div className="h-2 w-2 rounded-full bg-primary"></div>
-                    </div>
-                  ))}
+                  {getImageAnalysis(selectedImage).annotations.map(
+                    (annotation, index) => (
+                      <div
+                        key={index}
+                        className="absolute h-6 w-6 rounded-full bg-primary/50 flex items-center justify-center"
+                        style={{
+                          left: `${annotation.x}%`,
+                          top: `${annotation.y}%`,
+                          transform: "translate(-50%, -50%)",
+                        }}
+                        title={annotation.label}
+                      >
+                        <div className="h-2 w-2 rounded-full bg-primary"></div>
+                      </div>
+                    )
+                  )}
                   <Button
                     variant="secondary"
                     size="icon"
@@ -190,14 +243,16 @@ export function AIVisualAnalysis({ images, symptoms, className = "" }: AIVisualA
                 <div>
                   <h3 className="text-sm font-medium mb-2">AI Findings</h3>
                   <ul className="space-y-2">
-                    {getImageAnalysis(selectedImage).findings.map((finding, index) => (
-                      <li key={index} className="flex items-start gap-2">
-                        <div className="h-5 w-5 flex-shrink-0 rounded-full bg-primary/10 flex items-center justify-center mt-0.5">
-                          <div className="h-2 w-2 rounded-full bg-primary"></div>
-                        </div>
-                        <span className="text-sm">{finding}</span>
-                      </li>
-                    ))}
+                    {getImageAnalysis(selectedImage).findings.map(
+                      (finding, index) => (
+                        <li key={index} className="flex items-start gap-2">
+                          <div className="h-5 w-5 flex-shrink-0 rounded-full bg-primary/10 flex items-center justify-center mt-0.5">
+                            <div className="h-2 w-2 rounded-full bg-primary"></div>
+                          </div>
+                          <span className="text-sm">{finding}</span>
+                        </li>
+                      )
+                    )}
                   </ul>
                 </div>
               </div>
@@ -206,6 +261,5 @@ export function AIVisualAnalysis({ images, symptoms, className = "" }: AIVisualA
         </Tabs>
       </CardContent>
     </Card>
-  )
+  );
 }
-

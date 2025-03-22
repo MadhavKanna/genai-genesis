@@ -1,90 +1,109 @@
-"use client"
+"use client";
 
-import type React from "react"
+import type React from "react";
 
-import { useState, useRef } from "react"
-import Link from "next/link"
-import { useRouter } from "next/navigation"
-import { Button } from "@/components/ui/button"
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
-import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
-import { Textarea } from "@/components/ui/textarea"
-import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group"
-import { Checkbox } from "@/components/ui/checkbox"
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
-import { VoiceInput } from "@/components/voice-input"
-import { LanguageSelector } from "@/components/language-selector"
-import { AIAnalysisService } from "@/components/ai-analysis-service"
-import { AIConversationGuide } from "@/components/ai-conversation-guide"
-import { LucideArrowLeft, LucideUpload, LucideCheck, LucideInfo, LucideBrain, LucideMessageSquare } from "lucide-react"
+import { useState, useRef } from "react";
+import Link from "next/link";
+import { useRouter } from "next/navigation";
+import { Button } from "@/src/components/ui/button";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardFooter,
+  CardHeader,
+  CardTitle,
+} from "@/src/components/ui/card";
+import { Input } from "@/src/components/ui/input";
+import { Label } from "@/src/components/ui/label";
+import { Textarea } from "@/src/components/ui/textarea";
+import { RadioGroup, RadioGroupItem } from "@/src/components/ui/radio-group";
+import { Checkbox } from "@/src/components/ui/checkbox";
+import {
+  Tabs,
+  TabsContent,
+  TabsList,
+  TabsTrigger,
+} from "@/src/components/ui/tabs";
+import { VoiceInput } from "@/src/components/voice-input";
+import { LanguageSelector } from "@/src/components/language-selector";
+import { AIAnalysisService } from "@/src/components/ai-analysis-service";
+import { AIConversationGuide } from "@/src/components/ai-conversation-guide";
+import {
+  LucideArrowLeft,
+  LucideUpload,
+  LucideCheck,
+  LucideInfo,
+  LucideBrain,
+  LucideMessageSquare,
+} from "lucide-react";
 
 export default function NewPatientCase() {
-  const router = useRouter()
-  const [step, setStep] = useState(1)
-  const [uploadedImages, setUploadedImages] = useState<File[]>([])
-  const [showAiAnalysis, setShowAiAnalysis] = useState(false)
-  const [aiAnalysisResult, setAiAnalysisResult] = useState<any>(null)
-  const [inputMethod, setInputMethod] = useState<"manual" | "guided">("manual")
-  const [isSubmitting, setIsSubmitting] = useState(false)
+  const router = useRouter();
+  const [step, setStep] = useState(1);
+  const [uploadedImages, setUploadedImages] = useState<File[]>([]);
+  const [showAiAnalysis, setShowAiAnalysis] = useState(false);
+  const [aiAnalysisResult, setAiAnalysisResult] = useState<any>(null);
+  const [inputMethod, setInputMethod] = useState<"manual" | "guided">("manual");
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   // Form data
-  const [primaryConcern, setPrimaryConcern] = useState("")
-  const [symptomDuration, setSymptomDuration] = useState("")
-  const [durationUnit, setDurationUnit] = useState("days")
-  const [additionalSymptoms, setAdditionalSymptoms] = useState("")
+  const [primaryConcern, setPrimaryConcern] = useState("");
+  const [symptomDuration, setSymptomDuration] = useState("");
+  const [durationUnit, setDurationUnit] = useState("days");
+  const [additionalSymptoms, setAdditionalSymptoms] = useState("");
 
-  const fileInputRef = useRef<HTMLInputElement>(null)
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
   const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files.length > 0) {
-      const newImages = Array.from(e.target.files)
-      setUploadedImages([...uploadedImages, ...newImages])
+      const newImages = Array.from(e.target.files);
+      setUploadedImages([...uploadedImages, ...newImages]);
     }
-  }
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault()
-    setIsSubmitting(true)
+    e.preventDefault();
+    setIsSubmitting(true);
     // In a real app, this would submit the form data to the server
     // Simulate API call
-    await new Promise(resolve => setTimeout(resolve, 2000))
-    router.push("/patient/confirmation")
-  }
+    await new Promise((resolve) => setTimeout(resolve, 2000));
+    router.push("/patient/confirmation");
+  };
 
   const handleAiAnalysis = () => {
-    setShowAiAnalysis(true)
-  }
+    setShowAiAnalysis(true);
+  };
 
   const handleAnalysisComplete = (result: any) => {
-    setAiAnalysisResult(result)
-    console.log("AI Analysis Result:", result)
-  }
+    setAiAnalysisResult(result);
+    console.log("AI Analysis Result:", result);
+  };
 
   const handleConversationComplete = (responses: Record<string, string>) => {
-    console.log("Conversation responses:", responses)
+    console.log("Conversation responses:", responses);
 
     // Update form with conversation responses
     if (responses.greeting) {
-      setPrimaryConcern(responses.greeting)
+      setPrimaryConcern(responses.greeting);
     }
 
     if (responses.duration) {
       // Try to extract a number and unit from the duration response
-      const durationText = responses.duration.toLowerCase()
-      const numberMatch = durationText.match(/\d+/)
+      const durationText = responses.duration.toLowerCase();
+      const numberMatch = durationText.match(/\d+/);
 
       if (numberMatch) {
-        setSymptomDuration(numberMatch[0])
+        setSymptomDuration(numberMatch[0]);
 
         if (durationText.includes("week")) {
-          setDurationUnit("weeks")
+          setDurationUnit("weeks");
         } else if (durationText.includes("month")) {
-          setDurationUnit("months")
+          setDurationUnit("months");
         } else if (durationText.includes("year")) {
-          setDurationUnit("years")
+          setDurationUnit("years");
         } else {
-          setDurationUnit("days")
+          setDurationUnit("days");
         }
       }
     }
@@ -93,17 +112,21 @@ export default function NewPatientCase() {
     const otherInfo = [
       responses.severity ? `Severity: ${responses.severity}/10` : "",
       responses.triggers ? `Triggers: ${responses.triggers}` : "",
-      responses["previous-treatment"] ? `Previous treatments: ${responses["previous-treatment"]}` : "",
-      responses["medical-history"] ? `Medical history: ${responses["medical-history"]}` : "",
+      responses["previous-treatment"]
+        ? `Previous treatments: ${responses["previous-treatment"]}`
+        : "",
+      responses["medical-history"]
+        ? `Medical history: ${responses["medical-history"]}`
+        : "",
     ]
       .filter(Boolean)
-      .join("\n\n")
+      .join("\n\n");
 
-    setAdditionalSymptoms(otherInfo)
+    setAdditionalSymptoms(otherInfo);
 
     // Switch back to manual input to review
-    setInputMethod("manual")
-  }
+    setInputMethod("manual");
+  };
 
   return (
     <div className="container max-w-4xl py-8 px-4 md:py-12">
@@ -116,9 +139,12 @@ export default function NewPatientCase() {
       </div>
 
       <div className="mb-8">
-        <h1 className="text-2xl font-bold md:text-3xl">Submit Your Health Concern</h1>
+        <h1 className="text-2xl font-bold md:text-3xl">
+          Submit Your Health Concern
+        </h1>
         <p className="text-muted-foreground mt-2">
-          Share your symptoms and concerns to receive guidance from medical professionals.
+          Share your symptoms and concerns to receive guidance from medical
+          professionals.
         </p>
       </div>
 
@@ -126,34 +152,46 @@ export default function NewPatientCase() {
         <div className="flex items-center gap-2">
           <div
             className={`h-8 w-8 rounded-full flex items-center justify-center ${
-              step >= 1 ? "bg-primary text-primary-foreground" : "bg-muted text-muted-foreground"
+              step >= 1
+                ? "bg-primary text-primary-foreground"
+                : "bg-muted text-muted-foreground"
             }`}
           >
             {step > 1 ? <LucideCheck className="h-4 w-4" /> : "1"}
           </div>
-          <span className={step >= 1 ? "font-medium" : "text-muted-foreground"}>Symptoms</span>
+          <span className={step >= 1 ? "font-medium" : "text-muted-foreground"}>
+            Symptoms
+          </span>
         </div>
         <div className="h-px w-12 bg-muted"></div>
         <div className="flex items-center gap-2">
           <div
             className={`h-8 w-8 rounded-full flex items-center justify-center ${
-              step >= 2 ? "bg-primary text-primary-foreground" : "bg-muted text-muted-foreground"
+              step >= 2
+                ? "bg-primary text-primary-foreground"
+                : "bg-muted text-muted-foreground"
             }`}
           >
             {step > 2 ? <LucideCheck className="h-4 w-4" /> : "2"}
           </div>
-          <span className={step >= 2 ? "font-medium" : "text-muted-foreground"}>Medical History</span>
+          <span className={step >= 2 ? "font-medium" : "text-muted-foreground"}>
+            Medical History
+          </span>
         </div>
         <div className="h-px w-12 bg-muted"></div>
         <div className="flex items-center gap-2">
           <div
             className={`h-8 w-8 rounded-full flex items-center justify-center ${
-              step >= 3 ? "bg-primary text-primary-foreground" : "bg-muted text-muted-foreground"
+              step >= 3
+                ? "bg-primary text-primary-foreground"
+                : "bg-muted text-muted-foreground"
             }`}
           >
             {step > 3 ? <LucideCheck className="h-4 w-4" /> : "3"}
           </div>
-          <span className={step >= 3 ? "font-medium" : "text-muted-foreground"}>Review</span>
+          <span className={step >= 3 ? "font-medium" : "text-muted-foreground"}>
+            Review
+          </span>
         </div>
       </div>
 
@@ -170,7 +208,9 @@ export default function NewPatientCase() {
                   </div>
                   <p className="text-gray-600 text-lg">Gemini is thinking</p>
                 </div>
-                <p className="text-sm text-gray-500">Analyzing your request...</p>
+                <p className="text-sm text-gray-500">
+                  Analyzing your request...
+                </p>
               </div>
             </CardContent>
           </Card>
@@ -180,20 +220,31 @@ export default function NewPatientCase() {
               <Card>
                 <CardHeader>
                   <CardTitle>Describe Your Symptoms</CardTitle>
-                  <CardDescription>Please provide detailed information about your current health concerns.</CardDescription>
+                  <CardDescription>
+                    Please provide detailed information about your current
+                    health concerns.
+                  </CardDescription>
                 </CardHeader>
                 <CardContent className="space-y-6">
                   <Tabs
                     value={inputMethod}
-                    onValueChange={(value) => setInputMethod(value as "manual" | "guided")}
+                    onValueChange={(value) =>
+                      setInputMethod(value as "manual" | "guided")
+                    }
                     className="w-full"
                   >
                     <TabsList className="grid w-full grid-cols-2 mb-6">
-                      <TabsTrigger value="manual" className="flex items-center gap-2">
+                      <TabsTrigger
+                        value="manual"
+                        className="flex items-center gap-2"
+                      >
                         <LucideMessageSquare className="h-4 w-4" />
                         Manual Input
                       </TabsTrigger>
-                      <TabsTrigger value="guided" className="flex items-center gap-2">
+                      <TabsTrigger
+                        value="guided"
+                        className="flex items-center gap-2"
+                      >
                         <LucideBrain className="h-4 w-4" />
                         AI-Guided
                       </TabsTrigger>
@@ -201,7 +252,9 @@ export default function NewPatientCase() {
 
                     <TabsContent value="manual" className="space-y-6">
                       <div className="space-y-2">
-                        <Label htmlFor="primary-concern">What is your primary health concern?</Label>
+                        <Label htmlFor="primary-concern">
+                          What is your primary health concern?
+                        </Label>
                         <VoiceInput
                           id="primary-concern"
                           placeholder="Describe your main symptom or concern"
@@ -212,7 +265,9 @@ export default function NewPatientCase() {
                       </div>
 
                       <div className="space-y-2">
-                        <Label htmlFor="symptom-duration">How long have you been experiencing these symptoms?</Label>
+                        <Label htmlFor="symptom-duration">
+                          How long have you been experiencing these symptoms?
+                        </Label>
                         <div className="grid grid-cols-2 gap-4">
                           <Input
                             id="symptom-duration"
@@ -246,7 +301,9 @@ export default function NewPatientCase() {
                       </div>
 
                       <div className="space-y-2">
-                        <Label htmlFor="additional-symptoms">Do you have any additional symptoms?</Label>
+                        <Label htmlFor="additional-symptoms">
+                          Do you have any additional symptoms?
+                        </Label>
                         <VoiceInput
                           id="additional-symptoms"
                           placeholder="List any other symptoms you're experiencing"
@@ -258,7 +315,9 @@ export default function NewPatientCase() {
                     </TabsContent>
 
                     <TabsContent value="guided">
-                      <AIConversationGuide onComplete={handleConversationComplete} />
+                      <AIConversationGuide
+                        onComplete={handleConversationComplete}
+                      />
                     </TabsContent>
                   </Tabs>
 
@@ -266,7 +325,9 @@ export default function NewPatientCase() {
                     <Label>Upload relevant images (optional)</Label>
                     <div className="border-2 border-dashed rounded-lg p-6 text-center">
                       <LucideUpload className="h-8 w-8 mx-auto mb-2 text-muted-foreground" />
-                      <p className="text-sm text-muted-foreground mb-2">Drag and drop images or click to browse</p>
+                      <p className="text-sm text-muted-foreground mb-2">
+                        Drag and drop images or click to browse
+                      </p>
                       <Input
                         id="image-upload"
                         type="file"
@@ -276,7 +337,11 @@ export default function NewPatientCase() {
                         ref={fileInputRef}
                         onChange={handleImageUpload}
                       />
-                      <Button type="button" variant="outline" onClick={() => fileInputRef.current?.click()}>
+                      <Button
+                        type="button"
+                        variant="outline"
+                        onClick={() => fileInputRef.current?.click()}
+                      >
                         Select Files
                       </Button>
                     </div>
@@ -284,9 +349,14 @@ export default function NewPatientCase() {
                     {uploadedImages.length > 0 && (
                       <div className="grid grid-cols-3 gap-4 mt-4">
                         {uploadedImages.map((img, index) => (
-                          <div key={index} className="relative aspect-square rounded-md overflow-hidden">
+                          <div
+                            key={index}
+                            className="relative aspect-square rounded-md overflow-hidden"
+                          >
                             <img
-                              src={URL.createObjectURL(img) || "/placeholder.svg"}
+                              src={
+                                URL.createObjectURL(img) || "/placeholder.svg"
+                              }
                               alt={`Uploaded image ${index + 1}`}
                               className="object-cover w-full h-full"
                             />
@@ -306,10 +376,17 @@ export default function NewPatientCase() {
                       {!showAiAnalysis ? (
                         <div className="space-y-3">
                           <p className="text-sm text-muted-foreground">
-                            Our AI can analyze your symptoms to provide preliminary insights before your case is reviewed by
+                            Our AI can analyze your symptoms to provide
+                            preliminary insights before your case is reviewed by
                             medical professionals.
                           </p>
-                          <Button type="button" variant="outline" size="sm" onClick={handleAiAnalysis} className="w-full">
+                          <Button
+                            type="button"
+                            variant="outline"
+                            size="sm"
+                            onClick={handleAiAnalysis}
+                            className="w-full"
+                          >
                             <LucideBrain className="mr-2 h-4 w-4" />
                             Run AI Analysis
                           </Button>
@@ -337,12 +414,22 @@ export default function NewPatientCase() {
               <Card>
                 <CardHeader>
                   <CardTitle>Medical History</CardTitle>
-                  <CardDescription>This information helps clinicians provide more accurate guidance.</CardDescription>
+                  <CardDescription>
+                    This information helps clinicians provide more accurate
+                    guidance.
+                  </CardDescription>
                 </CardHeader>
                 <CardContent className="space-y-6">
                   <div className="space-y-2">
                     <Label htmlFor="age">Age</Label>
-                    <Input id="age" type="number" placeholder="Your age" min="0" max="120" required />
+                    <Input
+                      id="age"
+                      type="number"
+                      placeholder="Your age"
+                      min="0"
+                      max="120"
+                      required
+                    />
                   </div>
 
                   <div className="space-y-2">
@@ -401,16 +488,28 @@ export default function NewPatientCase() {
 
                   <div className="space-y-2">
                     <Label htmlFor="medications">Current Medications</Label>
-                    <Textarea id="medications" placeholder="List any medications you're currently taking" rows={3} />
+                    <Textarea
+                      id="medications"
+                      placeholder="List any medications you're currently taking"
+                      rows={3}
+                    />
                   </div>
 
                   <div className="space-y-2">
                     <Label htmlFor="allergies">Allergies</Label>
-                    <Textarea id="allergies" placeholder="List any allergies you have" rows={2} />
+                    <Textarea
+                      id="allergies"
+                      placeholder="List any allergies you have"
+                      rows={2}
+                    />
                   </div>
                 </CardContent>
                 <CardFooter className="flex justify-between">
-                  <Button type="button" variant="outline" onClick={() => setStep(1)}>
+                  <Button
+                    type="button"
+                    variant="outline"
+                    onClick={() => setStep(1)}
+                  >
                     Back
                   </Button>
                   <Button type="button" onClick={() => setStep(3)}>
@@ -424,16 +523,22 @@ export default function NewPatientCase() {
               <Card>
                 <CardHeader>
                   <CardTitle>Review Your Information</CardTitle>
-                  <CardDescription>Please review the information you've provided before submitting.</CardDescription>
+                  <CardDescription>
+                    Please review the information you've provided before
+                    submitting.
+                  </CardDescription>
                 </CardHeader>
                 <CardContent className="space-y-6">
                   <div className="rounded-lg bg-muted p-4 flex items-start gap-3">
                     <LucideInfo className="h-5 w-5 text-primary flex-shrink-0 mt-0.5" />
                     <div>
-                      <p className="text-sm font-medium">Important Information</p>
+                      <p className="text-sm font-medium">
+                        Important Information
+                      </p>
                       <p className="text-sm text-muted-foreground mt-1">
-                        The guidance you receive is not a medical diagnosis. Always consult with your healthcare provider
-                        for official medical advice.
+                        The guidance you receive is not a medical diagnosis.
+                        Always consult with your healthcare provider for
+                        official medical advice.
                       </p>
                     </div>
                   </div>
@@ -442,35 +547,53 @@ export default function NewPatientCase() {
                     <div>
                       <h3 className="text-sm font-medium mb-2">Symptoms</h3>
                       <div className="rounded-lg border p-3">
-                        <p className="text-sm">Primary concern: {primaryConcern || "[Sample symptom description]"}</p>
-                        <p className="text-sm mt-2">
-                          Duration: {symptomDuration || "2"} {durationUnit || "weeks"}
+                        <p className="text-sm">
+                          Primary concern:{" "}
+                          {primaryConcern || "[Sample symptom description]"}
                         </p>
                         <p className="text-sm mt-2">
-                          Additional symptoms: {additionalSymptoms || "[Sample additional symptoms]"}
+                          Duration: {symptomDuration || "2"}{" "}
+                          {durationUnit || "weeks"}
+                        </p>
+                        <p className="text-sm mt-2">
+                          Additional symptoms:{" "}
+                          {additionalSymptoms || "[Sample additional symptoms]"}
                         </p>
                       </div>
                     </div>
 
                     <div>
-                      <h3 className="text-sm font-medium mb-2">Medical History</h3>
+                      <h3 className="text-sm font-medium mb-2">
+                        Medical History
+                      </h3>
                       <div className="rounded-lg border p-3">
                         <p className="text-sm">Age: 35</p>
                         <p className="text-sm mt-2">Gender: Female</p>
                         <p className="text-sm mt-2">Conditions: Asthma</p>
-                        <p className="text-sm mt-2">Medications: [Sample medications]</p>
-                        <p className="text-sm mt-2">Allergies: [Sample allergies]</p>
+                        <p className="text-sm mt-2">
+                          Medications: [Sample medications]
+                        </p>
+                        <p className="text-sm mt-2">
+                          Allergies: [Sample allergies]
+                        </p>
                       </div>
                     </div>
 
                     {uploadedImages.length > 0 && (
                       <div>
-                        <h3 className="text-sm font-medium mb-2">Uploaded Images ({uploadedImages.length})</h3>
+                        <h3 className="text-sm font-medium mb-2">
+                          Uploaded Images ({uploadedImages.length})
+                        </h3>
                         <div className="grid grid-cols-4 gap-2">
                           {uploadedImages.map((img, index) => (
-                            <div key={index} className="relative aspect-square rounded-md overflow-hidden">
+                            <div
+                              key={index}
+                              className="relative aspect-square rounded-md overflow-hidden"
+                            >
                               <img
-                                src={URL.createObjectURL(img) || "/placeholder.svg"}
+                                src={
+                                  URL.createObjectURL(img) || "/placeholder.svg"
+                                }
                                 alt={`Uploaded image ${index + 1}`}
                                 className="object-cover w-full h-full"
                               />
@@ -482,25 +605,37 @@ export default function NewPatientCase() {
 
                     {aiAnalysisResult && (
                       <div>
-                        <h3 className="text-sm font-medium mb-2">AI Analysis Results</h3>
+                        <h3 className="text-sm font-medium mb-2">
+                          AI Analysis Results
+                        </h3>
                         <div className="rounded-lg border p-3">
                           <div className="flex items-center gap-2 mb-2">
                             <LucideBrain className="h-4 w-4 text-primary" />
-                            <p className="text-sm font-medium">Preliminary Assessment</p>
+                            <p className="text-sm font-medium">
+                              Preliminary Assessment
+                            </p>
                           </div>
 
                           {aiAnalysisResult.differentialDiagnosis && (
                             <div className="mt-2">
-                              <p className="text-xs text-muted-foreground mb-1">Possible conditions:</p>
+                              <p className="text-xs text-muted-foreground mb-1">
+                                Possible conditions:
+                              </p>
                               <ul className="text-sm space-y-1">
-                                {aiAnalysisResult.differentialDiagnosis.slice(0, 3).map((diagnosis: any, index: number) => (
-                                  <li key={index} className="flex items-center gap-1">
-                                    <div className="h-1.5 w-1.5 rounded-full bg-primary"></div>
-                                    <span>
-                                      {diagnosis.condition} ({diagnosis.confidence})
-                                    </span>
-                                  </li>
-                                ))}
+                                {aiAnalysisResult.differentialDiagnosis
+                                  .slice(0, 3)
+                                  .map((diagnosis: any, index: number) => (
+                                    <li
+                                      key={index}
+                                      className="flex items-center gap-1"
+                                    >
+                                      <div className="h-1.5 w-1.5 rounded-full bg-primary"></div>
+                                      <span>
+                                        {diagnosis.condition} (
+                                        {diagnosis.confidence})
+                                      </span>
+                                    </li>
+                                  ))}
                               </ul>
                             </div>
                           )}
@@ -508,7 +643,8 @@ export default function NewPatientCase() {
                           {aiAnalysisResult.suggestedTests && (
                             <div className="mt-2">
                               <p className="text-xs text-muted-foreground">
-                                This is a preliminary AI assessment only. Medical professionals will review your case.
+                                This is a preliminary AI assessment only.
+                                Medical professionals will review your case.
                               </p>
                             </div>
                           )}
@@ -521,7 +657,8 @@ export default function NewPatientCase() {
                     <div className="flex items-center space-x-2">
                       <Checkbox id="consent" required />
                       <Label htmlFor="consent" className="text-sm">
-                        I consent to sharing this anonymized information with medical professionals for guidance purposes.
+                        I consent to sharing this anonymized information with
+                        medical professionals for guidance purposes.
                       </Label>
                     </div>
                     <div className="flex items-center space-x-2">
@@ -532,7 +669,10 @@ export default function NewPatientCase() {
                           Terms of Service
                         </Link>{" "}
                         and{" "}
-                        <Link href="/privacy" className="text-primary underline">
+                        <Link
+                          href="/privacy"
+                          className="text-primary underline"
+                        >
                           Privacy Policy
                         </Link>
                         .
@@ -541,7 +681,11 @@ export default function NewPatientCase() {
                   </div>
                 </CardContent>
                 <CardFooter className="flex justify-between">
-                  <Button type="button" variant="outline" onClick={() => setStep(2)}>
+                  <Button
+                    type="button"
+                    variant="outline"
+                    onClick={() => setStep(2)}
+                  >
                     Back
                   </Button>
                   <Button type="submit">Submit Case</Button>
@@ -552,7 +696,5 @@ export default function NewPatientCase() {
         )}
       </form>
     </div>
-  )
+  );
 }
-
-

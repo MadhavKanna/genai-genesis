@@ -13,7 +13,7 @@ import {
 } from "@mui/material";
 import MicIcon from "@mui/icons-material/Mic";
 import StopIcon from "@mui/icons-material/Stop";
-import { functions } from "@/firebase";
+import { functions } from "../../firebase";
 
 // Add Web Speech API type definitions
 declare global {

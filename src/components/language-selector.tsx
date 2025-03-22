@@ -1,21 +1,30 @@
-"use client"
-import { Button } from "@/components/ui/button"
-import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu"
-import { LucideGlobe } from "lucide-react"
-import { useSiteLanguage } from "@/components/site-language-provider"
+"use client";
+import { Button } from "@/src/components/ui/button";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/src/components/ui/dropdown-menu";
+import { LucideGlobe } from "lucide-react";
+import { useSiteLanguage } from "@/src/components/site-language-provider";
 
 interface LanguageSelectorProps {
-  variant?: "default" | "outline" | "ghost"
-  size?: "default" | "sm" | "lg" | "icon"
-  className?: string
+  variant?: "default" | "outline" | "ghost";
+  size?: "default" | "sm" | "lg" | "icon";
+  className?: string;
 }
 
-export function LanguageSelector({ variant = "outline", size = "default", className = "" }: LanguageSelectorProps) {
-  const { currentLanguage, setLanguage, languages } = useSiteLanguage()
+export function LanguageSelector({
+  variant = "outline",
+  size = "default",
+  className = "",
+}: LanguageSelectorProps) {
+  const { currentLanguage, setLanguage, languages } = useSiteLanguage();
 
   const handleLanguageChange = (language: (typeof languages)[0]) => {
-    setLanguage(language)
-  }
+    setLanguage(language);
+  };
 
   return (
     <DropdownMenu>
@@ -44,6 +53,5 @@ export function LanguageSelector({ variant = "outline", size = "default", classN
         ))}
       </DropdownMenuContent>
     </DropdownMenu>
-  )
+  );
 }
-

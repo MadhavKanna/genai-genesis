@@ -1,10 +1,20 @@
-"use client"
+"use client";
 
-import Link from "next/link"
-import { Button } from "@/components/ui/button"
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
-import { StatisticsDashboard } from "@/components/statistics-dashboard"
+import Link from "next/link";
+import { Button } from "@/src/components/ui/button";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/src/components/ui/card";
+import {
+  Avatar,
+  AvatarFallback,
+  AvatarImage,
+} from "@/src/components/ui/avatar";
+import { StatisticsDashboard } from "@/src/components/statistics-dashboard";
 import {
   LucideHeartPulse,
   LucideUsers,
@@ -16,7 +26,7 @@ import {
   LucideArrowLeft,
   LucideDownload,
   LucideShare2,
-} from "lucide-react"
+} from "lucide-react";
 
 export default function ClinicianStatisticsPage() {
   return (
@@ -91,7 +101,11 @@ export default function ClinicianStatisticsPage() {
               <span className="text-xs text-muted-foreground">Orthopedics</span>
             </div>
           </div>
-          <Button variant="outline" className="w-full mt-2 rounded-full" size="sm">
+          <Button
+            variant="outline"
+            className="w-full mt-2 rounded-full"
+            size="sm"
+          >
             <LucideLogOut className="mr-2 h-4 w-4" />
             Log out
           </Button>
@@ -117,7 +131,10 @@ export default function ClinicianStatisticsPage() {
         <main className="container py-6">
           <div className="mb-6">
             <div className="flex items-center gap-2 mb-2">
-              <Link href="/clinician/dashboard" className="inline-flex items-center gap-1 text-sm">
+              <Link
+                href="/clinician/dashboard"
+                className="inline-flex items-center gap-1 text-sm"
+              >
                 <LucideArrowLeft className="h-4 w-4" />
                 Back to Dashboard
               </Link>
@@ -126,15 +143,18 @@ export default function ClinicianStatisticsPage() {
               <CardHeader>
                 <CardTitle>UN Relief Coordination</CardTitle>
                 <CardDescription>
-                  Aggregated anonymous data from patient cases to support humanitarian relief efforts
+                  Aggregated anonymous data from patient cases to support
+                  humanitarian relief efforts
                 </CardDescription>
               </CardHeader>
               <CardContent>
                 <p className="text-sm text-muted-foreground">
-                  This dashboard provides critical insights into medication needs and health conditions across
-                  crisis-affected regions. The data is anonymized and aggregated from all clinicians on the platform to
-                  help UN agencies and NGOs coordinate medication distribution and healthcare resource allocation. Your
-                  contributions help save lives in underserved areas.
+                  This dashboard provides critical insights into medication
+                  needs and health conditions across crisis-affected regions.
+                  The data is anonymized and aggregated from all clinicians on
+                  the platform to help UN agencies and NGOs coordinate
+                  medication distribution and healthcare resource allocation.
+                  Your contributions help save lives in underserved areas.
                 </p>
               </CardContent>
             </Card>
@@ -144,6 +164,5 @@ export default function ClinicianStatisticsPage() {
         </main>
       </div>
     </div>
-  )
+  );
 }
-

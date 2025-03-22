@@ -1,20 +1,32 @@
-"use client"
+"use client";
 
-import { useState, useEffect } from "react"
-import Link from "next/link"
-import { useRouter } from "next/navigation"
-import { Button } from "@/components/ui/button"
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
-import { Badge } from "@/components/ui/badge"
-import { Avatar, AvatarFallback } from "@/components/ui/avatar"
-import { Separator } from "@/components/ui/separator"
-import { VoiceInput } from "@/components/voice-input"
-import { LanguageSelector } from "@/components/language-selector"
-import { LiveChat } from "@/components/live-chat"
-import { AIVisualAnalysis } from "@/components/ai-visual-analysis"
-import { MedicalTermInfo } from "@/components/medical-term-info"
-import { analyzeSymptoms } from "@/lib/gemini-api"
+import { useState, useEffect } from "react";
+import Link from "next/link";
+import { useRouter } from "next/navigation";
+import { Button } from "@/src/components/ui/button";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardFooter,
+  CardHeader,
+  CardTitle,
+} from "@/src/components/ui/card";
+import {
+  Tabs,
+  TabsContent,
+  TabsList,
+  TabsTrigger,
+} from "@/src/components/ui/tabs";
+import { Badge } from "@/src/components/ui/badge";
+import { Avatar, AvatarFallback } from "@/src/components/ui/avatar";
+import { Separator } from "@/src/components/ui/separator";
+import { VoiceInput } from "@/src/components/voice-input";
+import { LanguageSelector } from "@/src/components/language-selector";
+import { LiveChat } from "@/src/components/live-chat";
+import { AIVisualAnalysis } from "@/src/components/ai-visual-analysis";
+import { MedicalTermInfo } from "@/src/components/medical-term-info";
+import { analyzeSymptoms } from "@/src/lib/gemini-api";
 
 import {
   LucideArrowLeft,
@@ -25,15 +37,19 @@ import {
   FlaskConicalIcon as LucideFlask,
   LucideActivity,
   LucideFileText,
-} from "lucide-react"
+} from "lucide-react";
 
-export default function ClinicianCasePage({ params }: { params: { id: string } }) {
-  const router = useRouter()
-  const [activeTab, setActiveTab] = useState("overview")
-  const [assessment, setAssessment] = useState("")
-  const [isSubmitting, setIsSubmitting] = useState(false)
-  const [isAnalyzing, setIsAnalyzing] = useState(false)
-  const [aiAnalysisResult, setAiAnalysisResult] = useState<any>(null)
+export default function ClinicianCasePage({
+  params,
+}: {
+  params: { id: string };
+}) {
+  const router = useRouter();
+  const [activeTab, setActiveTab] = useState("overview");
+  const [assessment, setAssessment] = useState("");
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isAnalyzing, setIsAnalyzing] = useState(false);
+  const [aiAnalysisResult, setAiAnalysisResult] = useState<any>(null);
 
   // Sample data - in a real app, this would come from an API
   const caseData = {
@@ -55,14 +71,38 @@ export default function ClinicianCasePage({ params }: { params: { id: string } }
       allergies: ["Penicillin"],
     },
     images: [
-      { id: 1, description: "Rash on right forearm", url: "/placeholder.svg?height=300&width=300" },
-      { id: 2, description: "Rash on torso", url: "/placeholder.svg?height=300&width=300" },
-      { id: 3, description: "Close-up of rash", url: "/placeholder.svg?height=300&width=300" },
+      {
+        id: 1,
+        description: "Rash on right forearm",
+        url: "/placeholder.svg?height=300&width=300",
+      },
+      {
+        id: 2,
+        description: "Rash on torso",
+        url: "/placeholder.svg?height=300&width=300",
+      },
+      {
+        id: 3,
+        description: "Close-up of rash",
+        url: "/placeholder.svg?height=300&width=300",
+      },
     ],
     aiAnalysis: null,
     otherClinicians: [
-      { id: 1, name: "Dr. Sarah Johnson", specialty: "Dermatology", status: "Reviewing", avatar: "SJ" },
-      { id: 2, name: "Dr. Michael Chen", specialty: "Allergy & Immunology", status: "Pending", avatar: "MC" },
+      {
+        id: 1,
+        name: "Dr. Sarah Johnson",
+        specialty: "Dermatology",
+        status: "Reviewing",
+        avatar: "SJ",
+      },
+      {
+        id: 2,
+        name: "Dr. Michael Chen",
+        specialty: "Allergy & Immunology",
+        status: "Pending",
+        avatar: "MC",
+      },
     ],
     recommendedTests: [
       {
@@ -98,14 +138,14 @@ export default function ClinicianCasePage({ params }: { params: { id: string } }
         status: "Recommended",
       },
     ],
-  }
+  };
 
   // Run AI analysis when the component loads
   useEffect(() => {
     const runAiAnalysis = async () => {
-      if (aiAnalysisResult) return // Skip if we already have results
+      if (aiAnalysisResult) return; // Skip if we already have results
 
-      setIsAnalyzing(true)
+      setIsAnalyzing(true);
 
       try {
         // Combine symptoms for analysis
@@ -119,42 +159,45 @@ export default function ClinicianCasePage({ params }: { params: { id: string } }
           - Conditions: ${caseData.medicalHistory.conditions.join(", ")}
           - Medications: ${caseData.medicalHistory.medications.join(", ")}
           - Allergies: ${caseData.medicalHistory.allergies.join(", ")}
-        `
+        `;
 
         // For demo purposes, we're just analyzing the text
         // In a real app, you would also analyze the images
-        const result = await analyzeSymptoms(symptoms)
+        const result = await analyzeSymptoms(symptoms);
 
-        console.log("AI Analysis Result:", result)
-        setAiAnalysisResult(result)
+        console.log("AI Analysis Result:", result);
+        setAiAnalysisResult(result);
       } catch (error) {
-        console.error("Error running AI analysis:", error)
+        console.error("Error running AI analysis:", error);
       } finally {
-        setIsAnalyzing(false)
+        setIsAnalyzing(false);
       }
-    }
+    };
 
-    runAiAnalysis()
-  }, [aiAnalysisResult])
+    runAiAnalysis();
+  }, [aiAnalysisResult]);
 
   const handleSubmit = () => {
-    if (!assessment.trim()) return
+    if (!assessment.trim()) return;
 
-    setIsSubmitting(true)
+    setIsSubmitting(true);
 
     // Simulate API call
     setTimeout(() => {
-      setIsSubmitting(false)
-      router.push("/clinician/dashboard?submitted=true")
-    }, 2000)
-  }
+      setIsSubmitting(false);
+      router.push("/clinician/dashboard?submitted=true");
+    }, 2000);
+  };
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 to-white">
       <header className="bg-white border-b">
         <div className="container py-4">
           <div className="flex justify-between items-center mb-2">
-            <Link href="/clinician/dashboard" className="inline-flex items-center gap-1 text-sm">
+            <Link
+              href="/clinician/dashboard"
+              className="inline-flex items-center gap-1 text-sm"
+            >
               <LucideArrowLeft className="h-4 w-4" />
               Back to Dashboard
             </Link>
@@ -177,7 +220,9 @@ export default function ClinicianCasePage({ params }: { params: { id: string } }
                 </div>
               </div>
             </div>
-            <Badge className="bg-gemini-gradient-new">Awaiting Your Assessment</Badge>
+            <Badge className="bg-gemini-gradient-new">
+              Awaiting Your Assessment
+            </Badge>
           </div>
         </div>
       </header>
@@ -185,7 +230,11 @@ export default function ClinicianCasePage({ params }: { params: { id: string } }
       <main className="container py-6">
         <div className="grid md:grid-cols-3 gap-6">
           <div className="md:col-span-2">
-            <Tabs defaultValue="overview" className="w-full" onValueChange={setActiveTab}>
+            <Tabs
+              defaultValue="overview"
+              className="w-full"
+              onValueChange={setActiveTab}
+            >
               <TabsList className="grid w-full grid-cols-5 mb-6">
                 <TabsTrigger value="overview">Case Overview</TabsTrigger>
                 <TabsTrigger value="images">Patient Images</TabsTrigger>
@@ -198,7 +247,9 @@ export default function ClinicianCasePage({ params }: { params: { id: string } }
                 <Card className="gemini-card border-none">
                   <CardHeader>
                     <CardTitle>Patient Information</CardTitle>
-                    <CardDescription>Basic information about the patient</CardDescription>
+                    <CardDescription>
+                      Basic information about the patient
+                    </CardDescription>
                   </CardHeader>
                   <CardContent className="space-y-6">
                     <div className="grid grid-cols-2 gap-4">
@@ -208,7 +259,9 @@ export default function ClinicianCasePage({ params }: { params: { id: string } }
                       </div>
                       <div>
                         <h3 className="text-sm font-medium mb-1">Gender</h3>
-                        <p className="text-sm">{caseData.medicalHistory.gender}</p>
+                        <p className="text-sm">
+                          {caseData.medicalHistory.gender}
+                        </p>
                       </div>
                     </div>
 
@@ -216,7 +269,9 @@ export default function ClinicianCasePage({ params }: { params: { id: string } }
 
                     <div className="grid gap-4">
                       <div>
-                        <h3 className="text-sm font-medium mb-1">Primary Concern</h3>
+                        <h3 className="text-sm font-medium mb-1">
+                          Primary Concern
+                        </h3>
                         <p className="text-sm">{caseData.primaryConcern}</p>
                       </div>
 
@@ -226,7 +281,9 @@ export default function ClinicianCasePage({ params }: { params: { id: string } }
                       </div>
 
                       <div>
-                        <h3 className="text-sm font-medium mb-1">Additional Symptoms</h3>
+                        <h3 className="text-sm font-medium mb-1">
+                          Additional Symptoms
+                        </h3>
                         <p className="text-sm">{caseData.additionalSymptoms}</p>
                       </div>
                     </div>
@@ -234,27 +291,41 @@ export default function ClinicianCasePage({ params }: { params: { id: string } }
                     <Separator />
 
                     <div>
-                      <h3 className="text-sm font-medium mb-2">Medical History</h3>
+                      <h3 className="text-sm font-medium mb-2">
+                        Medical History
+                      </h3>
                       <div className="grid gap-4">
                         <div>
-                          <h4 className="text-xs text-muted-foreground mb-1">Existing Conditions</h4>
+                          <h4 className="text-xs text-muted-foreground mb-1">
+                            Existing Conditions
+                          </h4>
                           <div className="flex flex-wrap gap-2">
-                            {caseData.medicalHistory.conditions.map((condition, index) => (
-                              <Badge key={index} variant="outline">
-                                {condition}
-                              </Badge>
-                            ))}
+                            {caseData.medicalHistory.conditions.map(
+                              (condition, index) => (
+                                <Badge key={index} variant="outline">
+                                  {condition}
+                                </Badge>
+                              )
+                            )}
                           </div>
                         </div>
 
                         <div>
-                          <h4 className="text-xs text-muted-foreground mb-1">Current Medications</h4>
-                          <p className="text-sm">{caseData.medicalHistory.medications.join(", ")}</p>
+                          <h4 className="text-xs text-muted-foreground mb-1">
+                            Current Medications
+                          </h4>
+                          <p className="text-sm">
+                            {caseData.medicalHistory.medications.join(", ")}
+                          </p>
                         </div>
 
                         <div>
-                          <h4 className="text-xs text-muted-foreground mb-1">Allergies</h4>
-                          <p className="text-sm">{caseData.medicalHistory.allergies.join(", ")}</p>
+                          <h4 className="text-xs text-muted-foreground mb-1">
+                            Allergies
+                          </h4>
+                          <p className="text-sm">
+                            {caseData.medicalHistory.allergies.join(", ")}
+                          </p>
                         </div>
                       </div>
                     </div>
@@ -264,18 +335,24 @@ export default function ClinicianCasePage({ params }: { params: { id: string } }
                 <Card className="gemini-card border-none">
                   <CardHeader>
                     <CardTitle>Your Assessment</CardTitle>
-                    <CardDescription>Provide your professional assessment of this case</CardDescription>
+                    <CardDescription>
+                      Provide your professional assessment of this case
+                    </CardDescription>
                   </CardHeader>
                   <CardContent className="space-y-4">
                     <div className="rounded-lg bg-muted p-4">
                       <div className="flex items-start gap-3">
                         <LucideAlertCircle className="h-5 w-5 text-primary flex-shrink-0 mt-0.5" />
                         <div>
-                          <p className="text-sm font-medium">Important Guidelines</p>
+                          <p className="text-sm font-medium">
+                            Important Guidelines
+                          </p>
                           <p className="text-sm text-muted-foreground mt-1">
-                            Please provide your professional assessment based on the information provided. Focus on
-                            possible diagnoses, recommended tests, and treatment approaches. Remember that your
-                            assessment will be anonymized and shared with the patient.
+                            Please provide your professional assessment based on
+                            the information provided. Focus on possible
+                            diagnoses, recommended tests, and treatment
+                            approaches. Remember that your assessment will be
+                            anonymized and shared with the patient.
                           </p>
                         </div>
                       </div>
@@ -285,7 +362,9 @@ export default function ClinicianCasePage({ params }: { params: { id: string } }
                       <div className="rounded-lg border p-4">
                         <div className="flex items-center gap-2 mb-2">
                           <LucideBrain className="h-4 w-4 text-primary" />
-                          <p className="text-sm font-medium">AI Analysis Suggestions</p>
+                          <p className="text-sm font-medium">
+                            AI Analysis Suggestions
+                          </p>
                         </div>
 
                         {aiAnalysisResult.differentialDiagnosis && (
@@ -304,7 +383,8 @@ export default function ClinicianCasePage({ params }: { params: { id: string } }
                         )}
 
                         <p className="text-xs text-muted-foreground mt-2">
-                          These are AI suggestions only. Use your professional judgment.
+                          These are AI suggestions only. Use your professional
+                          judgment.
                         </p>
                       </div>
                     )}
@@ -342,7 +422,9 @@ export default function ClinicianCasePage({ params }: { params: { id: string } }
                 <Card className="gemini-card border-none">
                   <CardHeader>
                     <CardTitle>Patient Images</CardTitle>
-                    <CardDescription>Images uploaded by the patient</CardDescription>
+                    <CardDescription>
+                      Images uploaded by the patient
+                    </CardDescription>
                   </CardHeader>
                   <CardContent>
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -355,7 +437,9 @@ export default function ClinicianCasePage({ params }: { params: { id: string } }
                               className="w-full h-full object-cover"
                             />
                           </div>
-                          <p className="text-sm text-center">{image.description}</p>
+                          <p className="text-sm text-center">
+                            {image.description}
+                          </p>
                         </div>
                       ))}
                     </div>
@@ -367,7 +451,9 @@ export default function ClinicianCasePage({ params }: { params: { id: string } }
                 <Card className="gemini-card border-none">
                   <CardHeader>
                     <CardTitle>Recommended Tests</CardTitle>
-                    <CardDescription>Tests that may help with diagnosis</CardDescription>
+                    <CardDescription>
+                      Tests that may help with diagnosis
+                    </CardDescription>
                   </CardHeader>
                   <CardContent className="space-y-4">
                     {caseData.recommendedTests.map((test) => (
@@ -377,7 +463,9 @@ export default function ClinicianCasePage({ params }: { params: { id: string } }
                             <LucideFlask className="h-4 w-4 text-primary" />
                             <div>
                               <h3 className="font-medium">{test.name}</h3>
-                              <p className="text-xs text-muted-foreground">Type: {test.type}</p>
+                              <p className="text-xs text-muted-foreground">
+                                Type: {test.type}
+                              </p>
                             </div>
                           </div>
                           <Badge
@@ -385,8 +473,8 @@ export default function ClinicianCasePage({ params }: { params: { id: string } }
                               test.urgency === "High"
                                 ? "bg-destructive"
                                 : test.urgency === "Medium"
-                                  ? "bg-warning text-warning-foreground"
-                                  : "bg-secondary"
+                                ? "bg-warning text-warning-foreground"
+                                : "bg-secondary"
                             }
                           >
                             {test.urgency} Priority
@@ -394,7 +482,9 @@ export default function ClinicianCasePage({ params }: { params: { id: string } }
                         </div>
                         <p className="text-sm">{test.reason}</p>
                         <div className="flex justify-between items-center mt-3">
-                          <p className="text-xs text-muted-foreground">Status: {test.status}</p>
+                          <p className="text-xs text-muted-foreground">
+                            Status: {test.status}
+                          </p>
                           <Button variant="outline" size="sm">
                             Request Test
                           </Button>
@@ -406,11 +496,15 @@ export default function ClinicianCasePage({ params }: { params: { id: string } }
                       <div className="flex items-start gap-3">
                         <LucideActivity className="h-5 w-5 text-primary flex-shrink-0 mt-0.5" />
                         <div>
-                          <p className="text-sm font-medium">Coordinating with Patient's Provider</p>
+                          <p className="text-sm font-medium">
+                            Coordinating with Patient's Provider
+                          </p>
                           <p className="text-sm text-muted-foreground mt-1">
-                            These test recommendations will be shared with the patient's primary healthcare provider for
-                            coordination. You can request additional tests or provide specific instructions for the
-                            patient's local healthcare team.
+                            These test recommendations will be shared with the
+                            patient's primary healthcare provider for
+                            coordination. You can request additional tests or
+                            provide specific instructions for the patient's
+                            local healthcare team.
                           </p>
                         </div>
                       </div>
@@ -431,25 +525,33 @@ export default function ClinicianCasePage({ params }: { params: { id: string } }
                   <Card className="gemini-card border-none">
                     <CardContent className="flex flex-col items-center justify-center py-12">
                       <div className="gemini-spinner mb-4"></div>
-                      <h3 className="text-lg font-medium mb-2">Analyzing Patient Data</h3>
+                      <h3 className="text-lg font-medium mb-2">
+                        Analyzing Patient Data
+                      </h3>
                       <p className="text-muted-foreground text-center max-w-md">
-                        Google Gemini AI is analyzing the patient's symptoms, medical history, and images to provide
-                        insights.
+                        Google Gemini AI is analyzing the patient's symptoms,
+                        medical history, and images to provide insights.
                       </p>
                     </CardContent>
                   </Card>
                 ) : aiAnalysisResult ? (
                   <AIVisualAnalysis
                     images={caseData.images}
-                    symptoms={[caseData.primaryConcern, caseData.additionalSymptoms]}
+                    symptoms={[
+                      caseData.primaryConcern,
+                      caseData.additionalSymptoms,
+                    ]}
                   />
                 ) : (
                   <Card className="gemini-card border-none">
                     <CardContent className="flex flex-col items-center justify-center py-12">
                       <LucideAlertCircle className="h-12 w-12 text-muted-foreground mb-4" />
-                      <h3 className="text-lg font-medium mb-2">Analysis Not Available</h3>
+                      <h3 className="text-lg font-medium mb-2">
+                        Analysis Not Available
+                      </h3>
                       <p className="text-muted-foreground text-center max-w-md">
-                        There was an error generating the AI analysis. Please try again later.
+                        There was an error generating the AI analysis. Please
+                        try again later.
                       </p>
                     </CardContent>
                   </Card>
@@ -479,7 +581,10 @@ export default function ClinicianCasePage({ params }: { params: { id: string } }
                 <div className="space-y-2">
                   <div className="text-sm font-medium">Review Progress</div>
                   <div className="h-2 bg-muted rounded-full overflow-hidden">
-                    <div className="h-full bg-gemini-gradient-new rounded-full" style={{ width: "33%" }}></div>
+                    <div
+                      className="h-full bg-gemini-gradient-new rounded-full"
+                      style={{ width: "33%" }}
+                    ></div>
                   </div>
                   <div className="flex justify-between text-xs text-muted-foreground">
                     <span>1/3 clinicians reviewed</span>
@@ -490,7 +595,9 @@ export default function ClinicianCasePage({ params }: { params: { id: string } }
                 <div className="rounded-lg bg-blue-50 p-3">
                   <div className="flex items-center gap-2">
                     <LucideAlertCircle className="h-4 w-4 text-primary" />
-                    <span className="text-sm font-medium">Your review is needed</span>
+                    <span className="text-sm font-medium">
+                      Your review is needed
+                    </span>
                   </div>
                   <p className="text-xs text-muted-foreground mt-1">
                     This case is awaiting your assessment to proceed.
@@ -505,7 +612,10 @@ export default function ClinicianCasePage({ params }: { params: { id: string } }
               </CardHeader>
               <CardContent className="space-y-4">
                 {caseData.otherClinicians.map((clinician) => (
-                  <div key={clinician.id} className="flex items-center justify-between">
+                  <div
+                    key={clinician.id}
+                    className="flex items-center justify-between"
+                  >
                     <div className="flex items-center gap-3">
                       <Avatar>
                         <AvatarFallback className="bg-primary text-primary-foreground">
@@ -513,11 +623,22 @@ export default function ClinicianCasePage({ params }: { params: { id: string } }
                         </AvatarFallback>
                       </Avatar>
                       <div>
-                        <div className="text-sm font-medium">{clinician.name}</div>
-                        <div className="text-xs text-muted-foreground">{clinician.specialty}</div>
+                        <div className="text-sm font-medium">
+                          {clinician.name}
+                        </div>
+                        <div className="text-xs text-muted-foreground">
+                          {clinician.specialty}
+                        </div>
                       </div>
                     </div>
-                    <Badge variant="outline" className={clinician.status === "Reviewing" ? "bg-blue-50" : "bg-muted"}>
+                    <Badge
+                      variant="outline"
+                      className={
+                        clinician.status === "Reviewing"
+                          ? "bg-blue-50"
+                          : "bg-muted"
+                      }
+                    >
                       {clinician.status}
                     </Badge>
                   </div>
@@ -536,7 +657,8 @@ export default function ClinicianCasePage({ params }: { params: { id: string } }
                       Contact Dermatitis
                     </MedicalTermInfo>
                     <p className="text-xs text-muted-foreground mt-1">
-                      Symptoms match pattern of allergic reaction to external substance
+                      Symptoms match pattern of allergic reaction to external
+                      substance
                     </p>
                   </div>
 
@@ -545,7 +667,8 @@ export default function ClinicianCasePage({ params }: { params: { id: string } }
                       Atopic Dermatitis (Eczema)
                     </MedicalTermInfo>
                     <p className="text-xs text-muted-foreground mt-1">
-                      Patient has history of childhood eczema which may have recurred
+                      Patient has history of childhood eczema which may have
+                      recurred
                     </p>
                   </div>
 
@@ -572,7 +695,9 @@ export default function ClinicianCasePage({ params }: { params: { id: string } }
                   </div>
                   <div>
                     <div className="text-sm font-medium">92% Match Score</div>
-                    <div className="text-xs text-muted-foreground">High relevance to your specialty</div>
+                    <div className="text-xs text-muted-foreground">
+                      High relevance to your specialty
+                    </div>
                   </div>
                 </div>
 
@@ -601,6 +726,5 @@ export default function ClinicianCasePage({ params }: { params: { id: string } }
         </div>
       </main>
     </div>
-  )
+  );
 }
-

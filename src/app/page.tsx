@@ -1,8 +1,15 @@
-import Link from "next/link"
-import Image from "next/image"
-import { Button } from "@/components/ui/button"
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
-import { LucideUsers, LucideBrain, LucideActivity } from "lucide-react"
+import Link from "next/link";
+import Image from "next/image";
+import { Button } from "@/src/components/ui/button";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardFooter,
+  CardHeader,
+  CardTitle,
+} from "@/src/components/ui/card";
+import { LucideUsers, LucideBrain, LucideActivity } from "lucide-react";
 
 export default function Home() {
   return (
@@ -12,7 +19,7 @@ export default function Home() {
           <div className="flex items-center gap-2">
             <div className="relative h-10 w-10 overflow-hidden">
               <Image
-                src="/images/symedon-logo.png"
+                src="/symedon-logo.png"
                 alt="Symedon Logo"
                 width={40}
                 height={40}
@@ -66,8 +73,9 @@ export default function Home() {
                   Connecting Patients with Global Medical Expertise
                 </h1>
                 <p className="text-muted-foreground md:text-xl">
-                  Symedon bridges the gap between patients seeking medical guidance and volunteer clinicians worldwide.
-                  Get insights from multiple medical professionals while maintaining your privacy.
+                  Symedon bridges the gap between patients seeking medical
+                  guidance and volunteer clinicians worldwide. Get insights from
+                  multiple medical professionals while maintaining your privacy.
                 </p>
                 <div className="flex flex-col sm:flex-row gap-3">
                   <Link href="/patient/new">
@@ -76,13 +84,18 @@ export default function Home() {
                     </Button>
                   </Link>
                   <Link href="/clinician/register">
-                    <Button size="lg" variant="outline" className="w-full sm:w-auto rounded-full">
+                    <Button
+                      size="lg"
+                      variant="outline"
+                      className="w-full sm:w-auto rounded-full"
+                    >
                       Join as a Clinician
                     </Button>
                   </Link>
                 </div>
                 <p className="text-sm text-muted-foreground">
-                  Not a replacement for emergency care or your primary physician.
+                  Not a replacement for emergency care or your primary
+                  physician.
                 </p>
               </div>
               <div className="relative h-[350px] rounded-[24px] overflow-hidden symedon-border flex items-center justify-center bg-white">
@@ -90,17 +103,20 @@ export default function Home() {
                 <div className="relative z-10 p-6 text-center">
                   <div className="w-24 h-24 mx-auto mb-4">
                     <Image
-                      src="/images/symedon-logo.png"
+                      src="/symedon-logo.png"
                       alt="Symedon Logo"
                       width={96}
                       height={96}
                       className="object-contain"
                     />
                   </div>
-                  <h3 className="text-xl font-medium mb-2">How Symedon Works</h3>
+                  <h3 className="text-xl font-medium mb-2">
+                    How Symedon Works
+                  </h3>
                   <p className="text-muted-foreground">
-                    Submit your health concerns securely, receive insights from multiple medical professionals, and get
-                    aggregated guidance to discuss with your healthcare provider.
+                    Submit your health concerns securely, receive insights from
+                    multiple medical professionals, and get aggregated guidance
+                    to discuss with your healthcare provider.
                   </p>
                 </div>
               </div>
@@ -111,10 +127,12 @@ export default function Home() {
         <section className="py-12 md:py-24" id="how-it-works">
           <div className="container px-4 md:px-6">
             <div className="text-center mb-12">
-              <h2 className="text-3xl font-bold tracking-tighter">How It Works</h2>
+              <h2 className="text-3xl font-bold tracking-tighter">
+                How It Works
+              </h2>
               <p className="text-muted-foreground md:text-lg mt-4 max-w-3xl mx-auto">
-                Our platform connects patients with medical professionals worldwide while maintaining privacy and
-                security.
+                Our platform connects patients with medical professionals
+                worldwide while maintaining privacy and security.
               </p>
             </div>
             <div className="grid gap-8 md:grid-cols-3">
@@ -127,8 +145,8 @@ export default function Home() {
                 </CardHeader>
                 <CardContent>
                   <p className="text-muted-foreground">
-                    Describe your symptoms, upload relevant images, and provide medical history. All information is
-                    anonymized.
+                    Describe your symptoms, upload relevant images, and provide
+                    medical history. All information is anonymized.
                   </p>
                 </CardContent>
               </Card>
@@ -141,7 +159,8 @@ export default function Home() {
                 </CardHeader>
                 <CardContent>
                   <p className="text-muted-foreground">
-                    Google Gemini analyzes your case and matches you with the most appropriate medical professionals.
+                    Google Gemini analyzes your case and matches you with the
+                    most appropriate medical professionals.
                   </p>
                 </CardContent>
               </Card>
@@ -154,7 +173,8 @@ export default function Home() {
                 </CardHeader>
                 <CardContent>
                   <p className="text-muted-foreground">
-                    Get aggregated feedback and guidance that you can discuss with your healthcare provider.
+                    Get aggregated feedback and guidance that you can discuss
+                    with your healthcare provider.
                   </p>
                 </CardContent>
               </Card>
@@ -162,14 +182,19 @@ export default function Home() {
           </div>
         </section>
 
-        <section className="py-12 md:py-24 bg-gradient-to-br from-blue-50 to-white" id="for-clinicians">
+        <section
+          className="py-12 md:py-24 bg-gradient-to-br from-blue-50 to-white"
+          id="for-clinicians"
+        >
           <div className="container px-4 md:px-6">
             <div className="grid gap-6 lg:grid-cols-2 lg:gap-12 items-center">
               <div className="space-y-4">
-                <h2 className="text-3xl font-bold tracking-tighter">For Medical Professionals</h2>
+                <h2 className="text-3xl font-bold tracking-tighter">
+                  For Medical Professionals
+                </h2>
                 <p className="text-muted-foreground md:text-lg">
-                  Join our global network of volunteer clinicians to help patients worldwide while expanding your
-                  clinical experience.
+                  Join our global network of volunteer clinicians to help
+                  patients worldwide while expanding your clinical experience.
                 </p>
                 <ul className="space-y-2">
                   <li className="flex items-start gap-2">
@@ -182,7 +207,9 @@ export default function Home() {
                     <div className="h-5 w-5 flex-shrink-0 rounded-full bg-primary/10 flex items-center justify-center mt-0.5">
                       <div className="h-2 w-2 rounded-full bg-primary"></div>
                     </div>
-                    <span>Expand your clinical experience with diverse cases</span>
+                    <span>
+                      Expand your clinical experience with diverse cases
+                    </span>
                   </li>
                   <li className="flex items-start gap-2">
                     <div className="h-5 w-5 flex-shrink-0 rounded-full bg-primary/10 flex items-center justify-center mt-0.5">
@@ -203,33 +230,42 @@ export default function Home() {
                 <CardHeader>
                   <CardTitle>Clinician Registration</CardTitle>
                   <CardDescription>
-                    Complete your profile to join our global network of medical professionals
+                    Complete your profile to join our global network of medical
+                    professionals
                   </CardDescription>
                 </CardHeader>
                 <CardContent>
                   <div className="space-y-4">
                     <div className="grid grid-cols-2 gap-4">
                       <div className="space-y-2">
-                        <label className="text-sm font-medium">Medical Specialty</label>
+                        <label className="text-sm font-medium">
+                          Medical Specialty
+                        </label>
                         <div className="h-10 w-full rounded-md border bg-background px-3 py-2 text-sm">
                           Select specialty
                         </div>
                       </div>
                       <div className="space-y-2">
-                        <label className="text-sm font-medium">Years of Experience</label>
+                        <label className="text-sm font-medium">
+                          Years of Experience
+                        </label>
                         <div className="h-10 w-full rounded-md border bg-background px-3 py-2 text-sm">
                           Select years
                         </div>
                       </div>
                     </div>
                     <div className="space-y-2">
-                      <label className="text-sm font-medium">Medical License Number</label>
+                      <label className="text-sm font-medium">
+                        Medical License Number
+                      </label>
                       <div className="h-10 w-full rounded-md border bg-background px-3 py-2 text-sm">
                         Enter license number
                       </div>
                     </div>
                     <div className="space-y-2">
-                      <label className="text-sm font-medium">Country of Practice</label>
+                      <label className="text-sm font-medium">
+                        Country of Practice
+                      </label>
                       <div className="h-10 w-full rounded-md border bg-background px-3 py-2 text-sm">
                         Select country
                       </div>
@@ -237,7 +273,9 @@ export default function Home() {
                   </div>
                 </CardContent>
                 <CardFooter>
-                  <Button className="w-full rounded-full">Continue Registration</Button>
+                  <Button className="w-full rounded-full">
+                    Continue Registration
+                  </Button>
                 </CardFooter>
               </Card>
             </div>
@@ -250,7 +288,7 @@ export default function Home() {
           <div className="flex items-center gap-2">
             <div className="relative h-8 w-8 overflow-hidden">
               <Image
-                src="/images/symedon-logo.png"
+                src="/symedon-logo.png"
                 alt="Symedon Logo"
                 width={32}
                 height={32}
@@ -260,8 +298,8 @@ export default function Home() {
             <span className="text-lg font-semibold">Symedon</span>
           </div>
           <p className="text-sm text-muted-foreground">
-            &copy; {new Date().getFullYear()} Symedon. All rights reserved. Not a substitute for professional medical
-            advice.
+            &copy; {new Date().getFullYear()} Symedon. All rights reserved. Not
+            a substitute for professional medical advice.
           </p>
           <div className="flex gap-4 text-sm text-muted-foreground">
             <Link href="/terms">Terms</Link>
@@ -271,6 +309,5 @@ export default function Home() {
         </div>
       </footer>
     </div>
-  )
+  );
 }
-

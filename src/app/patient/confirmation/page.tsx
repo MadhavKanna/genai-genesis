@@ -1,7 +1,19 @@
-import Link from "next/link"
-import { Button } from "@/components/ui/button"
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
-import { LucideCheckCircle, LucideArrowLeft, LucideUsers, LucideCalendar } from "lucide-react"
+import Link from "next/link";
+import { Button } from "@/src/components/ui/button";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardFooter,
+  CardHeader,
+  CardTitle,
+} from "@/src/components/ui/card";
+import {
+  LucideCheckCircle,
+  LucideArrowLeft,
+  LucideUsers,
+  LucideCalendar,
+} from "lucide-react";
 
 export default function ConfirmationPage() {
   return (
@@ -16,9 +28,12 @@ export default function ConfirmationPage() {
           <div className="mx-auto mb-4 h-12 w-12 rounded-full bg-primary/10 flex items-center justify-center">
             <LucideCheckCircle className="h-6 w-6 text-primary" />
           </div>
-          <CardTitle className="text-2xl">Case Submitted Successfully</CardTitle>
+          <CardTitle className="text-2xl">
+            Case Submitted Successfully
+          </CardTitle>
           <CardDescription>
-            Your case has been anonymized and is now available for review by medical professionals.
+            Your case has been anonymized and is now available for review by
+            medical professionals.
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-6">
@@ -43,28 +58,41 @@ export default function ConfirmationPage() {
                 <div className="h-5 w-5 flex-shrink-0 rounded-full bg-primary/10 flex items-center justify-center mt-0.5">
                   <div className="h-2 w-2 rounded-full bg-primary"></div>
                 </div>
-                <span>Medical professionals will review your case and provide their insights</span>
+                <span>
+                  Medical professionals will review your case and provide their
+                  insights
+                </span>
               </li>
               <li className="flex items-start gap-2">
                 <div className="h-5 w-5 flex-shrink-0 rounded-full bg-primary/10 flex items-center justify-center mt-0.5">
                   <div className="h-2 w-2 rounded-full bg-primary"></div>
                 </div>
-                <span>You'll receive a notification when your guidance report is ready</span>
+                <span>
+                  You'll receive a notification when your guidance report is
+                  ready
+                </span>
               </li>
               <li className="flex items-start gap-2">
                 <div className="h-5 w-5 flex-shrink-0 rounded-full bg-primary/10 flex items-center justify-center mt-0.5">
                   <div className="h-2 w-2 rounded-full bg-primary"></div>
                 </div>
-                <span>Review the guidance and discuss it with your healthcare provider</span>
+                <span>
+                  Review the guidance and discuss it with your healthcare
+                  provider
+                </span>
               </li>
             </ol>
           </div>
 
           <div className="rounded-lg border p-4 text-sm text-muted-foreground">
             <p>
-              Expected response time: <span className="font-medium">24-48 hours</span>
+              Expected response time:{" "}
+              <span className="font-medium">24-48 hours</span>
             </p>
-            <p className="mt-2">You'll receive an email notification when your guidance report is ready to view.</p>
+            <p className="mt-2">
+              You'll receive an email notification when your guidance report is
+              ready to view.
+            </p>
           </div>
         </CardContent>
         <CardFooter className="flex flex-col gap-3">
@@ -79,6 +107,5 @@ export default function ConfirmationPage() {
         </CardFooter>
       </Card>
     </div>
-  )
+  );
 }
-

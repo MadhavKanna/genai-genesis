@@ -1,15 +1,31 @@
-"use client"
+"use client";
 
-import { useState } from "react"
-import Link from "next/link"
-import Image from "next/image"
-import { Button } from "@/components/ui/button"
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
-import { Badge } from "@/components/ui/badge"
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
-import { Input } from "@/components/ui/input"
-import { useAuth } from "@/components/auth-provider"
+import { useState } from "react";
+import Link from "next/link";
+import Image from "next/image";
+import { Button } from "@/src/components/ui/button";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardFooter,
+  CardHeader,
+  CardTitle,
+} from "@/src/components/ui/card";
+import {
+  Tabs,
+  TabsContent,
+  TabsList,
+  TabsTrigger,
+} from "@/src/components/ui/tabs";
+import { Badge } from "@/src/components/ui/badge";
+import {
+  Avatar,
+  AvatarFallback,
+  AvatarImage,
+} from "@/src/components/ui/avatar";
+import { Input } from "@/src/components/ui/input";
+import { useAuth } from "@/src/components/auth-provider";
 import {
   LucideUsers,
   LucideBrain,
@@ -22,17 +38,17 @@ import {
   LucideSearch,
   LucideFilter,
   LucideBarChart,
-} from "lucide-react"
+} from "lucide-react";
 
-import { LanguageSelector } from "@/components/language-selector"
+import { LanguageSelector } from "@/src/components/language-selector";
 
 export default function ClinicianDashboard() {
-  const [activeTab, setActiveTab] = useState("pending")
-  const { signOut } = useAuth()
+  const [activeTab, setActiveTab] = useState("pending");
+  const { signOut } = useAuth();
 
   const handleLogout = async () => {
-    await signOut()
-  }
+    await signOut();
+  };
 
   return (
     <div className="flex min-h-screen bg-gradient-to-br from-blue-50 to-white">
@@ -42,7 +58,7 @@ export default function ClinicianDashboard() {
           <div className="flex items-center gap-2">
             <div className="relative h-8 w-8 overflow-hidden">
               <Image
-                src="/images/symedon-logo.png"
+                src="/symedon-logo.png"
                 alt="Symedon Logo"
                 width={32}
                 height={32}
@@ -109,7 +125,12 @@ export default function ClinicianDashboard() {
               <span className="text-xs text-muted-foreground">Orthopedics</span>
             </div>
           </div>
-          <Button variant="outline" className="w-full mt-2 rounded-full" size="sm" onClick={handleLogout}>
+          <Button
+            variant="outline"
+            className="w-full mt-2 rounded-full"
+            size="sm"
+            onClick={handleLogout}
+          >
             <LucideLogOut className="mr-2 h-4 w-4" />
             Log out
           </Button>
@@ -123,7 +144,11 @@ export default function ClinicianDashboard() {
           <div className="ml-auto flex items-center gap-4">
             <div className="relative">
               <LucideSearch className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
-              <Input type="search" placeholder="Search cases..." className="w-64 rounded-full pl-8" />
+              <Input
+                type="search"
+                placeholder="Search cases..."
+                className="w-64 rounded-full pl-8"
+              />
             </div>
             <Button variant="outline" className="rounded-full">
               <LucideFilter className="mr-2 h-4 w-4" />
@@ -134,7 +159,11 @@ export default function ClinicianDashboard() {
         </header>
 
         <main className="container py-6">
-          <Tabs defaultValue="pending" className="w-full" onValueChange={setActiveTab}>
+          <Tabs
+            defaultValue="pending"
+            className="w-full"
+            onValueChange={setActiveTab}
+          >
             <TabsList className="grid w-full grid-cols-4 mb-8">
               <TabsTrigger value="pending">Pending Review (3)</TabsTrigger>
               <TabsTrigger value="matched">Matched Cases (5)</TabsTrigger>
@@ -144,24 +173,38 @@ export default function ClinicianDashboard() {
 
             <TabsContent value="pending" className="space-y-4">
               <div className="flex items-center justify-between">
-                <h2 className="text-xl font-semibold">Cases Awaiting Your Review</h2>
-                <p className="text-sm text-muted-foreground">3 cases need your attention</p>
+                <h2 className="text-xl font-semibold">
+                  Cases Awaiting Your Review
+                </h2>
+                <p className="text-sm text-muted-foreground">
+                  3 cases need your attention
+                </p>
               </div>
 
               <Card className="symedon-card border-none">
                 <CardHeader className="pb-2">
                   <div className="flex justify-between items-center">
-                    <CardTitle className="text-lg">Persistent Skin Rash</CardTitle>
-                    <Badge className="bg-symedon-red-gradient">High Priority</Badge>
+                    <CardTitle className="text-lg">
+                      Persistent Skin Rash
+                    </CardTitle>
+                    <Badge className="bg-symedon-red-gradient">
+                      High Priority
+                    </Badge>
                   </div>
-                  <CardDescription>Case ID: #SYM-23789 • Matched: May 16, 2023</CardDescription>
+                  <CardDescription>
+                    Case ID: #SYM-23789 • Matched: May 16, 2023
+                  </CardDescription>
                 </CardHeader>
                 <CardContent>
                   <div className="space-y-4">
                     <div className="grid grid-cols-2 gap-4 text-sm">
                       <div>
-                        <span className="text-muted-foreground">Primary concern:</span>
-                        <p className="font-medium">Itchy rash on arms and torso</p>
+                        <span className="text-muted-foreground">
+                          Primary concern:
+                        </span>
+                        <p className="font-medium">
+                          Itchy rash on arms and torso
+                        </p>
                       </div>
                       <div>
                         <span className="text-muted-foreground">Duration:</span>
@@ -183,7 +226,9 @@ export default function ClinicianDashboard() {
 
                     <div className="flex items-center gap-2 text-xs text-muted-foreground">
                       <LucideBrain className="h-3 w-3" />
-                      <span>AI Match Score: 92% relevance to your specialty</span>
+                      <span>
+                        AI Match Score: 92% relevance to your specialty
+                      </span>
                     </div>
                   </div>
                 </CardContent>
@@ -201,6 +246,5 @@ export default function ClinicianDashboard() {
         </main>
       </div>
     </div>
-  )
+  );
 }
-

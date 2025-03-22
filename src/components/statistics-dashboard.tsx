@@ -1,12 +1,29 @@
-"use client"
+"use client";
 
-import { useState } from "react"
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { Button } from "@/components/ui/button"
-import { Badge } from "@/components/ui/badge"
-import { Progress } from "@/components/ui/progress"
+import { useState } from "react";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/src/components/ui/card";
+import {
+  Tabs,
+  TabsContent,
+  TabsList,
+  TabsTrigger,
+} from "@/src/components/ui/tabs";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/src/components/ui/select";
+import { Button } from "@/src/components/ui/button";
+import { Badge } from "@/src/components/ui/badge";
+import { Progress } from "@/src/components/ui/progress";
 import {
   LucideDownload,
   LucideShare2,
@@ -18,7 +35,7 @@ import {
   LucideAlertCircle,
   LucideInfo,
   FlaskConicalIcon as LucideFlask,
-} from "lucide-react"
+} from "lucide-react";
 
 // Enhanced mock data for regional medication needs
 const regionalMedicationData = [
@@ -27,11 +44,36 @@ const regionalMedicationData = [
     population: 1850000,
     displacedPopulation: 450000,
     medicationNeeds: [
-      { name: "Antibiotics", count: 12500, percentageOfNeed: 85, urgency: "high" },
-      { name: "Insulin", count: 8700, percentageOfNeed: 45, urgency: "critical" },
-      { name: "Antihypertensives", count: 9200, percentageOfNeed: 60, urgency: "high" },
-      { name: "Analgesics", count: 15000, percentageOfNeed: 70, urgency: "medium" },
-      { name: "Asthma Inhalers", count: 4300, percentageOfNeed: 30, urgency: "high" },
+      {
+        name: "Antibiotics",
+        count: 12500,
+        percentageOfNeed: 85,
+        urgency: "high",
+      },
+      {
+        name: "Insulin",
+        count: 8700,
+        percentageOfNeed: 45,
+        urgency: "critical",
+      },
+      {
+        name: "Antihypertensives",
+        count: 9200,
+        percentageOfNeed: 60,
+        urgency: "high",
+      },
+      {
+        name: "Analgesics",
+        count: 15000,
+        percentageOfNeed: 70,
+        urgency: "medium",
+      },
+      {
+        name: "Asthma Inhalers",
+        count: 4300,
+        percentageOfNeed: 30,
+        urgency: "high",
+      },
     ],
     healthcareAccess: "limited",
     lastUpdated: "2025-03-15",
@@ -41,11 +83,36 @@ const regionalMedicationData = [
     population: 670000,
     displacedPopulation: 210000,
     medicationNeeds: [
-      { name: "Antimalarials", count: 18500, percentageOfNeed: 40, urgency: "critical" },
-      { name: "Antibiotics", count: 14200, percentageOfNeed: 55, urgency: "high" },
-      { name: "Oral Rehydration Salts", count: 22000, percentageOfNeed: 65, urgency: "critical" },
-      { name: "Analgesics", count: 9800, percentageOfNeed: 50, urgency: "medium" },
-      { name: "Antiretrovirals", count: 5600, percentageOfNeed: 25, urgency: "high" },
+      {
+        name: "Antimalarials",
+        count: 18500,
+        percentageOfNeed: 40,
+        urgency: "critical",
+      },
+      {
+        name: "Antibiotics",
+        count: 14200,
+        percentageOfNeed: 55,
+        urgency: "high",
+      },
+      {
+        name: "Oral Rehydration Salts",
+        count: 22000,
+        percentageOfNeed: 65,
+        urgency: "critical",
+      },
+      {
+        name: "Analgesics",
+        count: 9800,
+        percentageOfNeed: 50,
+        urgency: "medium",
+      },
+      {
+        name: "Antiretrovirals",
+        count: 5600,
+        percentageOfNeed: 25,
+        urgency: "high",
+      },
     ],
     healthcareAccess: "severely limited",
     lastUpdated: "2025-03-18",
@@ -55,11 +122,36 @@ const regionalMedicationData = [
     population: 920000,
     displacedPopulation: 740000,
     medicationNeeds: [
-      { name: "Antibiotics", count: 16800, percentageOfNeed: 60, urgency: "high" },
-      { name: "Oral Rehydration Salts", count: 25000, percentageOfNeed: 75, urgency: "critical" },
-      { name: "Antihypertensives", count: 7200, percentageOfNeed: 40, urgency: "medium" },
-      { name: "Analgesics", count: 12500, percentageOfNeed: 55, urgency: "medium" },
-      { name: "Antimalarials", count: 9300, percentageOfNeed: 50, urgency: "high" },
+      {
+        name: "Antibiotics",
+        count: 16800,
+        percentageOfNeed: 60,
+        urgency: "high",
+      },
+      {
+        name: "Oral Rehydration Salts",
+        count: 25000,
+        percentageOfNeed: 75,
+        urgency: "critical",
+      },
+      {
+        name: "Antihypertensives",
+        count: 7200,
+        percentageOfNeed: 40,
+        urgency: "medium",
+      },
+      {
+        name: "Analgesics",
+        count: 12500,
+        percentageOfNeed: 55,
+        urgency: "medium",
+      },
+      {
+        name: "Antimalarials",
+        count: 9300,
+        percentageOfNeed: 50,
+        urgency: "high",
+      },
     ],
     healthcareAccess: "limited",
     lastUpdated: "2025-03-10",
@@ -69,11 +161,36 @@ const regionalMedicationData = [
     population: 1100000,
     displacedPopulation: 320000,
     medicationNeeds: [
-      { name: "Antimalarials", count: 15600, percentageOfNeed: 45, urgency: "critical" },
-      { name: "Antibiotics", count: 11200, percentageOfNeed: 50, urgency: "high" },
-      { name: "Analgesics", count: 8900, percentageOfNeed: 40, urgency: "medium" },
-      { name: "Oral Rehydration Salts", count: 18500, percentageOfNeed: 70, urgency: "high" },
-      { name: "Antiretrovirals", count: 4200, percentageOfNeed: 30, urgency: "high" },
+      {
+        name: "Antimalarials",
+        count: 15600,
+        percentageOfNeed: 45,
+        urgency: "critical",
+      },
+      {
+        name: "Antibiotics",
+        count: 11200,
+        percentageOfNeed: 50,
+        urgency: "high",
+      },
+      {
+        name: "Analgesics",
+        count: 8900,
+        percentageOfNeed: 40,
+        urgency: "medium",
+      },
+      {
+        name: "Oral Rehydration Salts",
+        count: 18500,
+        percentageOfNeed: 70,
+        urgency: "high",
+      },
+      {
+        name: "Antiretrovirals",
+        count: 4200,
+        percentageOfNeed: 30,
+        urgency: "high",
+      },
     ],
     healthcareAccess: "limited",
     lastUpdated: "2025-03-12",
@@ -83,11 +200,36 @@ const regionalMedicationData = [
     population: 1930000,
     displacedPopulation: 580000,
     medicationNeeds: [
-      { name: "Antibiotics", count: 19500, percentageOfNeed: 55, urgency: "critical" },
-      { name: "Insulin", count: 7800, percentageOfNeed: 35, urgency: "critical" },
-      { name: "Antihypertensives", count: 10200, percentageOfNeed: 45, urgency: "high" },
-      { name: "Analgesics", count: 16500, percentageOfNeed: 60, urgency: "medium" },
-      { name: "Cholera Treatments", count: 12300, percentageOfNeed: 50, urgency: "critical" },
+      {
+        name: "Antibiotics",
+        count: 19500,
+        percentageOfNeed: 55,
+        urgency: "critical",
+      },
+      {
+        name: "Insulin",
+        count: 7800,
+        percentageOfNeed: 35,
+        urgency: "critical",
+      },
+      {
+        name: "Antihypertensives",
+        count: 10200,
+        percentageOfNeed: 45,
+        urgency: "high",
+      },
+      {
+        name: "Analgesics",
+        count: 16500,
+        percentageOfNeed: 60,
+        urgency: "medium",
+      },
+      {
+        name: "Cholera Treatments",
+        count: 12300,
+        percentageOfNeed: 50,
+        urgency: "critical",
+      },
     ],
     healthcareAccess: "severely limited",
     lastUpdated: "2025-03-20",
@@ -97,11 +239,36 @@ const regionalMedicationData = [
     population: 987000,
     displacedPopulation: 150000,
     medicationNeeds: [
-      { name: "Antibiotics", count: 9800, percentageOfNeed: 45, urgency: "high" },
-      { name: "Analgesics", count: 7500, percentageOfNeed: 40, urgency: "medium" },
-      { name: "Oral Rehydration Salts", count: 15000, percentageOfNeed: 65, urgency: "high" },
-      { name: "Antihypertensives", count: 6200, percentageOfNeed: 35, urgency: "medium" },
-      { name: "Antiretrovirals", count: 3800, percentageOfNeed: 25, urgency: "high" },
+      {
+        name: "Antibiotics",
+        count: 9800,
+        percentageOfNeed: 45,
+        urgency: "high",
+      },
+      {
+        name: "Analgesics",
+        count: 7500,
+        percentageOfNeed: 40,
+        urgency: "medium",
+      },
+      {
+        name: "Oral Rehydration Salts",
+        count: 15000,
+        percentageOfNeed: 65,
+        urgency: "high",
+      },
+      {
+        name: "Antihypertensives",
+        count: 6200,
+        percentageOfNeed: 35,
+        urgency: "medium",
+      },
+      {
+        name: "Antiretrovirals",
+        count: 3800,
+        percentageOfNeed: 25,
+        urgency: "high",
+      },
     ],
     healthcareAccess: "limited",
     lastUpdated: "2025-03-14",
@@ -111,11 +278,36 @@ const regionalMedicationData = [
     population: 4600000,
     displacedPopulation: 890000,
     medicationNeeds: [
-      { name: "Antibiotics", count: 22500, percentageOfNeed: 60, urgency: "high" },
-      { name: "Analgesics", count: 18700, percentageOfNeed: 55, urgency: "medium" },
-      { name: "Antihypertensives", count: 12300, percentageOfNeed: 40, urgency: "high" },
-      { name: "Insulin", count: 9500, percentageOfNeed: 35, urgency: "critical" },
-      { name: "Psychiatric Medications", count: 7800, percentageOfNeed: 25, urgency: "high" },
+      {
+        name: "Antibiotics",
+        count: 22500,
+        percentageOfNeed: 60,
+        urgency: "high",
+      },
+      {
+        name: "Analgesics",
+        count: 18700,
+        percentageOfNeed: 55,
+        urgency: "medium",
+      },
+      {
+        name: "Antihypertensives",
+        count: 12300,
+        percentageOfNeed: 40,
+        urgency: "high",
+      },
+      {
+        name: "Insulin",
+        count: 9500,
+        percentageOfNeed: 35,
+        urgency: "critical",
+      },
+      {
+        name: "Psychiatric Medications",
+        count: 7800,
+        percentageOfNeed: 25,
+        urgency: "high",
+      },
     ],
     healthcareAccess: "limited",
     lastUpdated: "2025-03-17",
@@ -125,16 +317,41 @@ const regionalMedicationData = [
     population: 450000,
     displacedPopulation: 180000,
     medicationNeeds: [
-      { name: "Antimalarials", count: 14200, percentageOfNeed: 50, urgency: "critical" },
-      { name: "Antibiotics", count: 10800, percentageOfNeed: 45, urgency: "high" },
-      { name: "Oral Rehydration Salts", count: 16500, percentageOfNeed: 70, urgency: "critical" },
-      { name: "Analgesics", count: 8200, percentageOfNeed: 40, urgency: "medium" },
-      { name: "Nutritional Supplements", count: 19500, percentageOfNeed: 75, urgency: "critical" },
+      {
+        name: "Antimalarials",
+        count: 14200,
+        percentageOfNeed: 50,
+        urgency: "critical",
+      },
+      {
+        name: "Antibiotics",
+        count: 10800,
+        percentageOfNeed: 45,
+        urgency: "high",
+      },
+      {
+        name: "Oral Rehydration Salts",
+        count: 16500,
+        percentageOfNeed: 70,
+        urgency: "critical",
+      },
+      {
+        name: "Analgesics",
+        count: 8200,
+        percentageOfNeed: 40,
+        urgency: "medium",
+      },
+      {
+        name: "Nutritional Supplements",
+        count: 19500,
+        percentageOfNeed: 75,
+        urgency: "critical",
+      },
     ],
     healthcareAccess: "severely limited",
     lastUpdated: "2025-03-19",
   },
-]
+];
 
 // Aggregated medication needs across all regions
 const aggregatedMedicationNeeds = [
@@ -149,7 +366,7 @@ const aggregatedMedicationNeeds = [
   { name: "Cholera Treatments", count: 12300, percentage: 2.6 },
   { name: "Psychiatric Medications", count: 7800, percentage: 1.6 },
   { name: "Nutritional Supplements", count: 19500, percentage: 4.1 },
-]
+];
 
 // Common illnesses data
 const commonIllnessesData = [
@@ -163,7 +380,7 @@ const commonIllnessesData = [
   { name: "Mental Health Disorders", count: 112, percentage: 6.1 },
   { name: "Diabetes", count: 98, percentage: 5.3 },
   { name: "Tuberculosis", count: 74, percentage: 4.0 },
-]
+];
 
 // Diagnostic equipment needs data
 const diagnosticEquipmentNeeds = [
@@ -171,9 +388,24 @@ const diagnosticEquipmentNeeds = [
     region: "Aleppo, Syria",
     population: 1850000,
     equipmentNeeds: [
-      { name: "X-ray Machine", count: 12, percentAvailable: 35, priority: "critical" },
-      { name: "Ultrasound Machine", count: 8, percentAvailable: 40, priority: "high" },
-      { name: "Basic Laboratory Equipment", count: 15, percentAvailable: 45, priority: "critical" },
+      {
+        name: "X-ray Machine",
+        count: 12,
+        percentAvailable: 35,
+        priority: "critical",
+      },
+      {
+        name: "Ultrasound Machine",
+        count: 8,
+        percentAvailable: 40,
+        priority: "high",
+      },
+      {
+        name: "Basic Laboratory Equipment",
+        count: 15,
+        percentAvailable: 45,
+        priority: "critical",
+      },
       { name: "ECG Machine", count: 6, percentAvailable: 30, priority: "high" },
     ],
   },
@@ -181,86 +413,205 @@ const diagnosticEquipmentNeeds = [
     region: "Goma, DR Congo",
     population: 670000,
     equipmentNeeds: [
-      { name: "X-ray Machine", count: 8, percentAvailable: 20, priority: "critical" },
-      { name: "Ultrasound Machine", count: 5, percentAvailable: 25, priority: "critical" },
-      { name: "Basic Laboratory Equipment", count: 12, percentAvailable: 30, priority: "critical" },
-      { name: "Blood Analysis Equipment", count: 4, percentAvailable: 15, priority: "critical" },
+      {
+        name: "X-ray Machine",
+        count: 8,
+        percentAvailable: 20,
+        priority: "critical",
+      },
+      {
+        name: "Ultrasound Machine",
+        count: 5,
+        percentAvailable: 25,
+        priority: "critical",
+      },
+      {
+        name: "Basic Laboratory Equipment",
+        count: 12,
+        percentAvailable: 30,
+        priority: "critical",
+      },
+      {
+        name: "Blood Analysis Equipment",
+        count: 4,
+        percentAvailable: 15,
+        priority: "critical",
+      },
     ],
   },
   {
     region: "Cox's Bazar, Bangladesh",
     population: 920000,
     equipmentNeeds: [
-      { name: "X-ray Machine", count: 6, percentAvailable: 30, priority: "high" },
-      { name: "Ultrasound Machine", count: 4, percentAvailable: 35, priority: "high" },
-      { name: "Basic Laboratory Equipment", count: 10, percentAvailable: 40, priority: "high" },
-      { name: "Diagnostic Imaging Equipment", count: 3, percentAvailable: 25, priority: "critical" },
+      {
+        name: "X-ray Machine",
+        count: 6,
+        percentAvailable: 30,
+        priority: "high",
+      },
+      {
+        name: "Ultrasound Machine",
+        count: 4,
+        percentAvailable: 35,
+        priority: "high",
+      },
+      {
+        name: "Basic Laboratory Equipment",
+        count: 10,
+        percentAvailable: 40,
+        priority: "high",
+      },
+      {
+        name: "Diagnostic Imaging Equipment",
+        count: 3,
+        percentAvailable: 25,
+        priority: "critical",
+      },
     ],
   },
   {
     region: "Maiduguri, Nigeria",
     population: 1100000,
     equipmentNeeds: [
-      { name: "X-ray Machine", count: 7, percentAvailable: 25, priority: "critical" },
-      { name: "Ultrasound Machine", count: 5, percentAvailable: 30, priority: "high" },
-      { name: "Basic Laboratory Equipment", count: 12, percentAvailable: 35, priority: "high" },
-      { name: "MRI Machine", count: 1, percentAvailable: 10, priority: "critical" },
+      {
+        name: "X-ray Machine",
+        count: 7,
+        percentAvailable: 25,
+        priority: "critical",
+      },
+      {
+        name: "Ultrasound Machine",
+        count: 5,
+        percentAvailable: 30,
+        priority: "high",
+      },
+      {
+        name: "Basic Laboratory Equipment",
+        count: 12,
+        percentAvailable: 35,
+        priority: "high",
+      },
+      {
+        name: "MRI Machine",
+        count: 1,
+        percentAvailable: 10,
+        priority: "critical",
+      },
     ],
   },
   {
     region: "Sana'a, Yemen",
     population: 1930000,
     equipmentNeeds: [
-      { name: "X-ray Machine", count: 10, percentAvailable: 20, priority: "critical" },
-      { name: "Ultrasound Machine", count: 7, percentAvailable: 25, priority: "critical" },
-      { name: "Basic Laboratory Equipment", count: 15, percentAvailable: 30, priority: "critical" },
-      { name: "CT Scanner", count: 2, percentAvailable: 15, priority: "critical" },
+      {
+        name: "X-ray Machine",
+        count: 10,
+        percentAvailable: 20,
+        priority: "critical",
+      },
+      {
+        name: "Ultrasound Machine",
+        count: 7,
+        percentAvailable: 25,
+        priority: "critical",
+      },
+      {
+        name: "Basic Laboratory Equipment",
+        count: 15,
+        percentAvailable: 30,
+        priority: "critical",
+      },
+      {
+        name: "CT Scanner",
+        count: 2,
+        percentAvailable: 15,
+        priority: "critical",
+      },
     ],
   },
-]
+];
 
 // Aggregated equipment needs across all regions
 const aggregatedEquipmentNeeds = [
-  { name: "X-ray Machine", count: 43, percentAvailable: 26, casesRequiring: 1240 },
-  { name: "Ultrasound Machine", count: 29, percentAvailable: 31, casesRequiring: 980 },
-  { name: "Basic Laboratory Equipment", count: 64, percentAvailable: 36, casesRequiring: 1850 },
+  {
+    name: "X-ray Machine",
+    count: 43,
+    percentAvailable: 26,
+    casesRequiring: 1240,
+  },
+  {
+    name: "Ultrasound Machine",
+    count: 29,
+    percentAvailable: 31,
+    casesRequiring: 980,
+  },
+  {
+    name: "Basic Laboratory Equipment",
+    count: 64,
+    percentAvailable: 36,
+    casesRequiring: 1850,
+  },
   { name: "ECG Machine", count: 18, percentAvailable: 28, casesRequiring: 620 },
-  { name: "Blood Analysis Equipment", count: 15, percentAvailable: 22, casesRequiring: 540 },
-  { name: "Diagnostic Imaging Equipment", count: 12, percentAvailable: 25, casesRequiring: 480 },
+  {
+    name: "Blood Analysis Equipment",
+    count: 15,
+    percentAvailable: 22,
+    casesRequiring: 540,
+  },
+  {
+    name: "Diagnostic Imaging Equipment",
+    count: 12,
+    percentAvailable: 25,
+    casesRequiring: 480,
+  },
   { name: "MRI Machine", count: 3, percentAvailable: 12, casesRequiring: 320 },
   { name: "CT Scanner", count: 5, percentAvailable: 18, casesRequiring: 410 },
-]
+];
 
 interface StatisticsDashboardProps {
-  className?: string
+  className?: string;
 }
 
-export function StatisticsDashboard({ className = "" }: StatisticsDashboardProps) {
-  const [activeTab, setActiveTab] = useState("regional")
-  const [timeRange, setTimeRange] = useState("month")
-  const [selectedRegion, setSelectedRegion] = useState("all")
-  const [urgencyFilter, setUrgencyFilter] = useState("all")
+export function StatisticsDashboard({
+  className = "",
+}: StatisticsDashboardProps) {
+  const [activeTab, setActiveTab] = useState("regional");
+  const [timeRange, setTimeRange] = useState("month");
+  const [selectedRegion, setSelectedRegion] = useState("all");
+  const [urgencyFilter, setUrgencyFilter] = useState("all");
 
   // Filter medication data based on urgency
   const filteredMedicationData = regionalMedicationData.map((region) => ({
     ...region,
-    medicationNeeds: region.medicationNeeds.filter((med) => urgencyFilter === "all" || med.urgency === urgencyFilter),
-  }))
+    medicationNeeds: region.medicationNeeds.filter(
+      (med) => urgencyFilter === "all" || med.urgency === urgencyFilter
+    ),
+  }));
 
   // Get data for a specific region or all regions
   const getRegionData = () => {
     if (selectedRegion === "all") {
-      return filteredMedicationData
+      return filteredMedicationData;
     }
-    return filteredMedicationData.filter((region) => region.region === selectedRegion)
-  }
+    return filteredMedicationData.filter(
+      (region) => region.region === selectedRegion
+    );
+  };
 
-  const regionData = getRegionData()
+  const regionData = getRegionData();
 
   // Calculate total displaced population
-  const totalDisplaced = regionalMedicationData.reduce((sum, region) => sum + region.displacedPopulation, 0)
-  const totalPopulation = regionalMedicationData.reduce((sum, region) => sum + region.population, 0)
-  const displacedPercentage = Math.round((totalDisplaced / totalPopulation) * 100)
+  const totalDisplaced = regionalMedicationData.reduce(
+    (sum, region) => sum + region.displacedPopulation,
+    0
+  );
+  const totalPopulation = regionalMedicationData.reduce(
+    (sum, region) => sum + region.population,
+    0
+  );
+  const displacedPercentage = Math.round(
+    (totalDisplaced / totalPopulation) * 100
+  );
 
   return (
     <Card className={`${className}`}>
@@ -268,7 +619,10 @@ export function StatisticsDashboard({ className = "" }: StatisticsDashboardProps
         <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
           <div>
             <CardTitle>Global Health Statistics for UN Relief</CardTitle>
-            <CardDescription>Aggregated data from patient cases to support humanitarian relief efforts</CardDescription>
+            <CardDescription>
+              Aggregated data from patient cases to support humanitarian relief
+              efforts
+            </CardDescription>
           </div>
           <div className="flex items-center gap-2">
             <Select value={timeRange} onValueChange={setTimeRange}>
@@ -289,7 +643,11 @@ export function StatisticsDashboard({ className = "" }: StatisticsDashboardProps
         </div>
       </CardHeader>
       <CardContent>
-        <Tabs defaultValue="regional" className="w-full" onValueChange={setActiveTab}>
+        <Tabs
+          defaultValue="regional"
+          className="w-full"
+          onValueChange={setActiveTab}
+        >
           <TabsList className="grid w-full grid-cols-4 mb-6">
             <TabsTrigger value="regional">Regional Needs</TabsTrigger>
             <TabsTrigger value="medications">Medication Analysis</TabsTrigger>
@@ -306,20 +664,28 @@ export function StatisticsDashboard({ className = "" }: StatisticsDashboardProps
                 <CardContent>
                   <div className="flex items-center">
                     <LucideMapPin className="h-5 w-5 text-primary mr-2" />
-                    <span className="text-2xl font-bold">{regionalMedicationData.length}</span>
+                    <span className="text-2xl font-bold">
+                      {regionalMedicationData.length}
+                    </span>
                   </div>
-                  <p className="text-xs text-muted-foreground mt-1">Crisis-affected areas monitored</p>
+                  <p className="text-xs text-muted-foreground mt-1">
+                    Crisis-affected areas monitored
+                  </p>
                 </CardContent>
               </Card>
 
               <Card>
                 <CardHeader className="pb-2">
-                  <CardTitle className="text-base">Displaced Population</CardTitle>
+                  <CardTitle className="text-base">
+                    Displaced Population
+                  </CardTitle>
                 </CardHeader>
                 <CardContent>
                   <div className="flex items-center">
                     <LucideUsers className="h-5 w-5 text-primary mr-2" />
-                    <span className="text-2xl font-bold">{(totalDisplaced / 1000000).toFixed(1)}M</span>
+                    <span className="text-2xl font-bold">
+                      {(totalDisplaced / 1000000).toFixed(1)}M
+                    </span>
                   </div>
                   <div className="mt-2">
                     <div className="flex justify-between text-xs mb-1">
@@ -333,7 +699,9 @@ export function StatisticsDashboard({ className = "" }: StatisticsDashboardProps
 
               <Card>
                 <CardHeader className="pb-2">
-                  <CardTitle className="text-base">Critical Medication Needs</CardTitle>
+                  <CardTitle className="text-base">
+                    Critical Medication Needs
+                  </CardTitle>
                 </CardHeader>
                 <CardContent>
                   <div className="flex items-center">
@@ -341,12 +709,17 @@ export function StatisticsDashboard({ className = "" }: StatisticsDashboardProps
                     <span className="text-2xl font-bold">
                       {regionalMedicationData.reduce(
                         (count, region) =>
-                          count + region.medicationNeeds.filter((med) => med.urgency === "critical").length,
-                        0,
+                          count +
+                          region.medicationNeeds.filter(
+                            (med) => med.urgency === "critical"
+                          ).length,
+                        0
                       )}
                     </span>
                   </div>
-                  <p className="text-xs text-muted-foreground mt-1">Medications with critical shortage</p>
+                  <p className="text-xs text-muted-foreground mt-1">
+                    Medications with critical shortage
+                  </p>
                 </CardContent>
               </Card>
             </div>
@@ -357,8 +730,9 @@ export function StatisticsDashboard({ className = "" }: StatisticsDashboardProps
                 <div>
                   <p className="text-sm font-medium">UN Relief Coordination</p>
                   <p className="text-sm text-muted-foreground mt-1">
-                    This data is shared with UN agencies and NGOs to coordinate medication distribution and healthcare
-                    resource allocation in crisis-affected regions.
+                    This data is shared with UN agencies and NGOs to coordinate
+                    medication distribution and healthcare resource allocation
+                    in crisis-affected regions.
                   </p>
                 </div>
               </div>
@@ -367,7 +741,10 @@ export function StatisticsDashboard({ className = "" }: StatisticsDashboardProps
             <div className="flex justify-between items-center mb-4">
               <h3 className="text-lg font-medium">Regional Medication Needs</h3>
               <div className="flex items-center gap-2">
-                <Select value={selectedRegion} onValueChange={setSelectedRegion}>
+                <Select
+                  value={selectedRegion}
+                  onValueChange={setSelectedRegion}
+                >
                   <SelectTrigger className="w-[180px]">
                     <SelectValue placeholder="Select region" />
                   </SelectTrigger>
@@ -406,7 +783,8 @@ export function StatisticsDashboard({ className = "" }: StatisticsDashboardProps
                           {region.region}
                         </CardTitle>
                         <CardDescription>
-                          Population: {(region.population / 1000000).toFixed(1)}M • Displaced:{" "}
+                          Population: {(region.population / 1000000).toFixed(1)}
+                          M • Displaced:{" "}
                           {(region.displacedPopulation / 1000).toFixed(0)}K
                         </CardDescription>
                       </div>
@@ -415,15 +793,15 @@ export function StatisticsDashboard({ className = "" }: StatisticsDashboardProps
                           region.healthcareAccess === "severely limited"
                             ? "bg-destructive"
                             : region.healthcareAccess === "limited"
-                              ? "bg-warning text-black"
-                              : "bg-secondary"
+                            ? "bg-warning text-black"
+                            : "bg-secondary"
                         }
                       >
                         {region.healthcareAccess === "severely limited"
                           ? "Severely Limited Access"
                           : region.healthcareAccess === "limited"
-                            ? "Limited Access"
-                            : "Moderate Access"}
+                          ? "Limited Access"
+                          : "Moderate Access"}
                       </Badge>
                     </div>
                   </CardHeader>
@@ -438,8 +816,8 @@ export function StatisticsDashboard({ className = "" }: StatisticsDashboardProps
                                   medication.urgency === "critical"
                                     ? "bg-destructive mr-2"
                                     : medication.urgency === "high"
-                                      ? "bg-warning text-black mr-2"
-                                      : "bg-muted mr-2"
+                                    ? "bg-warning text-black mr-2"
+                                    : "bg-muted mr-2"
                                 }
                               >
                                 {medication.urgency}
@@ -452,13 +830,17 @@ export function StatisticsDashboard({ className = "" }: StatisticsDashboardProps
                                   medication.urgency === "critical"
                                     ? "bg-destructive"
                                     : medication.urgency === "high"
-                                      ? "bg-warning"
-                                      : "bg-gemini-gradient"
+                                    ? "bg-warning"
+                                    : "bg-gemini-gradient"
                                 }`}
-                                style={{ width: `${medication.percentageOfNeed}%` }}
+                                style={{
+                                  width: `${medication.percentageOfNeed}%`,
+                                }}
                               ></div>
                             </div>
-                            <div className="w-[15%] text-sm text-right">{medication.count.toLocaleString()}</div>
+                            <div className="w-[15%] text-sm text-right">
+                              {medication.count.toLocaleString()}
+                            </div>
                             <div className="w-[15%] text-sm text-right text-muted-foreground">
                               {medication.percentageOfNeed}% of need
                             </div>
@@ -496,10 +878,13 @@ export function StatisticsDashboard({ className = "" }: StatisticsDashboardProps
               <div className="flex items-start gap-3">
                 <LucidePill className="h-5 w-5 text-primary flex-shrink-0 mt-0.5" />
                 <div>
-                  <p className="text-sm font-medium">Medication Supply Planning</p>
+                  <p className="text-sm font-medium">
+                    Medication Supply Planning
+                  </p>
                   <p className="text-sm text-muted-foreground mt-1">
-                    This analysis helps organizations prepare and distribute appropriate medical supplies to underserved
-                    regions based on actual patient needs.
+                    This analysis helps organizations prepare and distribute
+                    appropriate medical supplies to underserved regions based on
+                    actual patient needs.
                   </p>
                 </div>
               </div>
@@ -523,14 +908,18 @@ export function StatisticsDashboard({ className = "" }: StatisticsDashboardProps
               <div className="space-y-3">
                 {aggregatedMedicationNeeds.map((item, index) => (
                   <div key={index} className="flex items-center gap-2">
-                    <div className="w-[40%] md:w-[30%] text-sm truncate">{item.name}</div>
+                    <div className="w-[40%] md:w-[30%] text-sm truncate">
+                      {item.name}
+                    </div>
                     <div className="flex-1 h-2 bg-muted rounded-full overflow-hidden">
                       <div
                         className="h-full bg-gemini-gradient rounded-full"
                         style={{ width: `${item.percentage}%` }}
                       ></div>
                     </div>
-                    <div className="w-[15%] text-sm text-right">{item.count.toLocaleString()}</div>
+                    <div className="w-[15%] text-sm text-right">
+                      {item.count.toLocaleString()}
+                    </div>
                     <div className="w-[15%] text-sm text-right text-muted-foreground">
                       {item.percentage.toFixed(1)}%
                     </div>
@@ -539,42 +928,61 @@ export function StatisticsDashboard({ className = "" }: StatisticsDashboardProps
               </div>
 
               <div className="text-xs text-muted-foreground text-right mt-2">
-                Based on {aggregatedMedicationNeeds.reduce((acc, item) => acc + item.count, 0).toLocaleString()}{" "}
+                Based on{" "}
+                {aggregatedMedicationNeeds
+                  .reduce((acc, item) => acc + item.count, 0)
+                  .toLocaleString()}{" "}
                 medication units needed
               </div>
             </div>
 
             <Card className="mt-6">
               <CardHeader>
-                <CardTitle className="text-base">Critical Shortages by Region</CardTitle>
-                <CardDescription>Regions with critical medication shortages</CardDescription>
+                <CardTitle className="text-base">
+                  Critical Shortages by Region
+                </CardTitle>
+                <CardDescription>
+                  Regions with critical medication shortages
+                </CardDescription>
               </CardHeader>
               <CardContent>
                 <div className="space-y-4">
                   {regionalMedicationData
                     .map((region) => {
-                      const criticalMeds = region.medicationNeeds.filter((med) => med.urgency === "critical")
-                      if (criticalMeds.length === 0) return null
+                      const criticalMeds = region.medicationNeeds.filter(
+                        (med) => med.urgency === "critical"
+                      );
+                      if (criticalMeds.length === 0) return null;
 
                       return (
-                        <div key={region.region} className="pb-4 border-b last:border-0">
+                        <div
+                          key={region.region}
+                          className="pb-4 border-b last:border-0"
+                        >
                           <div className="flex items-center justify-between mb-2">
                             <div className="font-medium">{region.region}</div>
-                            <Badge className="bg-destructive">{criticalMeds.length} Critical</Badge>
+                            <Badge className="bg-destructive">
+                              {criticalMeds.length} Critical
+                            </Badge>
                           </div>
                           <div className="space-y-2">
                             {criticalMeds.map((med, idx) => (
-                              <div key={idx} className="flex justify-between text-sm">
+                              <div
+                                key={idx}
+                                className="flex justify-between text-sm"
+                              >
                                 <div className="flex items-center">
                                   <LucideAlertCircle className="h-3 w-3 text-destructive mr-1" />
                                   <span>{med.name}</span>
                                 </div>
-                                <div className="text-muted-foreground">{med.percentageOfNeed}% of need met</div>
+                                <div className="text-muted-foreground">
+                                  {med.percentageOfNeed}% of need met
+                                </div>
                               </div>
                             ))}
                           </div>
                         </div>
-                      )
+                      );
                     })
                     .filter(Boolean)}
                 </div>
@@ -587,10 +995,13 @@ export function StatisticsDashboard({ className = "" }: StatisticsDashboardProps
               <div className="flex items-start gap-3">
                 <LucideFlask className="h-5 w-5 text-primary flex-shrink-0 mt-0.5" />
                 <div>
-                  <p className="text-sm font-medium">Diagnostic Equipment Needs</p>
+                  <p className="text-sm font-medium">
+                    Diagnostic Equipment Needs
+                  </p>
                   <p className="text-sm text-muted-foreground mt-1">
-                    This analysis helps NGOs and aid organizations identify critical diagnostic equipment needs in
-                    underserved regions based on recommended tests from patient cases.
+                    This analysis helps NGOs and aid organizations identify
+                    critical diagnostic equipment needs in underserved regions
+                    based on recommended tests from patient cases.
                   </p>
                 </div>
               </div>
@@ -598,7 +1009,9 @@ export function StatisticsDashboard({ className = "" }: StatisticsDashboardProps
 
             <div className="space-y-4">
               <div className="flex justify-between items-center">
-                <h3 className="text-lg font-medium">Global Diagnostic Equipment Needs</h3>
+                <h3 className="text-lg font-medium">
+                  Global Diagnostic Equipment Needs
+                </h3>
                 <div className="flex gap-2">
                   <Button variant="outline" size="sm" className="h-8">
                     <LucideDownload className="h-3 w-3 mr-2" />
@@ -614,14 +1027,18 @@ export function StatisticsDashboard({ className = "" }: StatisticsDashboardProps
               <div className="space-y-3">
                 {aggregatedEquipmentNeeds.map((item, index) => (
                   <div key={index} className="flex items-center gap-2">
-                    <div className="w-[40%] md:w-[30%] text-sm truncate">{item.name}</div>
+                    <div className="w-[40%] md:w-[30%] text-sm truncate">
+                      {item.name}
+                    </div>
                     <div className="flex-1 h-2 bg-muted rounded-full overflow-hidden">
                       <div
                         className="h-full bg-gemini-gradient rounded-full"
                         style={{ width: `${item.percentAvailable}%` }}
                       ></div>
                     </div>
-                    <div className="w-[15%] text-sm text-right">{item.count} needed</div>
+                    <div className="w-[15%] text-sm text-right">
+                      {item.count} needed
+                    </div>
                     <div className="w-[20%] text-sm text-right text-muted-foreground">
                       {item.percentAvailable}% available
                     </div>
@@ -630,37 +1047,56 @@ export function StatisticsDashboard({ className = "" }: StatisticsDashboardProps
               </div>
 
               <div className="text-xs text-muted-foreground text-right mt-2">
-                Based on {aggregatedEquipmentNeeds.reduce((acc, item) => acc + item.casesRequiring, 0).toLocaleString()}{" "}
+                Based on{" "}
+                {aggregatedEquipmentNeeds
+                  .reduce((acc, item) => acc + item.casesRequiring, 0)
+                  .toLocaleString()}{" "}
                 cases requiring diagnostic tests
               </div>
             </div>
 
             <Card className="mt-6">
               <CardHeader>
-                <CardTitle className="text-base">Critical Equipment Shortages by Region</CardTitle>
-                <CardDescription>Regions with critical diagnostic equipment shortages</CardDescription>
+                <CardTitle className="text-base">
+                  Critical Equipment Shortages by Region
+                </CardTitle>
+                <CardDescription>
+                  Regions with critical diagnostic equipment shortages
+                </CardDescription>
               </CardHeader>
               <CardContent>
                 <div className="space-y-4">
                   {diagnosticEquipmentNeeds.map((region) => (
-                    <div key={region.region} className="pb-4 border-b last:border-0">
+                    <div
+                      key={region.region}
+                      className="pb-4 border-b last:border-0"
+                    >
                       <div className="flex items-center justify-between mb-2">
                         <div className="font-medium">{region.region}</div>
                         <Badge className="bg-destructive">
-                          {region.equipmentNeeds.filter((eq) => eq.priority === "critical").length} Critical Shortages
+                          {
+                            region.equipmentNeeds.filter(
+                              (eq) => eq.priority === "critical"
+                            ).length
+                          }{" "}
+                          Critical Shortages
                         </Badge>
                       </div>
                       <div className="space-y-2">
                         {region.equipmentNeeds
                           .filter((eq) => eq.priority === "critical")
                           .map((equipment, idx) => (
-                            <div key={idx} className="flex justify-between text-sm">
+                            <div
+                              key={idx}
+                              className="flex justify-between text-sm"
+                            >
                               <div className="flex items-center">
                                 <LucideAlertCircle className="h-3 w-3 text-destructive mr-1" />
                                 <span>{equipment.name}</span>
                               </div>
                               <div className="text-muted-foreground">
-                                {equipment.percentAvailable}% available ({equipment.count} needed)
+                                {equipment.percentAvailable}% available (
+                                {equipment.count} needed)
                               </div>
                             </div>
                           ))}
@@ -675,11 +1111,15 @@ export function StatisticsDashboard({ className = "" }: StatisticsDashboardProps
               <div className="flex items-start gap-3">
                 <LucideInfo className="h-5 w-5 text-primary flex-shrink-0 mt-0.5" />
                 <div>
-                  <p className="text-sm font-medium">Equipment Needs Assessment</p>
+                  <p className="text-sm font-medium">
+                    Equipment Needs Assessment
+                  </p>
                   <p className="text-sm text-muted-foreground mt-1">
-                    Equipment needs are determined by analyzing the recommended tests from patient cases in each region.
-                    For example, a high number of X-ray recommendations indicates the need for X-ray machines in that
-                    area. This data helps NGOs prioritize medical equipment donations and infrastructure development.
+                    Equipment needs are determined by analyzing the recommended
+                    tests from patient cases in each region. For example, a high
+                    number of X-ray recommendations indicates the need for X-ray
+                    machines in that area. This data helps NGOs prioritize
+                    medical equipment donations and infrastructure development.
                   </p>
                 </div>
               </div>
@@ -693,8 +1133,9 @@ export function StatisticsDashboard({ className = "" }: StatisticsDashboardProps
                 <div>
                   <p className="text-sm font-medium">Disease Surveillance</p>
                   <p className="text-sm text-muted-foreground mt-1">
-                    This data helps identify disease patterns and outbreaks in crisis-affected regions, enabling faster
-                    response and prevention measures.
+                    This data helps identify disease patterns and outbreaks in
+                    crisis-affected regions, enabling faster response and
+                    prevention measures.
                   </p>
                 </div>
               </div>
@@ -718,27 +1159,37 @@ export function StatisticsDashboard({ className = "" }: StatisticsDashboardProps
               <div className="space-y-3">
                 {commonIllnessesData.map((item, index) => (
                   <div key={index} className="flex items-center gap-2">
-                    <div className="w-[40%] md:w-[30%] text-sm truncate">{item.name}</div>
+                    <div className="w-[40%] md:w-[30%] text-sm truncate">
+                      {item.name}
+                    </div>
                     <div className="flex-1 h-2 bg-muted rounded-full overflow-hidden">
                       <div
                         className="h-full bg-gemini-gradient rounded-full"
                         style={{ width: `${item.percentage}%` }}
                       ></div>
                     </div>
-                    <div className="w-[15%] text-sm text-right">{item.count}</div>
-                    <div className="w-[15%] text-sm text-right text-muted-foreground">{item.percentage}%</div>
+                    <div className="w-[15%] text-sm text-right">
+                      {item.count}
+                    </div>
+                    <div className="w-[15%] text-sm text-right text-muted-foreground">
+                      {item.percentage}%
+                    </div>
                   </div>
                 ))}
               </div>
 
               <div className="text-xs text-muted-foreground text-right mt-2">
-                Based on {commonIllnessesData.reduce((acc, item) => acc + item.count, 0)} cases
+                Based on{" "}
+                {commonIllnessesData.reduce((acc, item) => acc + item.count, 0)}{" "}
+                cases
               </div>
             </div>
 
             <Card className="mt-6">
               <CardHeader>
-                <CardTitle className="text-base">Regional Disease Patterns</CardTitle>
+                <CardTitle className="text-base">
+                  Regional Disease Patterns
+                </CardTitle>
                 <CardDescription>Top conditions by region</CardDescription>
               </CardHeader>
               <CardContent>
@@ -749,17 +1200,24 @@ export function StatisticsDashboard({ className = "" }: StatisticsDashboardProps
                       <div className="grid grid-cols-2 gap-2">
                         {/* Dynamically generate top conditions for each region */}
                         {[
-                          idx % 3 === 0 ? "Respiratory Infections" : idx % 3 === 1 ? "Malaria" : "Diarrheal Diseases",
+                          idx % 3 === 0
+                            ? "Respiratory Infections"
+                            : idx % 3 === 1
+                            ? "Malaria"
+                            : "Diarrheal Diseases",
                           idx % 2 === 0 ? "Malnutrition" : "Trauma/Injuries",
                           idx % 4 === 0
                             ? "Hypertension"
                             : idx % 4 === 1
-                              ? "Diabetes"
-                              : idx % 4 === 2
-                                ? "Skin Infections"
-                                : "Mental Health Disorders",
+                            ? "Diabetes"
+                            : idx % 4 === 2
+                            ? "Skin Infections"
+                            : "Mental Health Disorders",
                         ].map((condition, condIdx) => (
-                          <div key={condIdx} className="flex items-center text-sm">
+                          <div
+                            key={condIdx}
+                            className="flex items-center text-sm"
+                          >
                             <div className="h-2 w-2 rounded-full bg-primary mr-2"></div>
                             <span>{condition}</span>
                           </div>
@@ -774,6 +1232,5 @@ export function StatisticsDashboard({ className = "" }: StatisticsDashboardProps
         </Tabs>
       </CardContent>
     </Card>
-  )
+  );
 }
-
