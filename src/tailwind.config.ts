@@ -19,6 +19,9 @@ const config = {
       },
     },
     extend: {
+      fontFamily: {
+        sans: ["var(--font-sans)"],
+      },
       colors: {
         border: "hsl(var(--border))",
         input: "hsl(var(--input))",
@@ -26,19 +29,19 @@ const config = {
         background: "hsl(var(--background))",
         foreground: "hsl(var(--foreground))",
         primary: {
-          DEFAULT: "#4285F4", // Google Blue
+          DEFAULT: "#4c6fef", // Symedon Blue
           foreground: "#FFFFFF",
         },
         secondary: {
-          DEFAULT: "#34A853", // Google Green
+          DEFAULT: "#bf4f9a", // Symedon Purple
           foreground: "#FFFFFF",
         },
         destructive: {
-          DEFAULT: "#EA4335", // Google Red
+          DEFAULT: "#f04e59", // Symedon Red
           foreground: "#FFFFFF",
         },
         warning: {
-          DEFAULT: "#FBBC05", // Google Yellow
+          DEFAULT: "#FBBC05", // Google Yellow (kept for contrast)
           foreground: "#000000",
         },
         muted: {
@@ -80,11 +83,10 @@ const config = {
       backgroundImage: {
         "grid-pattern-light":
           "linear-gradient(to right, rgba(0, 0, 0, 0.05) 1px, transparent 1px), linear-gradient(to bottom, rgba(0, 0, 0, 0.05) 1px, transparent 1px)",
-        "gemini-gradient": "linear-gradient(135deg, #4285F4, #34A853, #FBBC05, #EA4335)",
-        "gemini-blue-gradient": "linear-gradient(135deg, #4285F4, #0F9D58)",
-        "gemini-green-gradient": "linear-gradient(135deg, #34A853, #4285F4)",
-        "gemini-yellow-gradient": "linear-gradient(135deg, #FBBC05, #EA4335)",
-        "gemini-red-gradient": "linear-gradient(135deg, #EA4335, #FBBC05)",
+        "symedon-gradient": "linear-gradient(135deg, #f04e59, #bf4f9a, #4c6fef)",
+        "symedon-blue-gradient": "linear-gradient(135deg, #4c6fef, #6a5cb8)",
+        "symedon-purple-gradient": "linear-gradient(135deg, #6a5cb8, #bf4f9a)",
+        "symedon-red-gradient": "linear-gradient(135deg, #bf4f9a, #f04e59)",
       },
     },
   },

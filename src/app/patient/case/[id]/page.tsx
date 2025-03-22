@@ -27,6 +27,7 @@ import {
 import { LanguageSelector } from "@/components/language-selector"
 import { LiveChat } from "@/components/live-chat"
 import { AIVisualAnalysis } from "@/components/ai-visual-analysis"
+import { MedicalTermInfo } from "@/components/medical-term-info"
 
 export default function CasePage({ params }: { params: { id: string } }) {
   const [activeTab, setActiveTab] = useState("summary")
@@ -189,7 +190,9 @@ export default function CasePage({ params }: { params: { id: string } }) {
                                 <div className="h-5 w-5 flex-shrink-0 rounded-full bg-primary/10 flex items-center justify-center mt-0.5">
                                   <div className="h-2 w-2 rounded-full bg-primary"></div>
                                 </div>
-                                <span>{cause}</span>
+                                <MedicalTermInfo term={cause}>
+                                  <span>{cause}</span>
+                                </MedicalTermInfo>
                               </li>
                             ))}
                           </ul>
@@ -205,7 +208,9 @@ export default function CasePage({ params }: { params: { id: string } }) {
                                 <div className="h-5 w-5 flex-shrink-0 rounded-full bg-secondary/10 flex items-center justify-center mt-0.5">
                                   <div className="h-2 w-2 rounded-full bg-secondary"></div>
                                 </div>
-                                <span>{test}</span>
+                                <MedicalTermInfo term={test}>
+                                  <span>{test}</span>
+                                </MedicalTermInfo>
                               </li>
                             ))}
                           </ul>
@@ -221,7 +226,9 @@ export default function CasePage({ params }: { params: { id: string } }) {
                                 <div className="h-5 w-5 flex-shrink-0 rounded-full bg-warning/10 flex items-center justify-center mt-0.5">
                                   <div className="h-2 w-2 rounded-full bg-warning"></div>
                                 </div>
-                                <span>{treatment}</span>
+                                <MedicalTermInfo term={treatment}>
+                                  <span>{treatment}</span>
+                                </MedicalTermInfo>
                               </li>
                             ))}
                           </ul>
@@ -237,7 +244,9 @@ export default function CasePage({ params }: { params: { id: string } }) {
                                 <div className="h-5 w-5 flex-shrink-0 rounded-full bg-destructive/10 flex items-center justify-center mt-0.5">
                                   <div className="h-2 w-2 rounded-full bg-destructive"></div>
                                 </div>
-                                <span>{item}</span>
+                                <MedicalTermInfo term={item}>
+                                  <span>{item}</span>
+                                </MedicalTermInfo>
                               </li>
                             ))}
                           </ul>

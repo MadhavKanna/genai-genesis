@@ -2,25 +2,31 @@
 
 import { useState } from "react"
 import Link from "next/link"
+import Image from "next/image"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Badge } from "@/components/ui/badge"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import {
-  LucideHeartPulse,
   LucideUsers,
   LucideBrain,
   LucideClipboard,
   LucideMessageSquare,
-  LucideAlertCircle,
   LucideFileText,
   LucideChevronRight,
   LucideLogOut,
+  LucideAlertCircle,
 } from "lucide-react"
+import { useAuth } from "@/components/auth-provider"
 
 export default function PatientDashboard() {
   const [activeTab, setActiveTab] = useState("active")
+  const { signOut } = useAuth()
+
+  const handleLogout = async () => {
+    await signOut()
+  }
 
   return (
     <div className="flex min-h-screen bg-gradient-to-br from-blue-50 to-white">
@@ -29,12 +35,15 @@ export default function PatientDashboard() {
         <div className="flex h-16 items-center border-b px-6">
           <div className="flex items-center gap-2">
             <div className="relative h-8 w-8 overflow-hidden">
-              <div className="absolute inset-0 bg-gemini-gradient rounded-full"></div>
-              <div className="absolute inset-1 bg-white rounded-full flex items-center justify-center">
-                <LucideHeartPulse className="h-5 w-5 text-primary" />
-              </div>
+              <Image
+                src="/images/symedon-logo.png"
+                alt="Symedon Logo"
+                width={32}
+                height={32}
+                className="object-contain"
+              />
             </div>
-            <span className="text-xl font-bold">DDXAi</span>
+            <span className="text-xl font-bold">Symedon</span>
           </div>
         </div>
         <div className="flex-1 overflow-auto py-2">
@@ -80,7 +89,7 @@ export default function PatientDashboard() {
               <span className="text-xs text-muted-foreground">jane@example.com</span>
             </div>
           </div>
-          <Button variant="outline" className="w-full mt-2 rounded-full" size="sm">
+          <Button variant="outline" className="w-full mt-2 rounded-full" size="sm" onClick={handleLogout}>
             <LucideLogOut className="mr-2 h-4 w-4" />
             Log out
           </Button>
@@ -103,7 +112,7 @@ export default function PatientDashboard() {
             <TabsList className="grid w-full grid-cols-3 mb-8">
               <TabsTrigger value="active">Active Cases</TabsTrigger>
               <TabsTrigger value="completed">Completed</TabsTrigger>
-              <TabsTrigger value="archived">Archived</TabsTrigger>
+              <TabsTrigger value="archived">Archived Cases</TabsTrigger>
             </TabsList>
 
             <TabsContent value="active" className="space-y-4">
@@ -112,20 +121,20 @@ export default function PatientDashboard() {
                 <p className="text-sm text-muted-foreground">Showing 2 active cases</p>
               </div>
 
-              <Card className="gemini-card border-none">
+              <Card className="symedon-card border-none">
                 <CardHeader className="pb-2">
                   <div className="flex justify-between items-center">
                     <CardTitle className="text-lg">Persistent Skin Rash</CardTitle>
-                    <Badge className="bg-gemini-yellow-gradient">In Review</Badge>
+                    <Badge className="bg-symedon-red-gradient">In Review</Badge>
                   </div>
-                  <CardDescription>Case ID: #DDX-23789 • Submitted: May 15, 2023</CardDescription>
+                  <CardDescription>Case ID: #SYM-23789 • Submitted: May 15, 2023</CardDescription>
                 </CardHeader>
                 <CardContent>
                   <div className="space-y-4">
                     <div className="space-y-2">
                       <div className="text-sm font-medium">Case Progress</div>
                       <div className="h-2 bg-muted rounded-full overflow-hidden">
-                        <div className="h-full bg-gemini-gradient rounded-full" style={{ width: "60%" }}></div>
+                        <div className="h-full bg-symedon-gradient rounded-full" style={{ width: "60%" }}></div>
                       </div>
                       <div className="flex justify-between text-xs text-muted-foreground">
                         <span>3/5 clinicians reviewed</span>
@@ -176,20 +185,20 @@ export default function PatientDashboard() {
                 </CardFooter>
               </Card>
 
-              <Card className="gemini-card border-none">
+              <Card className="symedon-card border-none">
                 <CardHeader className="pb-2">
                   <div className="flex justify-between items-center">
                     <CardTitle className="text-lg">Recurring Headaches</CardTitle>
-                    <Badge className="bg-gemini-blue-gradient">Matching</Badge>
+                    <Badge className="bg-symedon-blue-gradient">Matching</Badge>
                   </div>
-                  <CardDescription>Case ID: #DDX-23790 • Submitted: May 18, 2023</CardDescription>
+                  <CardDescription>Case ID: #SYM-23790 • Submitted: May 18, 2023</CardDescription>
                 </CardHeader>
                 <CardContent>
                   <div className="space-y-4">
                     <div className="space-y-2">
                       <div className="text-sm font-medium">Case Progress</div>
                       <div className="h-2 bg-muted rounded-full overflow-hidden">
-                        <div className="h-full bg-gemini-gradient rounded-full" style={{ width: "20%" }}></div>
+                        <div className="h-full bg-symedon-gradient rounded-full" style={{ width: "20%" }}></div>
                       </div>
                       <div className="flex justify-between text-xs text-muted-foreground">
                         <span>Finding specialists</span>
@@ -231,13 +240,13 @@ export default function PatientDashboard() {
                 <p className="text-sm text-muted-foreground">Showing 1 completed case</p>
               </div>
 
-              <Card className="gemini-card border-none">
+              <Card className="symedon-card border-none">
                 <CardHeader className="pb-2">
                   <div className="flex justify-between items-center">
                     <CardTitle className="text-lg">Lower Back Pain</CardTitle>
                     <Badge className="bg-secondary">Completed</Badge>
                   </div>
-                  <CardDescription>Case ID: #DDX-23456 • Completed: April 28, 2023</CardDescription>
+                  <CardDescription>Case ID: #SYM-23456 • Completed: April 28, 2023</CardDescription>
                 </CardHeader>
                 <CardContent>
                   <div className="space-y-4">

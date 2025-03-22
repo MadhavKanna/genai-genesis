@@ -1,22 +1,8 @@
 "use client"
-
-import { useState } from "react"
 import { Button } from "@/components/ui/button"
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu"
 import { LucideGlobe } from "lucide-react"
-
-const languages = [
-  { code: "en", name: "English", flag: "🇺🇸" },
-  { code: "es", name: "Español", flag: "🇪🇸" },
-  { code: "fr", name: "Français", flag: "🇫🇷" },
-  { code: "de", name: "Deutsch", flag: "🇩🇪" },
-  { code: "zh", name: "中文", flag: "🇨🇳" },
-  { code: "ar", name: "العربية", flag: "🇸🇦" },
-  { code: "hi", name: "हिन्दी", flag: "🇮🇳" },
-  { code: "pt", name: "Português", flag: "🇧🇷" },
-  { code: "ru", name: "Русский", flag: "🇷🇺" },
-  { code: "ja", name: "日本語", flag: "🇯🇵" },
-]
+import { useSiteLanguage } from "@/components/site-language-provider"
 
 interface LanguageSelectorProps {
   variant?: "default" | "outline" | "ghost"
@@ -25,13 +11,10 @@ interface LanguageSelectorProps {
 }
 
 export function LanguageSelector({ variant = "outline", size = "default", className = "" }: LanguageSelectorProps) {
-  const [currentLanguage, setCurrentLanguage] = useState(languages[0])
+  const { currentLanguage, setLanguage, languages } = useSiteLanguage()
 
   const handleLanguageChange = (language: (typeof languages)[0]) => {
-    setCurrentLanguage(language)
-    // In a real app, this would trigger language change in the app
-    document.documentElement.lang = language.code
-    // This is where you would call your translation service
+    setLanguage(language)
   }
 
   return (

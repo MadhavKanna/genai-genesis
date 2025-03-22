@@ -12,10 +12,12 @@ import { Label } from "@/components/ui/label"
 import { Textarea } from "@/components/ui/textarea"
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group"
 import { Checkbox } from "@/components/ui/checkbox"
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { VoiceInput } from "@/components/voice-input"
 import { LanguageSelector } from "@/components/language-selector"
 import { AIAnalysisService } from "@/components/ai-analysis-service"
-import { LucideArrowLeft, LucideUpload, LucideCheck, LucideInfo, LucideBrain } from "lucide-react"
+import { AIConversationGuide } from "@/components/ai-conversation-guide"
+import { LucideArrowLeft, LucideUpload, LucideCheck, LucideInfo, LucideBrain, LucideMessageSquare } from "lucide-react"
 
 export default function NewPatientCase() {
   const router = useRouter()
@@ -23,6 +25,7 @@ export default function NewPatientCase() {
   const [uploadedImages, setUploadedImages] = useState<File[]>([])
   const [showAiAnalysis, setShowAiAnalysis] = useState(false)
   const [aiAnalysisResult, setAiAnalysisResult] = useState<any>(null)
+  const [inputMethod, setInputMethod] = useState<"manual" | "guided">("manual")
 
   // Form data
   const [primaryConcern, setPrimaryConcern] = useState("")
@@ -52,9 +55,50 @@ export default function NewPatientCase() {
   const handleAnalysisComplete = (result: any) => {
     setAiAnalysisResult(result)
     console.log("AI Analysis Result:", result)
+  }
 
-    // In a real app, you would store this result in your state or database
-    // For now, we're just logging it to the console as requested
+  const handleConversationComplete = (responses: Record<string, string>) => {
+    console.log("Conversation responses:", responses)
+
+    // Update form with conversation responses
+    if (responses.greeting) {
+      setPrimaryConcern(responses.greeting)
+    }
+
+    if (responses.duration) {
+      // Try to extract a number and unit from the duration response
+      const durationText = responses.duration.toLowerCase()
+      const numberMatch = durationText.match(/\d+/)
+
+      if (numberMatch) {
+        setSymptomDuration(numberMatch[0])
+
+        if (durationText.includes("week")) {
+          setDurationUnit("weeks")
+        } else if (durationText.includes("month")) {
+          setDurationUnit("months")
+        } else if (durationText.includes("year")) {
+          setDurationUnit("years")
+        } else {
+          setDurationUnit("days")
+        }
+      }
+    }
+
+    // Combine other responses into additional symptoms
+    const otherInfo = [
+      responses.severity ? `Severity: ${responses.severity}/10` : "",
+      responses.triggers ? `Triggers: ${responses.triggers}` : "",
+      responses["previous-treatment"] ? `Previous treatments: ${responses["previous-treatment"]}` : "",
+      responses["medical-history"] ? `Medical history: ${responses["medical-history"]}` : "",
+    ]
+      .filter(Boolean)
+      .join("\n\n")
+
+    setAdditionalSymptoms(otherInfo)
+
+    // Switch back to manual input to review
+    setInputMethod("manual")
   }
 
   return (
@@ -117,56 +161,84 @@ export default function NewPatientCase() {
               <CardDescription>Please provide detailed information about your current health concerns.</CardDescription>
             </CardHeader>
             <CardContent className="space-y-6">
-              <div className="space-y-2">
-                <Label htmlFor="primary-concern">What is your primary health concern?</Label>
-                <VoiceInput
-                  id="primary-concern"
-                  placeholder="Describe your main symptom or concern"
-                  rows={3}
-                  value={primaryConcern}
-                  onChange={setPrimaryConcern}
-                />
-              </div>
+              <Tabs
+                value={inputMethod}
+                onValueChange={(value) => setInputMethod(value as "manual" | "guided")}
+                className="w-full"
+              >
+                <TabsList className="grid w-full grid-cols-2 mb-6">
+                  <TabsTrigger value="manual" className="flex items-center gap-2">
+                    <LucideMessageSquare className="h-4 w-4" />
+                    Manual Input
+                  </TabsTrigger>
+                  <TabsTrigger value="guided" className="flex items-center gap-2">
+                    <LucideBrain className="h-4 w-4" />
+                    AI-Guided
+                  </TabsTrigger>
+                </TabsList>
 
-              <div className="space-y-2">
-                <Label htmlFor="symptom-duration">How long have you been experiencing these symptoms?</Label>
-                <div className="grid grid-cols-2 gap-4">
-                  <Input
-                    id="symptom-duration"
-                    type="number"
-                    placeholder="Duration"
-                    min="1"
-                    value={symptomDuration}
-                    onChange={(e) => setSymptomDuration(e.target.value)}
-                    required
-                  />
-                  <RadioGroup defaultValue="days" className="flex" value={durationUnit} onValueChange={setDurationUnit}>
-                    <div className="flex items-center space-x-2">
-                      <RadioGroupItem value="days" id="days" />
-                      <Label htmlFor="days">Days</Label>
-                    </div>
-                    <div className="flex items-center space-x-2 ml-4">
-                      <RadioGroupItem value="weeks" id="weeks" />
-                      <Label htmlFor="weeks">Weeks</Label>
-                    </div>
-                    <div className="flex items-center space-x-2 ml-4">
-                      <RadioGroupItem value="months" id="months" />
-                      <Label htmlFor="months">Months</Label>
-                    </div>
-                  </RadioGroup>
-                </div>
-              </div>
+                <TabsContent value="manual" className="space-y-6">
+                  <div className="space-y-2">
+                    <Label htmlFor="primary-concern">What is your primary health concern?</Label>
+                    <VoiceInput
+                      id="primary-concern"
+                      placeholder="Describe your main symptom or concern"
+                      rows={3}
+                      value={primaryConcern}
+                      onChange={setPrimaryConcern}
+                    />
+                  </div>
 
-              <div className="space-y-2">
-                <Label htmlFor="additional-symptoms">Do you have any additional symptoms?</Label>
-                <VoiceInput
-                  id="additional-symptoms"
-                  placeholder="List any other symptoms you're experiencing"
-                  rows={3}
-                  value={additionalSymptoms}
-                  onChange={setAdditionalSymptoms}
-                />
-              </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="symptom-duration">How long have you been experiencing these symptoms?</Label>
+                    <div className="grid grid-cols-2 gap-4">
+                      <Input
+                        id="symptom-duration"
+                        type="number"
+                        placeholder="Duration"
+                        min="1"
+                        value={symptomDuration}
+                        onChange={(e) => setSymptomDuration(e.target.value)}
+                        required
+                      />
+                      <RadioGroup
+                        defaultValue="days"
+                        className="flex"
+                        value={durationUnit}
+                        onValueChange={setDurationUnit}
+                      >
+                        <div className="flex items-center space-x-2">
+                          <RadioGroupItem value="days" id="days" />
+                          <Label htmlFor="days">Days</Label>
+                        </div>
+                        <div className="flex items-center space-x-2 ml-4">
+                          <RadioGroupItem value="weeks" id="weeks" />
+                          <Label htmlFor="weeks">Weeks</Label>
+                        </div>
+                        <div className="flex items-center space-x-2 ml-4">
+                          <RadioGroupItem value="months" id="months" />
+                          <Label htmlFor="months">Months</Label>
+                        </div>
+                      </RadioGroup>
+                    </div>
+                  </div>
+
+                  <div className="space-y-2">
+                    <Label htmlFor="additional-symptoms">Do you have any additional symptoms?</Label>
+                    <VoiceInput
+                      id="additional-symptoms"
+                      placeholder="List any other symptoms you're experiencing"
+                      rows={3}
+                      value={additionalSymptoms}
+                      onChange={setAdditionalSymptoms}
+                    />
+                  </div>
+                </TabsContent>
+
+                <TabsContent value="guided">
+                  <AIConversationGuide onComplete={handleConversationComplete} />
+                </TabsContent>
+              </Tabs>
 
               <div className="space-y-2">
                 <Label>Upload relevant images (optional)</Label>

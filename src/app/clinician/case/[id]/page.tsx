@@ -13,9 +13,19 @@ import { VoiceInput } from "@/components/voice-input"
 import { LanguageSelector } from "@/components/language-selector"
 import { LiveChat } from "@/components/live-chat"
 import { AIVisualAnalysis } from "@/components/ai-visual-analysis"
+import { MedicalTermInfo } from "@/components/medical-term-info"
 import { analyzeSymptoms } from "@/lib/gemini-api"
 
-import { LucideArrowLeft, LucideCalendar, LucideAlertCircle, LucideBrain, LucideSend } from "lucide-react"
+import {
+  LucideArrowLeft,
+  LucideCalendar,
+  LucideAlertCircle,
+  LucideBrain,
+  LucideSend,
+  FlaskConicalIcon as LucideFlask,
+  LucideActivity,
+  LucideFileText,
+} from "lucide-react"
 
 export default function ClinicianCasePage({ params }: { params: { id: string } }) {
   const router = useRouter()
@@ -53,6 +63,40 @@ export default function ClinicianCasePage({ params }: { params: { id: string } }
     otherClinicians: [
       { id: 1, name: "Dr. Sarah Johnson", specialty: "Dermatology", status: "Reviewing", avatar: "SJ" },
       { id: 2, name: "Dr. Michael Chen", specialty: "Allergy & Immunology", status: "Pending", avatar: "MC" },
+    ],
+    recommendedTests: [
+      {
+        id: 1,
+        name: "Complete Blood Count (CBC)",
+        type: "Blood",
+        reason: "To check for signs of infection or inflammation",
+        urgency: "High",
+        status: "Recommended",
+      },
+      {
+        id: 2,
+        name: "Skin Biopsy",
+        type: "Tissue",
+        reason: "To examine skin cells for signs of specific skin conditions",
+        urgency: "Medium",
+        status: "Recommended",
+      },
+      {
+        id: 3,
+        name: "Allergy Patch Testing",
+        type: "Skin",
+        reason: "To identify potential allergens causing contact dermatitis",
+        urgency: "High",
+        status: "Recommended",
+      },
+      {
+        id: 4,
+        name: "IgE Blood Test",
+        type: "Blood",
+        reason: "To check for allergic reactions",
+        urgency: "Medium",
+        status: "Recommended",
+      },
     ],
   }
 
@@ -133,7 +177,7 @@ export default function ClinicianCasePage({ params }: { params: { id: string } }
                 </div>
               </div>
             </div>
-            <Badge className="bg-gemini-yellow-gradient">Awaiting Your Assessment</Badge>
+            <Badge className="bg-gemini-gradient-new">Awaiting Your Assessment</Badge>
           </div>
         </div>
       </header>
@@ -142,9 +186,10 @@ export default function ClinicianCasePage({ params }: { params: { id: string } }
         <div className="grid md:grid-cols-3 gap-6">
           <div className="md:col-span-2">
             <Tabs defaultValue="overview" className="w-full" onValueChange={setActiveTab}>
-              <TabsList className="grid w-full grid-cols-4 mb-6">
+              <TabsList className="grid w-full grid-cols-5 mb-6">
                 <TabsTrigger value="overview">Case Overview</TabsTrigger>
                 <TabsTrigger value="images">Patient Images</TabsTrigger>
+                <TabsTrigger value="tests">Recommended Tests</TabsTrigger>
                 <TabsTrigger value="ai-analysis">AI Analysis</TabsTrigger>
                 <TabsTrigger value="chat">Live Chat</TabsTrigger>
               </TabsList>
@@ -318,6 +363,69 @@ export default function ClinicianCasePage({ params }: { params: { id: string } }
                 </Card>
               </TabsContent>
 
+              <TabsContent value="tests" className="space-y-6">
+                <Card className="gemini-card border-none">
+                  <CardHeader>
+                    <CardTitle>Recommended Tests</CardTitle>
+                    <CardDescription>Tests that may help with diagnosis</CardDescription>
+                  </CardHeader>
+                  <CardContent className="space-y-4">
+                    {caseData.recommendedTests.map((test) => (
+                      <div key={test.id} className="rounded-lg border p-4">
+                        <div className="flex justify-between items-start mb-2">
+                          <div className="flex items-center gap-2">
+                            <LucideFlask className="h-4 w-4 text-primary" />
+                            <div>
+                              <h3 className="font-medium">{test.name}</h3>
+                              <p className="text-xs text-muted-foreground">Type: {test.type}</p>
+                            </div>
+                          </div>
+                          <Badge
+                            className={
+                              test.urgency === "High"
+                                ? "bg-destructive"
+                                : test.urgency === "Medium"
+                                  ? "bg-warning text-warning-foreground"
+                                  : "bg-secondary"
+                            }
+                          >
+                            {test.urgency} Priority
+                          </Badge>
+                        </div>
+                        <p className="text-sm">{test.reason}</p>
+                        <div className="flex justify-between items-center mt-3">
+                          <p className="text-xs text-muted-foreground">Status: {test.status}</p>
+                          <Button variant="outline" size="sm">
+                            Request Test
+                          </Button>
+                        </div>
+                      </div>
+                    ))}
+
+                    <div className="rounded-lg bg-muted p-4">
+                      <div className="flex items-start gap-3">
+                        <LucideActivity className="h-5 w-5 text-primary flex-shrink-0 mt-0.5" />
+                        <div>
+                          <p className="text-sm font-medium">Coordinating with Patient's Provider</p>
+                          <p className="text-sm text-muted-foreground mt-1">
+                            These test recommendations will be shared with the patient's primary healthcare provider for
+                            coordination. You can request additional tests or provide specific instructions for the
+                            patient's local healthcare team.
+                          </p>
+                        </div>
+                      </div>
+                    </div>
+
+                    <div className="flex justify-end">
+                      <Button className="rounded-full">
+                        <LucideFileText className="mr-2 h-4 w-4" />
+                        Generate Test Request Form
+                      </Button>
+                    </div>
+                  </CardContent>
+                </Card>
+              </TabsContent>
+
               <TabsContent value="ai-analysis" className="space-y-6">
                 {isAnalyzing ? (
                   <Card className="gemini-card border-none">
@@ -371,7 +479,7 @@ export default function ClinicianCasePage({ params }: { params: { id: string } }
                 <div className="space-y-2">
                   <div className="text-sm font-medium">Review Progress</div>
                   <div className="h-2 bg-muted rounded-full overflow-hidden">
-                    <div className="h-full bg-gemini-gradient rounded-full" style={{ width: "33%" }}></div>
+                    <div className="h-full bg-gemini-gradient-new rounded-full" style={{ width: "33%" }}></div>
                   </div>
                   <div className="flex justify-between text-xs text-muted-foreground">
                     <span>1/3 clinicians reviewed</span>
@@ -419,11 +527,47 @@ export default function ClinicianCasePage({ params }: { params: { id: string } }
 
             <Card className="gemini-card border-none">
               <CardHeader>
+                <CardTitle>Possible Diagnoses</CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                <div className="space-y-3">
+                  <div className="rounded-lg border p-3">
+                    <MedicalTermInfo term="Dermatitis" className="font-medium">
+                      Contact Dermatitis
+                    </MedicalTermInfo>
+                    <p className="text-xs text-muted-foreground mt-1">
+                      Symptoms match pattern of allergic reaction to external substance
+                    </p>
+                  </div>
+
+                  <div className="rounded-lg border p-3">
+                    <MedicalTermInfo term="Eczema" className="font-medium">
+                      Atopic Dermatitis (Eczema)
+                    </MedicalTermInfo>
+                    <p className="text-xs text-muted-foreground mt-1">
+                      Patient has history of childhood eczema which may have recurred
+                    </p>
+                  </div>
+
+                  <div className="rounded-lg border p-3">
+                    <MedicalTermInfo term="Urticaria" className="font-medium">
+                      Urticaria (Hives)
+                    </MedicalTermInfo>
+                    <p className="text-xs text-muted-foreground mt-1">
+                      Raised, itchy welts consistent with allergic reaction
+                    </p>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+
+            <Card className="gemini-card border-none">
+              <CardHeader>
                 <CardTitle>AI Match Details</CardTitle>
               </CardHeader>
               <CardContent className="space-y-4">
                 <div className="flex items-center gap-2">
-                  <div className="h-10 w-10 rounded-full bg-gemini-blue-gradient flex items-center justify-center">
+                  <div className="h-10 w-10 rounded-full bg-gemini-gradient-new flex items-center justify-center">
                     <LucideBrain className="h-5 w-5 text-white" />
                   </div>
                   <div>

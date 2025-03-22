@@ -2,6 +2,17 @@
 @tailwind components;
 @tailwind utilities;
 
+@layer base {
+  :root {
+    --font-sans: "Inter", system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial,
+      sans-serif;
+  }
+
+  body {
+    font-family: var(--font-sans);
+  }
+}
+
 body {
   font-family: Arial, Helvetica, sans-serif;
 }
@@ -90,27 +101,29 @@ body {
   }
   body {
     @apply bg-background text-foreground;
+    font-family: "Inter", system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial,
+      sans-serif;
   }
 }
 
-/* Google-inspired styles */
-.gemini-card {
+/* Symedon-inspired styles */
+.symedon-card {
   border-radius: 24px;
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.12), 0 1px 2px rgba(0, 0, 0, 0.24);
   transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
 }
 
-.gemini-card:hover {
+.symedon-card:hover {
   box-shadow: 0 14px 28px rgba(0, 0, 0, 0.15), 0 10px 10px rgba(0, 0, 0, 0.12);
 }
 
-.gemini-border {
+.symedon-border {
   position: relative;
   border-radius: 24px;
   overflow: hidden;
 }
 
-.gemini-border::before {
+.symedon-border::before {
   content: "";
   position: absolute;
   top: 0;
@@ -119,10 +132,27 @@ body {
   bottom: 0;
   border: 2px solid transparent;
   border-radius: 24px;
-  background: linear-gradient(135deg, #4285f4, #34a853, #fbbc05, #ea4335) border-box;
+  background: linear-gradient(135deg, #f04e59, #bf4f9a, #4c6fef) border-box;
   -webkit-mask: linear-gradient(#fff 0 0) padding-box, linear-gradient(#fff 0 0);
   -webkit-mask-composite: destination-out;
   mask-composite: exclude;
+}
+
+/* Symedon gradient (red-purple-blue) based on the logo */
+.bg-symedon-gradient {
+  background: linear-gradient(135deg, #f04e59, #bf4f9a, #4c6fef);
+}
+
+.bg-symedon-blue-gradient {
+  background: linear-gradient(135deg, #4c6fef, #6a5cb8);
+}
+
+.bg-symedon-green-gradient {
+  background: linear-gradient(135deg, #6a5cb8, #bf4f9a);
+}
+
+.bg-symedon-red-gradient {
+  background: linear-gradient(135deg, #bf4f9a, #f04e59);
 }
 
 .gemini-dot-pulse {
@@ -131,8 +161,8 @@ body {
   width: 10px;
   height: 10px;
   border-radius: 5px;
-  background-color: #4285f4;
-  color: #4285f4;
+  background-color: #4c6fef;
+  color: #4c6fef;
   box-shadow: 9999px 0 0 -5px;
   animation: dot-pulse 1.5s infinite linear;
   animation-delay: 0.25s;
@@ -147,8 +177,8 @@ body {
   width: 10px;
   height: 10px;
   border-radius: 5px;
-  background-color: #4285f4;
-  color: #4285f4;
+  background-color: #4c6fef;
+  color: #4c6fef;
 }
 
 .gemini-dot-pulse::before {
@@ -202,26 +232,26 @@ body {
   }
 }
 
-.gemini-spinner {
+.symedon-spinner {
   width: 40px;
   height: 40px;
   display: grid;
   animation: spinner-plncf9 4s infinite;
 }
 
-.gemini-spinner::before,
-.gemini-spinner::after {
+.symedon-spinner::before,
+.symedon-spinner::after {
   content: "";
   grid-area: 1 / 1;
   border: 4px solid;
   border-radius: 50%;
-  border-color: #4285f4 #4285f4 #fbbc05 #ea4335;
+  border-color: #f04e59 #bf4f9a #4c6fef #6a5cb8;
   mix-blend-mode: darken;
   animation: spinner-plncf9 1s infinite linear;
 }
 
-.gemini-spinner::after {
-  border-color: #34a853 #fbbc05 #ea4335 #4285f4;
+.symedon-spinner::after {
+  border-color: #bf4f9a #4c6fef #6a5cb8 #f04e59;
   animation-direction: reverse;
 }
 

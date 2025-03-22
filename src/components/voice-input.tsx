@@ -38,14 +38,26 @@ export function VoiceInput({
       recognitionRef.current = new SpeechRecognition()
       recognitionRef.current.continuous = true
       recognitionRef.current.interimResults = true
+      recognitionRef.current.lang = "en-US" // Set language explicitly
 
       recognitionRef.current.onresult = (event: any) => {
-        const transcript = Array.from(event.results)
-          .map((result: any) => result[0])
-          .map((result) => result.transcript)
-          .join("")
+        let finalTranscript = ""
+        let interimTranscript = ""
 
-        onChange(transcript)
+        for (let i = event.resultIndex; i < event.results.length; ++i) {
+          if (event.results[i].isFinal) {
+            finalTranscript += event.results[i][0].transcript
+          } else {
+            interimTranscript += event.results[i][0].transcript
+          }
+        }
+
+        // Update with either the final transcript or the current value + interim
+        if (finalTranscript) {
+          onChange(finalTranscript)
+        } else {
+          onChange(value + " " + interimTranscript)
+        }
       }
 
       recognitionRef.current.onerror = (event: any) => {
@@ -54,9 +66,7 @@ export function VoiceInput({
       }
 
       recognitionRef.current.onend = () => {
-        if (isListening) {
-          recognitionRef.current.start()
-        }
+        setIsListening(false)
       }
     }
 
@@ -65,7 +75,7 @@ export function VoiceInput({
         recognitionRef.current.stop()
       }
     }
-  }, [onChange])
+  }, [onChange, value])
 
   const toggleListening = () => {
     if (!recognitionRef.current) return
@@ -74,6 +84,7 @@ export function VoiceInput({
       recognitionRef.current.stop()
       setIsListening(false)
     } else {
+      // Prevent any default actions
       recognitionRef.current.start()
       setIsListening(true)
     }
@@ -119,8 +130,11 @@ export function VoiceInput({
             <Button
               type="button"
               size="icon"
-              variant={isListening ? "destructive" : "secondary"}
-              onClick={toggleListening}
+              variant={isListening ? "destructive" : "ghost"}
+              onClick={(e) => {
+                e.preventDefault() // Prevent any form submission
+                toggleListening()
+              }}
               className="h-8 w-8"
               title={isListening ? "Stop listening" : "Start voice input"}
             >
