@@ -1,16 +1,20 @@
-"use client"
+"use client";
 
-import type React from "react"
+import type React from "react";
 
-import { useState } from "react"
-import { Button } from "@/components/ui/button"
-import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover"
-import { LucideInfo } from "lucide-react"
+import { useState } from "react";
+import { Button } from "@/src/components/ui/button";
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/src/components/ui/popover";
+import { LucideInfo } from "lucide-react";
 
 interface MedicalTermInfoProps {
-  term: string
-  children: React.ReactNode
-  className?: string
+  term: string;
+  children: React.ReactNode;
+  className?: string;
 }
 
 // Medical terms dictionary with layman explanations
@@ -119,7 +123,8 @@ const medicalTerms: Record<string, string> = {
   Tonsillitis:
     "Inflammation of the tonsils, two oval-shaped pads of tissue at the back of the throat — one on each side.",
 
-  Gastritis: "Inflammation of the lining of the stomach. It can occur suddenly (acute) or gradually (chronic).",
+  Gastritis:
+    "Inflammation of the lining of the stomach. It can occur suddenly (acute) or gradually (chronic).",
 
   Sciatica:
     "Pain that radiates along the path of the sciatic nerve, which branches from your lower back through your hips and buttocks and down each leg.",
@@ -153,21 +158,25 @@ const medicalTerms: Record<string, string> = {
 
   "Ulcerative Colitis":
     "An inflammatory bowel disease that causes long-lasting inflammation and ulcers in your digestive tract. It affects the innermost lining of your large intestine and rectum.",
-}
+};
 
-export function MedicalTermInfo({ term, children, className = "" }: MedicalTermInfoProps) {
-  const [isOpen, setIsOpen] = useState(false)
+export function MedicalTermInfo({
+  term,
+  children,
+  className = "",
+}: MedicalTermInfoProps) {
+  const [isOpen, setIsOpen] = useState(false);
 
   // Try to find an exact match first
-  let explanation = medicalTerms[term]
+  let explanation = medicalTerms[term];
 
   // If no exact match, try to find a partial match
   if (!explanation) {
-    const keys = Object.keys(medicalTerms)
+    const keys = Object.keys(medicalTerms);
     for (const key of keys) {
       if (term.includes(key) || key.includes(term)) {
-        explanation = medicalTerms[key]
-        break
+        explanation = medicalTerms[key];
+        break;
       }
     }
   }
@@ -175,7 +184,7 @@ export function MedicalTermInfo({ term, children, className = "" }: MedicalTermI
   // If still no match, provide a generic message
   if (!explanation) {
     explanation =
-      "This is a medical term or recommendation. If you're unsure what it means, please ask your healthcare provider for more information."
+      "This is a medical term or recommendation. If you're unsure what it means, please ask your healthcare provider for more information.";
   }
 
   return (
@@ -183,7 +192,11 @@ export function MedicalTermInfo({ term, children, className = "" }: MedicalTermI
       {children}
       <Popover open={isOpen} onOpenChange={setIsOpen}>
         <PopoverTrigger asChild>
-          <Button variant="ghost" size="icon" className="h-5 w-5 ml-1 rounded-full">
+          <Button
+            variant="ghost"
+            size="icon"
+            className="h-5 w-5 ml-1 rounded-full"
+          >
             <LucideInfo className="h-3 w-3" />
           </Button>
         </PopoverTrigger>
@@ -195,6 +208,5 @@ export function MedicalTermInfo({ term, children, className = "" }: MedicalTermI
         </PopoverContent>
       </Popover>
     </span>
-  )
+  );
 }
-

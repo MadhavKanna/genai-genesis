@@ -1,13 +1,29 @@
-"use client"
+"use client";
 
-import { useState } from "react"
-import Link from "next/link"
-import Image from "next/image"
-import { Button } from "@/components/ui/button"
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
-import { Badge } from "@/components/ui/badge"
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
+import { useState } from "react";
+import Link from "next/link";
+import Image from "next/image";
+import { Button } from "@/src/components/ui/button";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardFooter,
+  CardHeader,
+  CardTitle,
+} from "@/src/components/ui/card";
+import {
+  Tabs,
+  TabsContent,
+  TabsList,
+  TabsTrigger,
+} from "@/src/components/ui/tabs";
+import { Badge } from "@/src/components/ui/badge";
+import {
+  Avatar,
+  AvatarFallback,
+  AvatarImage,
+} from "@/src/components/ui/avatar";
 import {
   LucideUsers,
   LucideBrain,
@@ -17,16 +33,16 @@ import {
   LucideChevronRight,
   LucideLogOut,
   LucideAlertCircle,
-} from "lucide-react"
-import { useAuth } from "@/components/auth-provider"
+} from "lucide-react";
+import { useAuth } from "@/src/components/auth-provider";
 
 export default function PatientDashboard() {
-  const [activeTab, setActiveTab] = useState("active")
-  const { signOut } = useAuth()
+  const [activeTab, setActiveTab] = useState("active");
+  const { signOut } = useAuth();
 
   const handleLogout = async () => {
-    await signOut()
-  }
+    await signOut();
+  };
 
   return (
     <div className="flex min-h-screen bg-gradient-to-br from-blue-50 to-white">
@@ -36,7 +52,7 @@ export default function PatientDashboard() {
           <div className="flex items-center gap-2">
             <div className="relative h-8 w-8 overflow-hidden">
               <Image
-                src="/images/symedon-logo.png"
+                src="/symedon-logo.png"
                 alt="Symedon Logo"
                 width={32}
                 height={32}
@@ -86,10 +102,17 @@ export default function PatientDashboard() {
             </Avatar>
             <div className="flex flex-col">
               <span className="text-sm font-medium">Jane Patient</span>
-              <span className="text-xs text-muted-foreground">jane@example.com</span>
+              <span className="text-xs text-muted-foreground">
+                jane@example.com
+              </span>
             </div>
           </div>
-          <Button variant="outline" className="w-full mt-2 rounded-full" size="sm" onClick={handleLogout}>
+          <Button
+            variant="outline"
+            className="w-full mt-2 rounded-full"
+            size="sm"
+            onClick={handleLogout}
+          >
             <LucideLogOut className="mr-2 h-4 w-4" />
             Log out
           </Button>
@@ -108,7 +131,11 @@ export default function PatientDashboard() {
         </header>
 
         <main className="container py-6">
-          <Tabs defaultValue="active" className="w-full" onValueChange={setActiveTab}>
+          <Tabs
+            defaultValue="active"
+            className="w-full"
+            onValueChange={setActiveTab}
+          >
             <TabsList className="grid w-full grid-cols-3 mb-8">
               <TabsTrigger value="active">Active Cases</TabsTrigger>
               <TabsTrigger value="completed">Completed</TabsTrigger>
@@ -118,23 +145,32 @@ export default function PatientDashboard() {
             <TabsContent value="active" className="space-y-4">
               <div className="flex items-center justify-between">
                 <h2 className="text-xl font-semibold">Active Cases</h2>
-                <p className="text-sm text-muted-foreground">Showing 2 active cases</p>
+                <p className="text-sm text-muted-foreground">
+                  Showing 2 active cases
+                </p>
               </div>
 
               <Card className="symedon-card border-none">
                 <CardHeader className="pb-2">
                   <div className="flex justify-between items-center">
-                    <CardTitle className="text-lg">Persistent Skin Rash</CardTitle>
+                    <CardTitle className="text-lg">
+                      Persistent Skin Rash
+                    </CardTitle>
                     <Badge className="bg-symedon-red-gradient">In Review</Badge>
                   </div>
-                  <CardDescription>Case ID: #SYM-23789 • Submitted: May 15, 2023</CardDescription>
+                  <CardDescription>
+                    Case ID: #SYM-23789 • Submitted: May 15, 2023
+                  </CardDescription>
                 </CardHeader>
                 <CardContent>
                   <div className="space-y-4">
                     <div className="space-y-2">
                       <div className="text-sm font-medium">Case Progress</div>
                       <div className="h-2 bg-muted rounded-full overflow-hidden">
-                        <div className="h-full bg-symedon-gradient rounded-full" style={{ width: "60%" }}></div>
+                        <div
+                          className="h-full bg-symedon-gradient rounded-full"
+                          style={{ width: "60%" }}
+                        ></div>
                       </div>
                       <div className="flex justify-between text-xs text-muted-foreground">
                         <span>3/5 clinicians reviewed</span>
@@ -144,8 +180,12 @@ export default function PatientDashboard() {
 
                     <div className="grid grid-cols-2 gap-4 text-sm">
                       <div>
-                        <span className="text-muted-foreground">Primary concern:</span>
-                        <p className="font-medium">Itchy rash on arms and torso</p>
+                        <span className="text-muted-foreground">
+                          Primary concern:
+                        </span>
+                        <p className="font-medium">
+                          Itchy rash on arms and torso
+                        </p>
                       </div>
                       <div>
                         <span className="text-muted-foreground">Duration:</span>
@@ -156,13 +196,19 @@ export default function PatientDashboard() {
                     <div className="flex flex-wrap gap-2">
                       <div className="flex -space-x-2">
                         <Avatar className="border-2 border-background h-8 w-8">
-                          <AvatarFallback className="bg-primary text-primary-foreground">DR</AvatarFallback>
+                          <AvatarFallback className="bg-primary text-primary-foreground">
+                            DR
+                          </AvatarFallback>
                         </Avatar>
                         <Avatar className="border-2 border-background h-8 w-8">
-                          <AvatarFallback className="bg-secondary text-secondary-foreground">JM</AvatarFallback>
+                          <AvatarFallback className="bg-secondary text-secondary-foreground">
+                            JM
+                          </AvatarFallback>
                         </Avatar>
                         <Avatar className="border-2 border-background h-8 w-8">
-                          <AvatarFallback className="bg-warning text-warning-foreground">KL</AvatarFallback>
+                          <AvatarFallback className="bg-warning text-warning-foreground">
+                            KL
+                          </AvatarFallback>
                         </Avatar>
                         <div className="flex h-8 w-8 items-center justify-center rounded-full border-2 border-background bg-muted text-xs font-medium">
                           +2
@@ -188,17 +234,24 @@ export default function PatientDashboard() {
               <Card className="symedon-card border-none">
                 <CardHeader className="pb-2">
                   <div className="flex justify-between items-center">
-                    <CardTitle className="text-lg">Recurring Headaches</CardTitle>
+                    <CardTitle className="text-lg">
+                      Recurring Headaches
+                    </CardTitle>
                     <Badge className="bg-symedon-blue-gradient">Matching</Badge>
                   </div>
-                  <CardDescription>Case ID: #SYM-23790 • Submitted: May 18, 2023</CardDescription>
+                  <CardDescription>
+                    Case ID: #SYM-23790 • Submitted: May 18, 2023
+                  </CardDescription>
                 </CardHeader>
                 <CardContent>
                   <div className="space-y-4">
                     <div className="space-y-2">
                       <div className="text-sm font-medium">Case Progress</div>
                       <div className="h-2 bg-muted rounded-full overflow-hidden">
-                        <div className="h-full bg-symedon-gradient rounded-full" style={{ width: "20%" }}></div>
+                        <div
+                          className="h-full bg-symedon-gradient rounded-full"
+                          style={{ width: "20%" }}
+                        ></div>
                       </div>
                       <div className="flex justify-between text-xs text-muted-foreground">
                         <span>Finding specialists</span>
@@ -208,8 +261,12 @@ export default function PatientDashboard() {
 
                     <div className="grid grid-cols-2 gap-4 text-sm">
                       <div>
-                        <span className="text-muted-foreground">Primary concern:</span>
-                        <p className="font-medium">Severe headaches with nausea</p>
+                        <span className="text-muted-foreground">
+                          Primary concern:
+                        </span>
+                        <p className="font-medium">
+                          Severe headaches with nausea
+                        </p>
                       </div>
                       <div>
                         <span className="text-muted-foreground">Duration:</span>
@@ -219,7 +276,9 @@ export default function PatientDashboard() {
 
                     <div className="flex items-center gap-2 text-xs text-muted-foreground">
                       <LucideBrain className="h-3 w-3" />
-                      <span>AI is analyzing your case and matching with specialists</span>
+                      <span>
+                        AI is analyzing your case and matching with specialists
+                      </span>
                     </div>
                   </div>
                 </CardContent>
@@ -237,7 +296,9 @@ export default function PatientDashboard() {
             <TabsContent value="completed" className="space-y-4">
               <div className="flex items-center justify-between">
                 <h2 className="text-xl font-semibold">Completed Cases</h2>
-                <p className="text-sm text-muted-foreground">Showing 1 completed case</p>
+                <p className="text-sm text-muted-foreground">
+                  Showing 1 completed case
+                </p>
               </div>
 
               <Card className="symedon-card border-none">
@@ -246,13 +307,17 @@ export default function PatientDashboard() {
                     <CardTitle className="text-lg">Lower Back Pain</CardTitle>
                     <Badge className="bg-secondary">Completed</Badge>
                   </div>
-                  <CardDescription>Case ID: #SYM-23456 • Completed: April 28, 2023</CardDescription>
+                  <CardDescription>
+                    Case ID: #SYM-23456 • Completed: April 28, 2023
+                  </CardDescription>
                 </CardHeader>
                 <CardContent>
                   <div className="space-y-4">
                     <div className="grid grid-cols-2 gap-4 text-sm">
                       <div>
-                        <span className="text-muted-foreground">Primary concern:</span>
+                        <span className="text-muted-foreground">
+                          Primary concern:
+                        </span>
                         <p className="font-medium">Chronic lower back pain</p>
                       </div>
                       <div>
@@ -264,20 +329,29 @@ export default function PatientDashboard() {
                     <div className="flex flex-wrap gap-2">
                       <div className="flex -space-x-2">
                         <Avatar className="border-2 border-background h-8 w-8">
-                          <AvatarFallback className="bg-primary text-primary-foreground">TS</AvatarFallback>
+                          <AvatarFallback className="bg-primary text-primary-foreground">
+                            TS
+                          </AvatarFallback>
                         </Avatar>
                         <Avatar className="border-2 border-background h-8 w-8">
-                          <AvatarFallback className="bg-secondary text-secondary-foreground">MR</AvatarFallback>
+                          <AvatarFallback className="bg-secondary text-secondary-foreground">
+                            MR
+                          </AvatarFallback>
                         </Avatar>
                         <Avatar className="border-2 border-background h-8 w-8">
-                          <AvatarFallback className="bg-warning text-warning-foreground">PK</AvatarFallback>
+                          <AvatarFallback className="bg-warning text-warning-foreground">
+                            PK
+                          </AvatarFallback>
                         </Avatar>
                         <Avatar className="border-2 border-background h-8 w-8">
-                          <AvatarFallback className="bg-destructive text-destructive-foreground">AL</AvatarFallback>
+                          <AvatarFallback className="bg-destructive text-destructive-foreground">
+                            AL
+                          </AvatarFallback>
                         </Avatar>
                       </div>
                       <div className="text-xs text-muted-foreground flex items-center">
-                        <LucideUsers className="h-3 w-3 mr-1" />4 clinicians provided guidance
+                        <LucideUsers className="h-3 w-3 mr-1" />4 clinicians
+                        provided guidance
                       </div>
                     </div>
                   </div>
@@ -296,7 +370,9 @@ export default function PatientDashboard() {
             <TabsContent value="archived" className="space-y-4">
               <div className="flex items-center justify-between">
                 <h2 className="text-xl font-semibold">Archived Cases</h2>
-                <p className="text-sm text-muted-foreground">No archived cases</p>
+                <p className="text-sm text-muted-foreground">
+                  No archived cases
+                </p>
               </div>
 
               <div className="flex flex-col items-center justify-center py-12 text-center">
@@ -305,7 +381,8 @@ export default function PatientDashboard() {
                 </div>
                 <h3 className="text-lg font-medium mb-2">No Archived Cases</h3>
                 <p className="text-muted-foreground max-w-sm">
-                  You haven't archived any cases yet. Completed cases can be archived to keep your dashboard organized.
+                  You haven't archived any cases yet. Completed cases can be
+                  archived to keep your dashboard organized.
                 </p>
               </div>
             </TabsContent>
@@ -313,6 +390,5 @@ export default function PatientDashboard() {
         </main>
       </div>
     </div>
-  )
+  );
 }
-
