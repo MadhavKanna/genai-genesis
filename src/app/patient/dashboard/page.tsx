@@ -28,10 +28,10 @@ import {
   LucideUsers,
   LucideBrain,
   LucideClipboard,
-  LucideMessageSquare,
   LucideFileText,
   LucideChevronRight,
   LucideLogOut,
+  LucideSettings,
   LucideAlertCircle,
 } from "lucide-react";
 import { useAuth } from "@/src/components/auth-provider";
@@ -163,17 +163,10 @@ export default function PatientDashboard() {
               Profile
             </Link>
             <Link
-              href="/patient/messages"
-              className="flex items-center gap-3 rounded-lg px-3 py-2 text-muted-foreground hover:text-foreground transition-all"
-            >
-              <LucideMessageSquare className="h-4 w-4" />
-              Messages
-            </Link>
-            <Link
               href="/patient/settings"
               className="flex items-center gap-3 rounded-lg px-3 py-2 text-muted-foreground hover:text-foreground transition-all"
             >
-              <LucideFileText className="h-4 w-4" />
+              <LucideSettings className="h-4 w-4" />
               Settings
             </Link>
           </nav>

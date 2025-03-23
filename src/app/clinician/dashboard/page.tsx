@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import { Button } from "@/src/components/ui/button";
@@ -31,20 +31,131 @@ import {
   LucideBrain,
   LucideCheck,
   LucideClipboard,
-  LucideMessageSquare,
   LucideFileText,
   LucideChevronRight,
   LucideLogOut,
   LucideSearch,
   LucideFilter,
   LucideBarChart,
+  LucideHeart,
+  LucideClock,
+  LucideAlertCircle,
+  LucideSettings,
 } from "lucide-react";
 
 import { LanguageSelector } from "@/src/components/language-selector";
+import InteractiveGlobe from "@/src/components/InteractiveGlobe";
+import StatisticsCard from "@/src/components/StatisticsCard";
+
+// Mock data for the globe points
+const globePoints = [
+  {
+    lat: 40.7128,
+    lng: -74.0060,
+    color: "#10B981",
+    size: 0.8,
+    label: "Life saved in New York: Emergency surgery successful",
+    data: { type: "saved", date: "2 hours ago" }
+  },
+  {
+    lat: 51.5074,
+    lng: -0.1278,
+    color: "#10B981",
+    size: 0.8,
+    label: "Life saved in London: Critical care provided",
+    data: { type: "saved", date: "4 hours ago" }
+  },
+  {
+    lat: -33.8688,
+    lng: 151.2093,
+    color: "#10B981",
+    size: 0.8,
+    label: "Life saved in Sydney: Successful treatment",
+    data: { type: "saved", date: "1 hour ago" }
+  },
+  {
+    lat: 35.6762,
+    lng: 139.6503,
+    color: "#10B981",
+    size: 0.8,
+    label: "Life saved in Tokyo: Emergency response",
+    data: { type: "saved", date: "30 minutes ago" }
+  },
+  {
+    lat: 1.3521,
+    lng: 103.8198,
+    color: "#10B981",
+    size: 0.8,
+    label: "Life saved in Singapore: Critical intervention",
+    data: { type: "saved", date: "3 hours ago" }
+  },
+  {
+    lat: 19.4326,
+    lng: -99.1332,
+    color: "#10B981",
+    size: 0.8,
+    label: "Life saved in Mexico City: Urgent care provided",
+    data: { type: "saved", date: "5 hours ago" }
+  },
+  {
+    lat: -22.9068,
+    lng: -43.1729,
+    color: "#10B981",
+    size: 0.8,
+    label: "Life saved in Rio: Emergency treatment",
+    data: { type: "saved", date: "1 hour ago" }
+  }
+];
 
 export default function ClinicianDashboard() {
   const [activeTab, setActiveTab] = useState("pending");
   const { signOut } = useAuth();
+  const [savedLives, setSavedLives] = useState(0);
+  const [selectedPoint, setSelectedPoint] = useState<any>(null);
+  const [currentPoints, setCurrentPoints] = useState(globePoints);
+
+  useEffect(() => {
+    // Simulate incrementing saved lives over time
+    const interval = setInterval(() => {
+      setSavedLives(prev => prev + 1);
+
+      // Add a new random point
+      const locations = [
+        { city: "Nairobi", lat: -1.2921, lng: 36.8219 },
+        { city: "Mumbai", lat: 19.0760, lng: 72.8777 },
+        { city: "Cairo", lat: 30.0444, lng: 31.2357 },
+        { city: "Jakarta", lat: -6.2088, lng: 106.8456 },
+        { city: "Manila", lat: 14.5995, lng: 120.9842 },
+        { city: "Lagos", lat: 6.5244, lng: 3.3792 },
+        { city: "Delhi", lat: 28.6139, lng: 77.2090 },
+        { city: "Dhaka", lat: 23.8103, lng: 90.4125 }
+      ];
+
+      const newLocation = locations[Math.floor(Math.random() * locations.length)];
+      const newPoint = {
+        lat: newLocation.lat,
+        lng: newLocation.lng,
+        color: "#10B981",
+        size: 0.8,
+        label: `Life saved in ${newLocation.city}: Emergency care provided`,
+        data: { type: "saved", date: "Just now" }
+      };
+
+      setCurrentPoints(prev => {
+        const updated = [...prev, newPoint];
+        if (updated.length > 12) { // Keep only the most recent points
+          return updated.slice(-12);
+        }
+        return updated;
+      });
+    }, 10000); // Add a new point every 10 seconds
+
+    return () => clearInterval(interval);
+  }, []);
+
+  const handlePointClick = (point: any) => {
+    setSelectedPoint(point);
+  };
 
   const handleLogout = async () => {
     await signOut();
@@ -99,17 +210,10 @@ export default function ClinicianDashboard() {
               Profile
             </Link>
             <Link
-              href="/clinician/messages"
-              className="flex items-center gap-3 rounded-lg px-3 py-2 text-muted-foreground hover:text-foreground transition-all"
-            >
-              <LucideMessageSquare className="h-4 w-4" />
-              Messages
-            </Link>
-            <Link
               href="/clinician/settings"
               className="flex items-center gap-3 rounded-lg px-3 py-2 text-muted-foreground hover:text-foreground transition-all"
             >
-              <LucideFileText className="h-4 w-4" />
+              <LucideSettings className="h-4 w-4" />
               Settings
             </Link>
           </nav>
@@ -140,7 +244,7 @@ export default function ClinicianDashboard() {
       {/* Main content */}
       <div className="flex-1 overflow-auto">
         <header className="sticky top-0 z-10 flex h-16 items-center gap-4 border-b bg-white px-6">
-          <h1 className="text-lg font-semibold">Case Queue</h1>
+          <h1 className="text-lg font-semibold">Global Health Impact</h1>
           <div className="ml-auto flex items-center gap-4">
             <div className="relative">
               <LucideSearch className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
@@ -159,6 +263,52 @@ export default function ClinicianDashboard() {
         </header>
 
         <main className="container py-6">
+          {/* Impact Overview Section */}
+          <div className="mb-8">
+            <div className="grid grid-cols-1 gap-6">
+              <Card className="border-none bg-white/50 backdrop-blur-sm">
+                <CardHeader>
+                  <CardTitle className="text-lg">Global Impact Overview</CardTitle>
+                  <CardDescription>Real-time visualization of lives impacted</CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <div className="flex flex-col md:flex-row gap-6">
+                    <div className="relative flex-none w-[500px] h-[500px] overflow-hidden">
+                      <InteractiveGlobe
+                        points={currentPoints}
+                        onPointClick={handlePointClick}
+                        size="large"
+                        autoRotate={true}
+                      />
+                    </div>
+                    <div className="flex-1">
+                      <div className="space-y-4">
+                        <StatisticsCard
+                          title="Lives Saved"
+                          value={savedLives}
+                          description="Total patients helped through the platform"
+                          trend={{ value: 12, label: "this week", isPositive: true }}
+                        />
+                        <StatisticsCard
+                          title="Pending Cases"
+                          value="23"
+                          description="Cases awaiting review"
+                          trend={{ value: 5, label: "since yesterday", isPositive: false }}
+                        />
+                        <StatisticsCard
+                          title="New Cases"
+                          value="8"
+                          description="Cases received since last login"
+                          trend={{ value: 15, label: "increase", isPositive: true }}
+                        />
+                      </div>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+            </div>
+          </div>
+
           <Tabs
             defaultValue="pending"
             className="w-full"
