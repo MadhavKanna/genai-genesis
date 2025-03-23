@@ -13,17 +13,20 @@ interface LanguageSelectorProps {
   variant?: "default" | "outline" | "ghost";
   size?: "default" | "sm" | "lg" | "icon";
   className?: string;
+  onLanguageChange?: (languageCode: string) => void;
 }
 
 export function LanguageSelector({
   variant = "outline",
   size = "default",
   className = "",
+  onLanguageChange,
 }: LanguageSelectorProps) {
   const { currentLanguage, setLanguage, languages } = useSiteLanguage();
 
   const handleLanguageChange = (language: (typeof languages)[0]) => {
     setLanguage(language);
+    onLanguageChange?.(language.code);
   };
 
   return (

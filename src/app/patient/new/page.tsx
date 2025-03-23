@@ -37,6 +37,7 @@ import {
   LucideBrain,
   LucideMessageSquare,
 } from "lucide-react";
+import { ConversationalAI } from "@/src/components/ConversationalAI";
 
 export default function NewPatientCase() {
   const router = useRouter();
@@ -44,14 +45,19 @@ export default function NewPatientCase() {
   const [uploadedImages, setUploadedImages] = useState<File[]>([]);
   const [showAiAnalysis, setShowAiAnalysis] = useState(false);
   const [aiAnalysisResult, setAiAnalysisResult] = useState<any>(null);
-  const [inputMethod, setInputMethod] = useState<"manual" | "guided">("manual");
+  const [inputMethod, setInputMethod] = useState<"manual" | "guided">("guided");
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isConversationComplete, setIsConversationComplete] = useState(false);
+  const [languageCode, setLanguageCode] = useState("en-US");
 
   // Form data
   const [primaryConcern, setPrimaryConcern] = useState("");
   const [symptomDuration, setSymptomDuration] = useState("");
   const [durationUnit, setDurationUnit] = useState("days");
   const [additionalSymptoms, setAdditionalSymptoms] = useState("");
+  const [age, setAge] = useState("");
+  const [gender, setGender] = useState("");
+  const [otherGender, setOtherGender] = useState("");
 
   const fileInputRef = useRef<HTMLInputElement>(null);
 
@@ -128,6 +134,60 @@ export default function NewPatientCase() {
     setInputMethod("manual");
   };
 
+  const handleFormComplete = (formData: any) => {
+    console.log("Received form data:", formData);
+
+    // Validate that we have all required fields
+    const requiredFields = {
+      primaryConcern: formData.primaryConcern,
+      symptomDuration: formData.symptomDuration,
+      age: formData.age,
+      gender: formData.gender,
+    };
+
+    const missingFields = Object.entries(requiredFields)
+      .filter(([_, value]) => !value)
+      .map(([key]) => key);
+
+    if (missingFields.length > 0) {
+      console.log("Missing required fields:", missingFields);
+      return;
+    }
+
+    // Update form fields with the data from the LLM
+    setPrimaryConcern(formData.primaryConcern || "");
+    setSymptomDuration(formData.symptomDuration || "");
+    setDurationUnit(formData.durationUnit || "days");
+    setAdditionalSymptoms(formData.additionalSymptoms || "");
+    setAge(formData.age || "");
+    setGender(formData.gender || "");
+    setOtherGender(formData.otherGender || "");
+
+    // Only mark conversation as complete if all required fields are filled and valid
+    if (
+      formData.primaryConcern &&
+      formData.symptomDuration &&
+      formData.age &&
+      formData.gender &&
+      typeof formData.primaryConcern === "string" &&
+      typeof formData.symptomDuration === "number" &&
+      typeof formData.age === "number" &&
+      typeof formData.gender === "string"
+    ) {
+      console.log(
+        "All required fields are valid, marking conversation as complete"
+      );
+      setIsConversationComplete(true);
+    } else {
+      console.log("Form data validation failed:", {
+        primaryConcern: formData.primaryConcern,
+        symptomDuration: formData.symptomDuration,
+        age: formData.age,
+        gender: formData.gender,
+      });
+    }
+  };
+
   return (
     <div className="container max-w-4xl py-8 px-4 md:py-12">
       <div className="flex justify-between items-center mb-6">
@@ -135,7 +195,11 @@ export default function NewPatientCase() {
           <LucideArrowLeft className="h-4 w-4" />
           Back to home
         </Link>
-        <LanguageSelector size="sm" className="rounded-full" />
+        <LanguageSelector
+          size="sm"
+          className="rounded-full"
+          onLanguageChange={setLanguageCode}
+        />
       </div>
 
       <div className="mb-8">
@@ -206,10 +270,12 @@ export default function NewPatientCase() {
                     <div className="gemini-star"></div>
                     <div className="gemini-star"></div>
                   </div>
-                  <p className="text-gray-600 text-lg">Gemini is thinking</p>
+                  <p className="text-gray-600 text-lg">
+                    Processing your information
+                  </p>
                 </div>
                 <p className="text-sm text-gray-500">
-                  Analyzing your request...
+                  Please wait while we process your information...
                 </p>
               </div>
             </CardContent>
@@ -235,22 +301,39 @@ export default function NewPatientCase() {
                   >
                     <TabsList className="grid w-full grid-cols-2 mb-6">
                       <TabsTrigger
-                        value="manual"
-                        className="flex items-center gap-2"
-                      >
-                        <LucideMessageSquare className="h-4 w-4" />
-                        Manual Input
-                      </TabsTrigger>
-                      <TabsTrigger
                         value="guided"
                         className="flex items-center gap-2"
                       >
                         <LucideBrain className="h-4 w-4" />
                         AI-Guided
                       </TabsTrigger>
+                      <TabsTrigger
+                        value="manual"
+                        className="flex items-center gap-2"
+                      >
+                        <LucideMessageSquare className="h-4 w-4" />
+                        Manual Input
+                      </TabsTrigger>
                     </TabsList>
 
-                    <TabsContent value="manual" className="space-y-6">
+                    <TabsContent value="guided" className="space-y-6">
+                      <div className="space-y-4">
+                        <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                          <LucideInfo className="h-4 w-4" />
+                          <p>
+                            Click the microphone button to start speaking. The
+                            AI will guide you through providing your symptoms
+                            and medical history.
+                          </p>
+                        </div>
+                        <ConversationalAI
+                          languageCode={languageCode}
+                          onFormComplete={handleFormComplete}
+                        />
+                      </div>
+                    </TabsContent>
+
+                    <TabsContent value="manual">
                       <div className="space-y-2">
                         <Label htmlFor="primary-concern">
                           What is your primary health concern?
@@ -312,12 +395,6 @@ export default function NewPatientCase() {
                           onChange={setAdditionalSymptoms}
                         />
                       </div>
-                    </TabsContent>
-
-                    <TabsContent value="guided">
-                      <AIConversationGuide
-                        onComplete={handleConversationComplete}
-                      />
                     </TabsContent>
                   </Tabs>
 
@@ -403,7 +480,13 @@ export default function NewPatientCase() {
                   )}
                 </CardContent>
                 <CardFooter className="flex justify-end">
-                  <Button type="button" onClick={() => setStep(2)}>
+                  <Button
+                    type="button"
+                    onClick={() => setStep(2)}
+                    disabled={
+                      !primaryConcern || !symptomDuration || !age || !gender
+                    }
+                  >
                     Continue to Medical History
                   </Button>
                 </CardFooter>
