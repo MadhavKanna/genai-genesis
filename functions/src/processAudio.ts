@@ -25,15 +25,24 @@ const ai = genkit({
 });
 
 // System prompt for the medical assistant
-const systemPrompt = `You are a friendly and empathetic medical assistant helping users fill out a health form. Your goal is to collect all required information through natural conversation.
+const systemPrompt = (languageCode: string) => `
+You are a chatbot designed to help users fill out a form. 
+Ask the user for the required details in a conversational way, ensuring that all fields are collected.
+Present the final form in a structured JSON format.
+
+IMPORTANT: You MUST respond in the same language as the user's input. The user's language code is "${languageCode}". 
+For example, if the user speaks in Hindi, respond in Hindi. If they speak in Spanish, respond in Spanish.
+
+Also, you will be given input of your conversation history. You should use this to continue the conversation naturally.
 
 Guidelines:
 1. Ask one question at a time and wait for the user's response
 2. If the user's response is incomplete or unclear, ask follow-up questions
 3. Keep track of what information you've collected and what's still needed
-4. Be conversational and friendly, but professional
-5. Only output the JSON form when ALL required fields are filled
-6. If any required information is missing, continue the conversation
+4. Only output the JSON form when ALL required fields are filled
+5. Go through the questions one by one to get user responses
+6. ALWAYS respond in the same language as the user's input
+7. Your sole task is to collect the information in a direct and simple manner and output the JSON object with the required fields
 
 Required Information:
 1. Primary Health Concern (text)
@@ -74,7 +83,9 @@ When ALL required information is collected, output a JSON object with this struc
   "preExistingConditions": "string"
 }
 
-Remember: Only output the JSON when ALL required fields are filled. Otherwise, continue the conversation naturally.`;
+Remember: 
+1. Only output the JSON when ALL required fields are filled. Otherwise, continue the conversation naturally.
+2. ALWAYS respond in the same language as the user's input (${languageCode}).`;
 
 // Map of language codes to their full names for TTS
 const languageMap: { [key: string]: string } = {
@@ -183,6 +194,12 @@ const languageMap: { [key: string]: string } = {
   "zu-ZA": "zu-ZA",
 };
 
+interface Message {
+  role: "user" | "assistant" | "system";
+  content: string;
+  timestamp: string;
+}
+
 export const processAudio = functions.https.onRequest(async (req, res) => {
   // Handle CORS preflight requests
   return corsHandler(req, res, async () => {
@@ -197,24 +214,36 @@ export const processAudio = functions.https.onRequest(async (req, res) => {
         languageCode = "en-US",
         textInput,
         messages = [],
+        conversationId,
       } = req.body;
 
+      console.log("Received request", {
+        conversationId,
+        languageCode,
+        messageCount: messages.length,
+        hasAudioData: !!audioBase64,
+        hasTextInput: !!textInput,
+      });
+
       // Validate language code
-      if (!languageMap[languageCode]) {
+      if (!languageCode || typeof languageCode !== "string") {
+        console.error("Invalid language code:", languageCode);
         res.status(400).json({
-          error: "Unsupported language",
-          details: `Language code ${languageCode} is not supported`,
+          error: "Invalid language code",
+          details: "Language code must be a non-empty string",
         });
         return;
       }
 
-      console.log("Received request", {
-        hasAudioData: !!audioBase64,
-        hasTextInput: !!textInput,
-        audioDataLength: audioBase64?.length,
-        languageCode,
-        messageCount: messages.length,
-      });
+      if (!languageMap[languageCode]) {
+        console.error("Unsupported language code:", languageCode);
+        res.status(400).json({
+          error: "Unsupported language",
+          details: `Language code "${languageCode}" is not supported. Please use one of the supported language codes.`,
+          supportedLanguages: Object.keys(languageMap),
+        });
+        return;
+      }
 
       let transcription = "";
 
@@ -226,13 +255,26 @@ export const processAudio = functions.https.onRequest(async (req, res) => {
         });
 
         // Speech-to-Text
-        console.log("Starting speech-to-text conversion");
-        const [response] = await speechClient.recognize({
+        console.log(
+          "Starting speech-to-text conversion with language:",
+          languageCode
+        );
+        const response = await speechClient.recognize({
           audio: { content: audioBuffer.toString("base64") },
           config: {
             encoding: "WEBM_OPUS",
             sampleRateHertz: 48000,
             languageCode: languageCode,
+            model: "default",
+            useEnhanced: true,
+            enableAutomaticPunctuation: true,
+            enableWordTimeOffsets: true,
+            enableWordConfidence: true,
+            metadata: {
+              recordingDeviceType: "SMARTPHONE",
+              recordingDeviceName: "browser",
+              originalMediaType: "AUDIO",
+            },
           },
         });
 
@@ -241,12 +283,22 @@ export const processAudio = functions.https.onRequest(async (req, res) => {
           JSON.stringify(response, null, 2)
         );
 
-        transcription =
-          response.results?.[0]?.alternatives?.[0]?.transcript || "";
+        // Get the most confident alternative
+        const alternatives = response[0]?.results?.[0]?.alternatives || [];
+        const bestAlternative = alternatives.reduce((best, current) => {
+          const bestConfidence = best.confidence || 0;
+          const currentConfidence = current.confidence || 0;
+          return currentConfidence > bestConfidence ? current : best;
+        });
+
+        transcription = bestAlternative?.transcript || "";
       } else if (textInput) {
         transcription = textInput;
       } else {
-        res.status(400).send("No audio or text input provided");
+        res.status(400).json({
+          error: "No input provided",
+          details: "Either audioBase64 or textInput must be provided",
+        });
         return;
       }
 
@@ -262,15 +314,31 @@ export const processAudio = functions.https.onRequest(async (req, res) => {
       console.log("Processing input:", { transcription });
 
       // Process with Gemini
-      console.log("Starting Gemini processing");
+      console.log("Starting Gemini processing with language:", languageCode);
+
+      // Sort messages by timestamp to ensure correct order
+      const sortedMessages = [...messages].sort(
+        (a, b) =>
+          new Date(a.timestamp).getTime() - new Date(b.timestamp).getTime()
+      );
+
+      // Create the prompt with the full conversation history
       const prompt =
         [
-          { role: "system", content: systemPrompt },
-          ...messages,
+          { role: "system", content: systemPrompt(languageCode) },
+          ...sortedMessages.map((msg) => ({
+            role: msg.role,
+            content: msg.content,
+          })),
           { role: "user", content: transcription },
         ]
           .map((msg: any) => `${msg.role}: ${msg.content}`)
           .join("\n") + "\nAssistant:";
+
+      console.log(
+        "Sending prompt to Gemini with message count:",
+        sortedMessages.length + 2
+      );
 
       const { text } = await ai.generate(prompt);
       const aiResponse = text?.trim();
@@ -291,7 +359,10 @@ export const processAudio = functions.https.onRequest(async (req, res) => {
       });
 
       // Text-to-Speech
-      console.log("Starting text-to-speech conversion");
+      console.log(
+        "Starting text-to-speech conversion with language:",
+        languageCode
+      );
       try {
         // Clean the text while preserving non-Latin characters
         const ttsText = aiResponse
@@ -338,8 +409,9 @@ export const processAudio = functions.https.onRequest(async (req, res) => {
 
         res.json({
           transcription,
-          aiResponse: ttsText, // Send the cleaned text back
+          aiResponse: ttsText,
           audioResponse: audioDataUrl,
+          conversationId, // Include the conversation ID in the response
         });
       } catch (ttsError) {
         console.error("Text-to-speech error:", ttsError);

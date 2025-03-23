@@ -19,18 +19,19 @@ import {
 import { LucideBrain, LucideZoomIn, LucideInfo } from "lucide-react";
 
 interface AIVisualAnalysisProps {
-  images: Array<{
-    id: string | number;
+  images: {
+    id: string;
     url: string;
-    description?: string;
-  }>;
-  symptoms: string[];
+    description: string;
+    timestamp: string;
+  }[];
+  symptoms?: string[];
   className?: string;
 }
 
 export function AIVisualAnalysis({
   images,
-  symptoms,
+  symptoms = [],
   className = "",
 }: AIVisualAnalysisProps) {
   const [activeTab, setActiveTab] = useState("summary");

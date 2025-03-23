@@ -38,9 +38,11 @@ import {
   LucideMessageSquare,
 } from "lucide-react";
 import { ConversationalAI } from "@/src/components/ConversationalAI";
+import { useCase } from "@/src/contexts/CaseContext";
 
 export default function NewPatientCase() {
   const router = useRouter();
+  const { setCurrentCase } = useCase();
   const [step, setStep] = useState(1);
   const [uploadedImages, setUploadedImages] = useState<File[]>([]);
   const [showAiAnalysis, setShowAiAnalysis] = useState(false);
@@ -58,6 +60,9 @@ export default function NewPatientCase() {
   const [age, setAge] = useState("");
   const [gender, setGender] = useState("");
   const [otherGender, setOtherGender] = useState("");
+  const [medications, setMedications] = useState("");
+  const [allergies, setAllergies] = useState("");
+  const [conditions, setConditions] = useState<string[]>([]);
 
   const fileInputRef = useRef<HTMLInputElement>(null);
 
@@ -71,6 +76,22 @@ export default function NewPatientCase() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsSubmitting(true);
+
+    // Create the case data
+    const caseData = {
+      primaryConcern,
+      symptomDuration: parseInt(symptomDuration),
+      durationUnit,
+      additionalSymptoms,
+      age: parseInt(age),
+      gender,
+      otherGender: gender === "other" ? otherGender : null,
+      preExistingConditions: conditions.join(", "),
+    };
+
+    // Store the case data in the global state
+    setCurrentCase(caseData);
+
     // In a real app, this would submit the form data to the server
     // Simulate API call
     await new Promise((resolve) => setTimeout(resolve, 2000));
@@ -134,58 +155,31 @@ export default function NewPatientCase() {
     setInputMethod("manual");
   };
 
-  const handleFormComplete = (formData: any) => {
-    console.log("Received form data:", formData);
+  const handleFormComplete = (responses: any) => {
+    console.log("Form complete with responses:", responses);
+    // Update form fields with responses
+    setPrimaryConcern(responses.primaryConcern || "");
+    setSymptomDuration(responses.symptomDuration || "");
+    setAge(responses.age || "");
+    setGender(responses.gender || "");
+    setOtherGender(responses.otherGender || "");
+    // Handle conditions array properly
+    setConditions(
+      Array.isArray(responses.preExistingConditions)
+        ? responses.preExistingConditions
+        : responses.preExistingConditions
+        ? responses.preExistingConditions.split(", ")
+        : []
+    );
+    setMedications(responses.medications || "");
+    setAllergies(responses.allergies || "");
 
-    // Validate that we have all required fields
-    const requiredFields = {
-      primaryConcern: formData.primaryConcern,
-      symptomDuration: formData.symptomDuration,
-      age: formData.age,
-      gender: formData.gender,
-    };
-
-    const missingFields = Object.entries(requiredFields)
-      .filter(([_, value]) => !value)
-      .map(([key]) => key);
-
-    if (missingFields.length > 0) {
-      console.log("Missing required fields:", missingFields);
-      return;
-    }
-
-    // Update form fields with the data from the LLM
-    setPrimaryConcern(formData.primaryConcern || "");
-    setSymptomDuration(formData.symptomDuration || "");
-    setDurationUnit(formData.durationUnit || "days");
-    setAdditionalSymptoms(formData.additionalSymptoms || "");
-    setAge(formData.age || "");
-    setGender(formData.gender || "");
-    setOtherGender(formData.otherGender || "");
-
-    // Only mark conversation as complete if all required fields are filled and valid
-    if (
-      formData.primaryConcern &&
-      formData.symptomDuration &&
-      formData.age &&
-      formData.gender &&
-      typeof formData.primaryConcern === "string" &&
-      typeof formData.symptomDuration === "number" &&
-      typeof formData.age === "number" &&
-      typeof formData.gender === "string"
-    ) {
-      console.log(
-        "All required fields are valid, marking conversation as complete"
-      );
-      setIsConversationComplete(true);
-    } else {
-      console.log("Form data validation failed:", {
-        primaryConcern: formData.primaryConcern,
-        symptomDuration: formData.symptomDuration,
-        age: formData.age,
-        gender: formData.gender,
-      });
-    }
+    // Mark conversation as complete
+    setIsConversationComplete(true);
+    // Set input method to manual for review
+    setInputMethod("manual");
+    // Skip step 2 and go directly to step 3 (review)
+    setStep(3);
   };
 
   return (
@@ -483,9 +477,7 @@ export default function NewPatientCase() {
                   <Button
                     type="button"
                     onClick={() => setStep(2)}
-                    disabled={
-                      !primaryConcern || !symptomDuration || !age || !gender
-                    }
+                    disabled={!primaryConcern || !symptomDuration}
                   >
                     Continue to Medical History
                   </Button>
@@ -511,13 +503,19 @@ export default function NewPatientCase() {
                       placeholder="Your age"
                       min="0"
                       max="120"
+                      value={age}
+                      onChange={(e) => setAge(e.target.value)}
                       required
                     />
                   </div>
 
                   <div className="space-y-2">
                     <Label htmlFor="gender">Gender</Label>
-                    <RadioGroup defaultValue="female">
+                    <RadioGroup
+                      defaultValue="female"
+                      value={gender}
+                      onValueChange={setGender}
+                    >
                       <div className="flex flex-wrap gap-4">
                         <div className="flex items-center space-x-2">
                           <RadioGroupItem value="female" id="female" />
@@ -537,35 +535,55 @@ export default function NewPatientCase() {
                         </div>
                       </div>
                     </RadioGroup>
+                    {gender === "other" && (
+                      <Input
+                        placeholder="Please specify"
+                        value={otherGender}
+                        onChange={(e) => setOtherGender(e.target.value)}
+                        className="mt-2"
+                      />
+                    )}
                   </div>
 
                   <div className="space-y-2">
                     <Label>Do you have any of the following conditions?</Label>
                     <div className="grid grid-cols-2 gap-2">
-                      <div className="flex items-center space-x-2">
-                        <Checkbox id="diabetes" />
-                        <Label htmlFor="diabetes">Diabetes</Label>
-                      </div>
-                      <div className="flex items-center space-x-2">
-                        <Checkbox id="hypertension" />
-                        <Label htmlFor="hypertension">Hypertension</Label>
-                      </div>
-                      <div className="flex items-center space-x-2">
-                        <Checkbox id="heart-disease" />
-                        <Label htmlFor="heart-disease">Heart Disease</Label>
-                      </div>
-                      <div className="flex items-center space-x-2">
-                        <Checkbox id="asthma" />
-                        <Label htmlFor="asthma">Asthma</Label>
-                      </div>
-                      <div className="flex items-center space-x-2">
-                        <Checkbox id="cancer" />
-                        <Label htmlFor="cancer">Cancer</Label>
-                      </div>
-                      <div className="flex items-center space-x-2">
-                        <Checkbox id="autoimmune" />
-                        <Label htmlFor="autoimmune">Autoimmune Disorder</Label>
-                      </div>
+                      {[
+                        "diabetes",
+                        "hypertension",
+                        "heart-disease",
+                        "asthma",
+                        "cancer",
+                        "autoimmune",
+                      ].map((condition) => (
+                        <div
+                          key={condition}
+                          className="flex items-center space-x-2"
+                        >
+                          <Checkbox
+                            id={condition}
+                            checked={conditions.includes(condition)}
+                            onCheckedChange={(checked) => {
+                              if (checked) {
+                                setConditions([...conditions, condition]);
+                              } else {
+                                setConditions(
+                                  conditions.filter((c) => c !== condition)
+                                );
+                              }
+                            }}
+                          />
+                          <Label htmlFor={condition}>
+                            {condition
+                              .split("-")
+                              .map(
+                                (word) =>
+                                  word.charAt(0).toUpperCase() + word.slice(1)
+                              )
+                              .join(" ")}
+                          </Label>
+                        </div>
+                      ))}
                     </div>
                   </div>
 
@@ -575,6 +593,8 @@ export default function NewPatientCase() {
                       id="medications"
                       placeholder="List any medications you're currently taking"
                       rows={3}
+                      value={medications}
+                      onChange={(e) => setMedications(e.target.value)}
                     />
                   </div>
 
@@ -584,6 +604,8 @@ export default function NewPatientCase() {
                       id="allergies"
                       placeholder="List any allergies you have"
                       rows={2}
+                      value={allergies}
+                      onChange={(e) => setAllergies(e.target.value)}
                     />
                   </div>
                 </CardContent>
@@ -595,7 +617,13 @@ export default function NewPatientCase() {
                   >
                     Back
                   </Button>
-                  <Button type="button" onClick={() => setStep(3)}>
+                  <Button
+                    type="button"
+                    onClick={() => setStep(3)}
+                    disabled={
+                      !age || !gender || (gender === "other" && !otherGender)
+                    }
+                  >
                     Continue to Review
                   </Button>
                 </CardFooter>
@@ -631,16 +659,13 @@ export default function NewPatientCase() {
                       <h3 className="text-sm font-medium mb-2">Symptoms</h3>
                       <div className="rounded-lg border p-3">
                         <p className="text-sm">
-                          Primary concern:{" "}
-                          {primaryConcern || "[Sample symptom description]"}
+                          Primary concern: {primaryConcern}
                         </p>
                         <p className="text-sm mt-2">
-                          Duration: {symptomDuration || "2"}{" "}
-                          {durationUnit || "weeks"}
+                          Duration: {symptomDuration} {durationUnit}
                         </p>
                         <p className="text-sm mt-2">
-                          Additional symptoms:{" "}
-                          {additionalSymptoms || "[Sample additional symptoms]"}
+                          Additional symptoms: {additionalSymptoms || "None"}
                         </p>
                       </div>
                     </div>
@@ -650,14 +675,18 @@ export default function NewPatientCase() {
                         Medical History
                       </h3>
                       <div className="rounded-lg border p-3">
-                        <p className="text-sm">Age: 35</p>
-                        <p className="text-sm mt-2">Gender: Female</p>
-                        <p className="text-sm mt-2">Conditions: Asthma</p>
+                        <p className="text-sm">Age: {age}</p>
                         <p className="text-sm mt-2">
-                          Medications: [Sample medications]
+                          Gender: {gender === "other" ? otherGender : gender}
                         </p>
                         <p className="text-sm mt-2">
-                          Allergies: [Sample allergies]
+                          Conditions: {conditions.join(", ") || "None"}
+                        </p>
+                        <p className="text-sm mt-2">
+                          Medications: {medications || "None"}
+                        </p>
+                        <p className="text-sm mt-2">
+                          Allergies: {allergies || "None"}
                         </p>
                       </div>
                     </div>

@@ -8,6 +8,7 @@ import { Input } from "@/src/components/ui/input";
 import { Mic, Square, Send } from "lucide-react";
 import { functions } from "../../firebase";
 import { v4 as uuidv4 } from "uuid";
+import { useCase } from "@/src/contexts/CaseContext";
 
 interface Message {
   role: "user" | "assistant" | "system";
@@ -18,6 +19,7 @@ interface Message {
 interface ConversationalAIProps {
   languageCode?: string;
   onFormComplete?: (formData: any) => void;
+  conversationId?: string;
 }
 
 interface SpeechRecognitionResult {
@@ -31,10 +33,11 @@ interface SpeechRecognitionEvent {
   results: SpeechRecognitionResult[];
 }
 
-export const ConversationalAI: React.FC<ConversationalAIProps> = ({
+export function ConversationalAI({
   languageCode = "en-US",
   onFormComplete,
-}) => {
+  conversationId: externalConversationId,
+}: ConversationalAIProps) {
   const [isRecording, setIsRecording] = useState(false);
   const [isProcessing, setIsProcessing] = useState(false);
   const [messages, setMessages] = useState<Message[]>([]);
@@ -45,23 +48,26 @@ export const ConversationalAI: React.FC<ConversationalAIProps> = ({
   const audioRef = useRef<HTMLAudioElement | null>(null);
   const buttonRef = useRef<HTMLButtonElement>(null);
   const recognitionRef = useRef<any>(null);
-  const conversationId = useRef(uuidv4());
+  const conversationId = useRef(externalConversationId || uuidv4());
   const scrollAreaRef = useRef<HTMLDivElement>(null);
+  const { setCurrentCase } = useCase();
 
   useEffect(() => {
     // Initialize speech recognition
     if (typeof window !== "undefined" && "webkitSpeechRecognition" in window) {
       const recognition = new (window.webkitSpeechRecognition as any)();
-      recognition.continuous = true;
+      recognition.continuous = false; // One utterance at a time
       recognition.interimResults = true;
       recognition.lang = languageCode;
 
       recognition.onstart = () => {
-        console.log("Speech recognition started");
+        console.log("Speech recognition started with language:", languageCode);
       };
 
       recognition.onend = () => {
         console.log("Speech recognition ended");
+        // Simply update the recording state
+        setIsRecording(false);
       };
 
       recognition.onresult = (event: SpeechRecognitionEvent) => {
@@ -86,25 +92,47 @@ export const ConversationalAI: React.FC<ConversationalAIProps> = ({
 
       recognition.onerror = (event: any) => {
         console.error("Speech recognition error:", event.error);
-        setError("Speech recognition error occurred");
+        // Only set error if it's not an aborted error
+        if (event.error !== "aborted") {
+          setError("Speech recognition error occurred");
+        }
+        setIsRecording(false);
       };
 
       recognitionRef.current = recognition;
+
+      // Cleanup function
+      return () => {
+        if (recognitionRef.current) {
+          try {
+            recognitionRef.current.stop();
+            recognitionRef.current = null;
+          } catch (error) {
+            console.error("Error cleaning up recognition:", error);
+          }
+        }
+      };
     } else {
       setError(
         "Speech recognition is not supported in your browser. Please use Chrome or Edge."
       );
     }
+  }, [languageCode, isProcessing]);
 
-    return () => {
-      if (recognitionRef.current) {
-        recognitionRef.current.stop();
+  // Update recognition language when languageCode changes
+  useEffect(() => {
+    if (recognitionRef.current) {
+      try {
+        // Only update language if we're not currently recording
+        if (!isRecording) {
+          recognitionRef.current.lang = languageCode;
+          console.log("Updated speech recognition language to:", languageCode);
+        }
+      } catch (error) {
+        console.error("Error updating recognition language:", error);
       }
-      if (mediaRecorderRef.current?.state === "recording") {
-        mediaRecorderRef.current.stop();
-      }
-    };
-  }, [languageCode]);
+    }
+  }, [languageCode, isRecording]);
 
   useEffect(() => {
     // Scroll to bottom when new messages are added
@@ -113,36 +141,67 @@ export const ConversationalAI: React.FC<ConversationalAIProps> = ({
     }
   }, [messages]);
 
-  const startRecording = async () => {
-    try {
-      console.log("Recording started");
-      setError(null);
-      setIsRecording(true);
-
-      // Start speech recognition
-      if (recognitionRef.current) {
-        recognitionRef.current.start();
-      } else {
-        setError("Speech recognition not initialized");
-        return;
+  // Load conversation history from localStorage on mount
+  useEffect(() => {
+    const savedMessages = localStorage.getItem(
+      `conversation_${conversationId.current}`
+    );
+    if (savedMessages) {
+      try {
+        const parsedMessages = JSON.parse(savedMessages).map((msg: any) => ({
+          ...msg,
+          timestamp: new Date(msg.timestamp),
+        }));
+        setMessages(parsedMessages);
+      } catch (error) {
+        console.error("Error loading conversation history:", error);
       }
+    }
+  }, [conversationId.current]);
 
-      buttonRef.current?.classList.add("recording");
+  // Save conversation history to localStorage whenever messages change
+  useEffect(() => {
+    localStorage.setItem(
+      `conversation_${conversationId.current}`,
+      JSON.stringify(messages)
+    );
+  }, [messages, conversationId.current]);
+
+  const startRecording = () => {
+    if (!recognitionRef.current) {
+      setError("Speech recognition not initialized");
+      return;
+    }
+
+    try {
+      // Only start if we're not already recording and not processing
+      if (!isRecording && !isProcessing) {
+        recognitionRef.current.lang = languageCode;
+        console.log("Starting recording with language:", languageCode);
+        recognitionRef.current.start();
+        setIsRecording(true);
+      }
     } catch (error) {
-      console.error("Error accessing microphone:", error);
-      setError(
-        "Failed to access microphone. Please ensure you have granted microphone permissions."
-      );
+      console.error("Error starting recording:", error);
+      setError("Failed to start recording");
       setIsRecording(false);
     }
   };
 
   const stopRecording = () => {
     if (recognitionRef.current) {
-      recognitionRef.current.stop();
+      try {
+        // Only stop if we're actually recording
+        if (isRecording) {
+          recognitionRef.current.stop();
+          setIsRecording(false);
+        }
+      } catch (error) {
+        console.error("Error stopping recording:", error);
+        setError("Failed to stop recording");
+        setIsRecording(false);
+      }
     }
-    setIsRecording(false);
-    buttonRef.current?.classList.remove("recording");
   };
 
   const processText = async (text: string) => {
@@ -164,24 +223,23 @@ export const ConversationalAI: React.FC<ConversationalAIProps> = ({
           messages: messages.map((msg) => ({
             role: msg.role,
             content: msg.content,
+            timestamp: msg.timestamp.toISOString(),
           })),
         }),
       });
 
       if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`);
+        const errorData = await response.json();
+        console.error("Server error response:", errorData);
+        throw new Error(
+          errorData.error || `HTTP error! status: ${response.status}`
+        );
       }
 
       const data = await response.json();
       if (data.error) {
         throw new Error(data.error);
       }
-
-      // Add AI response to messages
-      setMessages((prev) => [
-        ...prev,
-        { role: "assistant", content: data.aiResponse, timestamp: new Date() },
-      ]);
 
       // Check if the response contains a JSON object with all required fields
       try {
@@ -200,12 +258,30 @@ export const ConversationalAI: React.FC<ConversationalAIProps> = ({
             typeof formData.gender === "string"
           ) {
             console.log("Form data complete:", formData);
-            // Only call onFormComplete if we have at least one message exchange
-            if (messages.length > 0) {
-              onFormComplete?.(formData);
-            }
-          } else {
-            console.log("Form data incomplete or invalid:", formData);
+            // Store the case data in context
+            setCurrentCase({
+              primaryConcern: formData.primaryConcern,
+              symptomDuration: formData.symptomDuration,
+              durationUnit: formData.durationUnit,
+              additionalSymptoms: formData.additionalSymptoms,
+              age: formData.age,
+              gender: formData.gender,
+              otherGender: formData.otherGender,
+              preExistingConditions: formData.preExistingConditions,
+            });
+            // Add a message indicating we can proceed to review
+            setMessages((prev) => [
+              ...prev,
+              {
+                role: "assistant",
+                content:
+                  "Great! I've collected all the necessary information. You can now proceed to review your case details.",
+                timestamp: new Date(),
+              },
+            ]);
+            // Call onFormComplete to trigger navigation
+            onFormComplete?.(formData);
+            return;
           }
         }
       } catch (e) {
@@ -214,10 +290,29 @@ export const ConversationalAI: React.FC<ConversationalAIProps> = ({
         );
       }
 
+      // Add AI response to messages, but filter out any JSON content
+      const filteredResponse = data.aiResponse
+        .replace(/\{[\s\S]*\}/, "")
+        .trim();
+      if (filteredResponse) {
+        setMessages((prev) => [
+          ...prev,
+          {
+            role: "assistant",
+            content: filteredResponse,
+            timestamp: new Date(),
+          },
+        ]);
+      }
+
       // Play the audio response
       if (data.audioResponse) {
-        const audio = new Audio(data.audioResponse);
-        await audio.play();
+        try {
+          const audio = new Audio(data.audioResponse);
+          await audio.play();
+        } catch (audioError) {
+          console.error("Error playing audio response:", audioError);
+        }
       }
     } catch (error) {
       console.error("Error processing text:", error);
@@ -253,28 +348,23 @@ export const ConversationalAI: React.FC<ConversationalAIProps> = ({
               messages: messages.map((msg) => ({
                 role: msg.role,
                 content: msg.content,
+                timestamp: msg.timestamp.toISOString(),
               })),
             }),
           });
 
           if (!response.ok) {
-            throw new Error(`HTTP error! status: ${response.status}`);
+            const errorData = await response.json();
+            console.error("Server error response:", errorData);
+            throw new Error(
+              errorData.error || `HTTP error! status: ${response.status}`
+            );
           }
 
           const data = await response.json();
           if (data.error) {
             throw new Error(data.error);
           }
-
-          // Add AI response to messages
-          setMessages((prev) => [
-            ...prev,
-            {
-              role: "assistant",
-              content: data.aiResponse,
-              timestamp: new Date(),
-            },
-          ]);
 
           // Check if the response contains a JSON object with all required fields
           try {
@@ -293,12 +383,30 @@ export const ConversationalAI: React.FC<ConversationalAIProps> = ({
                 typeof formData.gender === "string"
               ) {
                 console.log("Form data complete:", formData);
-                // Only call onFormComplete if we have at least one message exchange
-                if (messages.length > 0) {
-                  onFormComplete?.(formData);
-                }
-              } else {
-                console.log("Form data incomplete or invalid:", formData);
+                // Store the case data in context
+                setCurrentCase({
+                  primaryConcern: formData.primaryConcern,
+                  symptomDuration: formData.symptomDuration,
+                  durationUnit: formData.durationUnit,
+                  additionalSymptoms: formData.additionalSymptoms,
+                  age: formData.age,
+                  gender: formData.gender,
+                  otherGender: formData.otherGender,
+                  preExistingConditions: formData.preExistingConditions,
+                });
+                // Add a message indicating we can proceed to review
+                setMessages((prev) => [
+                  ...prev,
+                  {
+                    role: "assistant",
+                    content:
+                      "Great! I've collected all the necessary information. You can now proceed to review your case details.",
+                    timestamp: new Date(),
+                  },
+                ]);
+                // Call onFormComplete to trigger navigation
+                onFormComplete?.(formData);
+                return;
               }
             }
           } catch (e) {
@@ -307,10 +415,29 @@ export const ConversationalAI: React.FC<ConversationalAIProps> = ({
             );
           }
 
+          // Add AI response to messages, but filter out any JSON content
+          const filteredResponse = data.aiResponse
+            .replace(/\{[\s\S]*\}/, "")
+            .trim();
+          if (filteredResponse) {
+            setMessages((prev) => [
+              ...prev,
+              {
+                role: "assistant",
+                content: filteredResponse,
+                timestamp: new Date(),
+              },
+            ]);
+          }
+
           // Play the audio response
           if (data.audioResponse) {
-            const audio = new Audio(data.audioResponse);
-            await audio.play();
+            try {
+              const audio = new Audio(data.audioResponse);
+              await audio.play();
+            } catch (audioError) {
+              console.error("Error playing audio response:", audioError);
+            }
           }
         } catch (error) {
           console.error("Error processing audio:", error);
@@ -340,9 +467,28 @@ export const ConversationalAI: React.FC<ConversationalAIProps> = ({
     }
   };
 
+  // Add a function to clear conversation history
+  const clearConversation = () => {
+    localStorage.removeItem(`conversation_${conversationId.current}`);
+    setMessages([]);
+    conversationId.current = uuidv4();
+  };
+
   return (
     <Card className="w-full">
       <CardContent className="p-4">
+        <div className="flex justify-between items-center mb-4">
+          <h3 className="text-lg font-semibold">Conversation</h3>
+          <Button
+            variant="outline"
+            type="button"
+            size="sm"
+            onClick={clearConversation}
+            className="text-sm"
+          >
+            Clear History
+          </Button>
+        </div>
         <ScrollArea
           ref={scrollAreaRef}
           className="h-[400px] w-full rounded-md border p-4 mb-4"
@@ -427,4 +573,4 @@ export const ConversationalAI: React.FC<ConversationalAIProps> = ({
       </CardContent>
     </Card>
   );
-};
+}

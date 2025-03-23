@@ -40,42 +40,104 @@ import { LanguageSelector } from "@/src/components/language-selector";
 import { LiveChat } from "@/src/components/live-chat";
 import { AIVisualAnalysis } from "@/src/components/ai-visual-analysis";
 import { MedicalTermInfo } from "@/src/components/medical-term-info";
+import { useCase } from "@/src/contexts/CaseContext";
+import React from "react";
 
-export default function CasePage({ params }: { params: { id: string } }) {
+// Define interfaces for the case data structure
+interface CaseImage {
+  id: string;
+  url: string;
+  description: string;
+  timestamp: string;
+}
+
+interface Clinician {
+  id: number;
+  name: string;
+  specialty: string;
+  country: string;
+  avatar: string;
+}
+
+interface ClinicianNote {
+  id: string;
+  clinician: string;
+  specialty: string;
+  avatar: string;
+  date: string;
+  note: string;
+}
+
+interface CaseSummary {
+  possibleCauses: string[];
+  recommendedTests: string[];
+  suggestedTreatments: string[];
+  lifestyle: string[];
+}
+
+interface MedicalHistory {
+  conditions: string[];
+  medications: string[];
+  allergies: string[];
+}
+
+interface CaseData {
+  id: string;
+  title: string;
+  status: "completed" | "in_progress";
+  submittedDate: string;
+  completedDate?: string;
+  primaryConcern: string;
+  duration: string;
+  durationUnit: string;
+  additionalSymptoms: string;
+  medicalHistory: MedicalHistory;
+  images: CaseImage[];
+  clinicians: Clinician[];
+  clinicianNotes: ClinicianNote[];
+  summary?: CaseSummary;
+}
+
+export default function CasePage({
+  params,
+}: {
+  params: Promise<{ id: string }>;
+}) {
+  const { cases } = useCase();
   const [activeTab, setActiveTab] = useState("summary");
+  const resolvedParams = React.use(params);
 
-  // Sample data - in a real app, this would come from an API
-  const caseData = {
-    id: params.id,
+  // Find the current case from the cases array
+  const currentCase = cases.find((c) => c.id === resolvedParams.id);
+
+  // Mock data for previous cases
+  const mockCaseData: CaseData = {
+    id: "case-001",
     title: "Lower Back Pain",
     status: "completed",
     submittedDate: "April 22, 2023",
     completedDate: "April 28, 2023",
-    primaryConcern:
-      "Chronic lower back pain, worse in the morning and after sitting for long periods",
-    duration: "6 months",
-    additionalSymptoms:
-      "Occasional numbness in right leg, difficulty bending forward",
+    primaryConcern: "Chronic lower back pain, worse in the morning",
+    duration: "6",
+    durationUnit: "months",
+    additionalSymptoms: "Stiffness in the morning, pain radiating to right leg",
     medicalHistory: {
-      conditions: ["Hypertension"],
-      medications: ["Lisinopril 10mg daily"],
+      conditions: ["Hypertension", "Arthritis"],
+      medications: ["Lisinopril", "Ibuprofen"],
       allergies: ["Penicillin"],
     },
     images: [
       {
-        id: "img1",
-        url: "/placeholder.svg?height=300&width=300",
-        description: "Lower back, right side",
+        id: "1",
+        url: "/placeholder.svg",
+        description: "Lower back X-ray",
+        timestamp: "2023-04-22T10:00:00",
       },
       {
-        id: "img2",
-        url: "/placeholder.svg?height=300&width=300",
-        description: "Lower back, left side",
-      },
-      {
-        id: "img3",
-        url: "/placeholder.svg?height=300&width=300",
-        description: "Standing posture",
+        id: "2",
+        url: "/placeholder.svg",
+        description: "MRI scan",
+        timestamp: "2023-04-23T11:00:00",
       },
     ],
     clinicians: [
@@ -93,83 +155,59 @@ export default function CasePage({ params }: { params: { id: string } }) {
         country: "Spain",
         avatar: "MR",
       },
-      {
-        id: 3,
-        name: "Dr. Priya Kumar",
-        specialty: "Neurology",
-        country: "India",
-        avatar: "PK",
-      },
-      {
-        id: 4,
-        name: "Dr. Alex Lee",
-        specialty: "Pain Management",
-        country: "Canada",
-        avatar: "AL",
-      },
     ],
-    summary: {
-      possibleCauses: [
-        "Muscle strain or spasm",
-        "Lumbar disc herniation",
-        "Degenerative disc disease",
-        "Facet joint dysfunction",
-      ],
-      recommendedTests: [
-        "X-ray of the lumbar spine",
-        "MRI if symptoms persist or worsen",
-        "Physical examination by a local healthcare provider",
-      ],
-      suggestedTreatments: [
-        "Physical therapy focusing on core strengthening",
-        "Over-the-counter pain relievers (NSAIDs)",
-        "Heat and cold therapy",
-        "Proper ergonomics and posture correction",
-      ],
-      lifestyle: [
-        "Regular low-impact exercise (swimming, walking)",
-        "Maintain healthy weight",
-        "Ergonomic workspace setup",
-        "Avoid prolonged sitting",
-      ],
-    },
     clinicianNotes: [
       {
-        id: 1,
+        id: "note-001",
         clinician: "Dr. Thomas Smith",
         specialty: "Orthopedics",
         avatar: "TS",
-        note: "The symptoms are consistent with mechanical low back pain, possibly due to muscle strain or early degenerative changes. I recommend physical therapy focusing on core strengthening and proper body mechanics. If symptoms persist beyond 2-3 weeks of conservative treatment, consider imaging studies to rule out disc pathology.",
-        date: "April 24, 2023",
-      },
-      {
-        id: 2,
-        clinician: "Dr. Maria Rodriguez",
-        specialty: "Physical Medicine",
-        avatar: "MR",
-        note: "Based on the description, this appears to be mechanical back pain with possible radicular symptoms. I suggest a trial of NSAIDs, physical therapy with focus on McKenzie exercises, and lumbar stabilization. The morning stiffness suggests possible inflammatory component - monitor for other inflammatory symptoms.",
-        date: "April 25, 2023",
-      },
-      {
-        id: 3,
-        clinician: "Dr. Priya Kumar",
-        specialty: "Neurology",
-        avatar: "PK",
-        note: "The numbness in the right leg raises concern for possible nerve root compression. While conservative management is appropriate initially, if numbness persists or worsens, or if patient develops weakness or changes in bowel/bladder function, urgent evaluation is recommended. Consider MRI to evaluate for disc herniation if symptoms don't improve.",
-        date: "April 26, 2023",
-      },
-      {
-        id: 4,
-        clinician: "Dr. Alex Lee",
-        specialty: "Pain Management",
-        avatar: "AL",
-        note: "Chronic low back pain with these characteristics often responds well to a multimodal approach. Beyond physical therapy and NSAIDs, consider heat therapy, proper ergonomics, and mindfulness techniques for pain management. If pain is significantly limiting function, a short course of muscle relaxants may be considered under local physician supervision.",
-        date: "April 27, 2023",
+        date: "April 23, 2023",
+        note: "Patient presents with chronic lower back pain...",
       },
     ],
+    summary: {
+      possibleCauses: ["Herniated disc", "Muscle strain", "Arthritis"],
+      recommendedTests: ["MRI", "X-ray", "Physical examination"],
+      suggestedTreatments: ["Physical therapy", "Pain medication", "Exercise"],
+      lifestyle: ["Regular stretching", "Proper posture", "Weight management"],
+    },
   };
 
-  const isCompleted = caseData.status === "completed";
+  // Use the current case data if available, otherwise use mock data
+  const currentCaseData = currentCase
+    ? {
+        ...mockCaseData,
+        id: currentCase.id,
+        title: currentCase.primaryConcern,
+        status: "in_progress",
+        submittedDate: currentCase.createdAt
+          ? new Date(currentCase.createdAt).toLocaleDateString()
+          : new Date().toLocaleDateString(),
+        primaryConcern: currentCase.primaryConcern,
+        duration: currentCase.symptomDuration.toString(),
+        durationUnit: currentCase.durationUnit,
+        additionalSymptoms: currentCase.additionalSymptoms,
+        medicalHistory: {
+          conditions: [currentCase.preExistingConditions],
+          medications: [],
+          allergies: [],
+        },
+        images: [],
+        clinicians: [
+          {
+            id: 1,
+            name: "Dr. Thomas Smith",
+            specialty: "General Medicine",
+            country: "United States",
+            avatar: "TS",
+          },
+        ],
+        clinicianNotes: [],
+      }
+    : mockCaseData;
+
+  const isCompleted = currentCaseData.status === "completed";
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 to-white">
@@ -187,20 +225,20 @@ export default function CasePage({ params }: { params: { id: string } }) {
           </div>
           <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
             <div>
-              <h1 className="text-2xl font-bold">{caseData.title}</h1>
+              <h1 className="text-2xl font-bold">{currentCaseData.title}</h1>
               <div className="flex items-center gap-2 text-sm text-muted-foreground mt-1">
-                <span>Case ID: #{caseData.id}</span>
+                <span>Case ID: #{currentCaseData.id}</span>
                 <span>•</span>
                 <div className="flex items-center">
                   <LucideCalendar className="h-3 w-3 mr-1" />
-                  <span>Submitted: {caseData.submittedDate}</span>
+                  <span>Submitted: {currentCaseData.submittedDate}</span>
                 </div>
                 {isCompleted && (
                   <>
                     <span>•</span>
                     <div className="flex items-center">
                       <LucideCheck className="h-3 w-3 mr-1" />
-                      <span>Completed: {caseData.completedDate}</span>
+                      <span>Completed: {currentCaseData.completedDate}</span>
                     </div>
                   </>
                 )}
@@ -239,8 +277,9 @@ export default function CasePage({ params }: { params: { id: string } }) {
                       <CardHeader>
                         <CardTitle>Guidance Summary</CardTitle>
                         <CardDescription>
-                          Aggregated insights from {caseData.clinicians.length}{" "}
-                          medical professionals
+                          Aggregated insights from{" "}
+                          {currentCaseData.clinicians.length} medical
+                          professionals
                         </CardDescription>
                       </CardHeader>
                       <CardContent className="space-y-6">
@@ -249,8 +288,8 @@ export default function CasePage({ params }: { params: { id: string } }) {
                             Possible Causes
                           </h3>
                           <ul className="space-y-2">
-                            {caseData.summary.possibleCauses.map(
-                              (cause, index) => (
+                            {currentCaseData.summary?.possibleCauses.map(
+                              (cause: string, index: number) => (
                                 <li
                                   key={index}
                                   className="flex items-start gap-2"
@@ -274,8 +313,8 @@ export default function CasePage({ params }: { params: { id: string } }) {
                             Recommended Tests
                           </h3>
                           <ul className="space-y-2">
-                            {caseData.summary.recommendedTests.map(
-                              (test, index) => (
+                            {currentCaseData.summary?.recommendedTests.map(
+                              (test: string, index: number) => (
                                 <li
                                   key={index}
                                   className="flex items-start gap-2"
@@ -299,8 +338,8 @@ export default function CasePage({ params }: { params: { id: string } }) {
                             Suggested Treatments
                           </h3>
                           <ul className="space-y-2">
-                            {caseData.summary.suggestedTreatments.map(
-                              (treatment, index) => (
+                            {currentCaseData.summary?.suggestedTreatments.map(
+                              (treatment: string, index: number) => (
                                 <li
                                   key={index}
                                   className="flex items-start gap-2"
@@ -324,19 +363,21 @@ export default function CasePage({ params }: { params: { id: string } }) {
                             Lifestyle Recommendations
                           </h3>
                           <ul className="space-y-2">
-                            {caseData.summary.lifestyle.map((item, index) => (
-                              <li
-                                key={index}
-                                className="flex items-start gap-2"
-                              >
-                                <div className="h-5 w-5 flex-shrink-0 rounded-full bg-destructive/10 flex items-center justify-center mt-0.5">
-                                  <div className="h-2 w-2 rounded-full bg-destructive"></div>
-                                </div>
-                                <MedicalTermInfo term={item}>
-                                  <span>{item}</span>
-                                </MedicalTermInfo>
-                              </li>
-                            ))}
+                            {currentCaseData.summary?.lifestyle.map(
+                              (item: string, index: number) => (
+                                <li
+                                  key={index}
+                                  className="flex items-start gap-2"
+                                >
+                                  <div className="h-5 w-5 flex-shrink-0 rounded-full bg-destructive/10 flex items-center justify-center mt-0.5">
+                                    <div className="h-2 w-2 rounded-full bg-destructive"></div>
+                                  </div>
+                                  <MedicalTermInfo term={item}>
+                                    <span>{item}</span>
+                                  </MedicalTermInfo>
+                                </li>
+                              )
+                            )}
                           </ul>
                         </div>
                       </CardContent>
@@ -373,10 +414,10 @@ export default function CasePage({ params }: { params: { id: string } }) {
                     </Card>
 
                     <AIVisualAnalysis
-                      images={caseData.images}
+                      images={currentCaseData.images}
                       symptoms={[
-                        caseData.primaryConcern,
-                        caseData.additionalSymptoms,
+                        currentCaseData.primaryConcern,
+                        currentCaseData.additionalSymptoms,
                       ]}
                     />
 
@@ -409,7 +450,7 @@ export default function CasePage({ params }: { params: { id: string } }) {
                       <div className="space-y-2">
                         <div className="flex justify-between text-sm">
                           <span>Case Progress</span>
-                          <span>3/5 clinicians reviewed</span>
+                          <span>0/1 clinicians reviewed</span>
                         </div>
                         <Progress value={60} className="h-2" />
                       </div>
@@ -452,7 +493,7 @@ export default function CasePage({ params }: { params: { id: string } }) {
                         </div>
                         <div className="text-xs text-muted-foreground flex items-center">
                           <LucideUsers className="h-3 w-3 mr-1" />
-                          Matched with 5 clinicians
+                          Matched with 1 clinician
                         </div>
                       </div>
                     </CardContent>
@@ -474,19 +515,26 @@ export default function CasePage({ params }: { params: { id: string } }) {
                         <h3 className="text-sm font-medium mb-1">
                           Primary Concern
                         </h3>
-                        <p className="text-sm">{caseData.primaryConcern}</p>
+                        <p className="text-sm">
+                          {currentCaseData.primaryConcern}
+                        </p>
                       </div>
 
                       <div>
                         <h3 className="text-sm font-medium mb-1">Duration</h3>
-                        <p className="text-sm">{caseData.duration}</p>
+                        <p className="text-sm">
+                          {currentCaseData.duration}{" "}
+                          {currentCaseData.durationUnit}
+                        </p>
                       </div>
 
                       <div>
                         <h3 className="text-sm font-medium mb-1">
                           Additional Symptoms
                         </h3>
-                        <p className="text-sm">{caseData.additionalSymptoms}</p>
+                        <p className="text-sm">
+                          {currentCaseData.additionalSymptoms}
+                        </p>
                       </div>
                     </div>
 
@@ -502,8 +550,8 @@ export default function CasePage({ params }: { params: { id: string } }) {
                             Existing Conditions
                           </h4>
                           <div className="flex flex-wrap gap-2">
-                            {caseData.medicalHistory.conditions.map(
-                              (condition, index) => (
+                            {currentCaseData.medicalHistory.conditions.map(
+                              (condition: string, index: number) => (
                                 <Badge key={index} variant="outline">
                                   {condition}
                                 </Badge>
@@ -517,7 +565,9 @@ export default function CasePage({ params }: { params: { id: string } }) {
                             Current Medications
                           </h4>
                           <p className="text-sm">
-                            {caseData.medicalHistory.medications.join(", ")}
+                            {currentCaseData.medicalHistory.medications.join(
+                              ", "
+                            )}
                           </p>
                         </div>
 
@@ -526,7 +576,9 @@ export default function CasePage({ params }: { params: { id: string } }) {
                             Allergies
                           </h4>
                           <p className="text-sm">
-                            {caseData.medicalHistory.allergies.join(", ")}
+                            {currentCaseData.medicalHistory.allergies.join(
+                              ", "
+                            )}
                           </p>
                         </div>
                       </div>
@@ -537,20 +589,24 @@ export default function CasePage({ params }: { params: { id: string } }) {
                         Uploaded Images
                       </h3>
                       <div className="grid grid-cols-3 gap-4">
-                        {caseData.images.map((image, index) => (
-                          <div key={index} className="space-y-1">
-                            <div className="aspect-square rounded-md overflow-hidden border">
-                              <img
-                                src={image.url || "/placeholder.svg"}
-                                alt={image.description || `Image ${index + 1}`}
-                                className="w-full h-full object-cover"
-                              />
+                        {currentCaseData.images.map(
+                          (image: CaseImage, index: number) => (
+                            <div key={index} className="space-y-1">
+                              <div className="aspect-square rounded-md overflow-hidden border">
+                                <img
+                                  src={image.url || "/placeholder.svg"}
+                                  alt={
+                                    image.description || `Image ${index + 1}`
+                                  }
+                                  className="w-full h-full object-cover"
+                                />
+                              </div>
+                              <p className="text-xs text-center text-muted-foreground">
+                                {image.description}
+                              </p>
                             </div>
-                            <p className="text-xs text-center text-muted-foreground">
-                              {image.description}
-                            </p>
-                          </div>
-                        ))}
+                          )
+                        )}
                       </div>
                     </div>
                   </CardContent>
@@ -566,37 +622,42 @@ export default function CasePage({ params }: { params: { id: string } }) {
                     </CardDescription>
                   </CardHeader>
                   <CardContent className="space-y-6">
-                    {caseData.clinicianNotes.map((note, index) => (
-                      <div key={note.id} className="p-4 rounded-lg border">
-                        <div className="flex items-center gap-3 mb-3">
-                          <Avatar>
-                            <AvatarFallback className="bg-primary text-primary-foreground">
-                              {note.avatar}
-                            </AvatarFallback>
-                          </Avatar>
-                          <div>
-                            <div className="font-medium">{note.clinician}</div>
-                            <div className="text-sm text-muted-foreground">
-                              {note.specialty}
+                    {currentCaseData.clinicianNotes.map(
+                      (note: ClinicianNote, index: number) => (
+                        <div key={note.id} className="p-4 rounded-lg border">
+                          <div className="flex items-center gap-3 mb-3">
+                            <Avatar>
+                              <AvatarFallback className="bg-primary text-primary-foreground">
+                                {note.avatar}
+                              </AvatarFallback>
+                            </Avatar>
+                            <div>
+                              <div className="font-medium">
+                                {note.clinician}
+                              </div>
+                              <div className="text-sm text-muted-foreground">
+                                {note.specialty}
+                              </div>
+                            </div>
+                            <div className="ml-auto text-xs text-muted-foreground">
+                              {note.date}
                             </div>
                           </div>
-                          <div className="ml-auto text-xs text-muted-foreground">
-                            {note.date}
-                          </div>
+                          <p className="text-sm">{note.note}</p>
+                          {index <
+                            currentCaseData.clinicianNotes.length - 1 && (
+                            <Separator className="mt-4" />
+                          )}
                         </div>
-                        <p className="text-sm">{note.note}</p>
-                        {index < caseData.clinicianNotes.length - 1 && (
-                          <Separator className="mt-4" />
-                        )}
-                      </div>
-                    ))}
+                      )
+                    )}
                   </CardContent>
                 </Card>
               </TabsContent>
 
               <TabsContent value="chat" className="space-y-6">
                 <LiveChat
-                  caseId={params.id}
+                  caseId={resolvedParams.id}
                   userRole="patient"
                   userName="Jane Patient"
                   userAvatar="JP"
@@ -617,7 +678,7 @@ export default function CasePage({ params }: { params: { id: string } }) {
                 </CardDescription>
               </CardHeader>
               <CardContent className="space-y-4">
-                {caseData.clinicians.map((clinician) => (
+                {currentCaseData.clinicians.map((clinician: Clinician) => (
                   <div key={clinician.id} className="flex items-center gap-3">
                     <Avatar>
                       <AvatarFallback className="bg-primary text-primary-foreground">

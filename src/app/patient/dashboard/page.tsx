@@ -35,14 +35,98 @@ import {
   LucideAlertCircle,
 } from "lucide-react";
 import { useAuth } from "@/src/components/auth-provider";
+import { useCase } from "@/src/contexts/CaseContext";
 
 export default function PatientDashboard() {
   const [activeTab, setActiveTab] = useState("active");
   const { signOut } = useAuth();
+  const { cases } = useCase();
 
   const handleLogout = async () => {
     await signOut();
   };
+
+  // Mock data for previous cases
+  const mockCases = [
+    {
+      id: "case-001",
+      title: "Lower Back Pain",
+      status: "completed",
+      submissionDate: "April 22, 2023",
+      primaryConcern: "Chronic lower back pain, worse in the morning",
+      duration: "6 months",
+      assignedClinicians: [
+        {
+          id: 1,
+          name: "Dr. Thomas Smith",
+          specialty: "Orthopedics",
+          country: "United States",
+          avatar: "TS",
+        },
+        {
+          id: 2,
+          name: "Dr. Maria Rodriguez",
+          specialty: "Physical Medicine",
+          country: "Spain",
+          avatar: "MR",
+        },
+      ],
+    },
+    {
+      id: "case-002",
+      title: "Migraine Headaches",
+      status: "completed",
+      submissionDate: "March 15, 2023",
+      primaryConcern: "Severe headaches with sensitivity to light",
+      duration: "2 years",
+      assignedClinicians: [
+        {
+          id: 3,
+          name: "Dr. Sarah Chen",
+          specialty: "Neurology",
+          country: "Canada",
+          avatar: "SC",
+        },
+      ],
+    },
+  ];
+
+  // Create a new case entry if we have a current case
+  const newCase =
+    cases.length > 0
+      ? {
+          id: cases[cases.length - 1].id,
+          title: cases[cases.length - 1].primaryConcern,
+          status: "in_progress",
+          submissionDate: new Date(
+            cases[cases.length - 1].createdAt
+          ).toLocaleDateString(),
+          primaryConcern: cases[cases.length - 1].primaryConcern,
+          duration: `${cases[cases.length - 1].symptomDuration} ${
+            cases[cases.length - 1].durationUnit
+          }`,
+          assignedClinicians: [
+            {
+              id: 1,
+              name: "Dr. Thomas Smith",
+              specialty: "General Medicine",
+              country: "United States",
+              avatar: "TS",
+            },
+          ],
+        }
+      : null;
+
+  // Combine new case with mock cases
+  const allCases = newCase ? [newCase, ...mockCases] : mockCases;
+
+  // Filter cases based on status
+  const activeCases = allCases.filter(
+    (case_) => case_.status === "in_progress"
+  );
+  const completedCases = allCases.filter(
+    (case_) => case_.status === "completed"
+  );
 
   return (
     <div className="flex min-h-screen bg-gradient-to-br from-blue-50 to-white">
@@ -146,225 +230,154 @@ export default function PatientDashboard() {
               <div className="flex items-center justify-between">
                 <h2 className="text-xl font-semibold">Active Cases</h2>
                 <p className="text-sm text-muted-foreground">
-                  Showing 2 active cases
+                  Showing {activeCases.length} active cases
                 </p>
               </div>
 
-              <Card className="symedon-card border-none">
-                <CardHeader className="pb-2">
-                  <div className="flex justify-between items-center">
-                    <CardTitle className="text-lg">
-                      Persistent Skin Rash
-                    </CardTitle>
-                    <Badge className="bg-symedon-red-gradient">In Review</Badge>
-                  </div>
-                  <CardDescription>
-                    Case ID: #SYM-23789 • Submitted: May 15, 2023
-                  </CardDescription>
-                </CardHeader>
-                <CardContent>
-                  <div className="space-y-4">
-                    <div className="space-y-2">
-                      <div className="text-sm font-medium">Case Progress</div>
-                      <div className="h-2 bg-muted rounded-full overflow-hidden">
-                        <div
-                          className="h-full bg-symedon-gradient rounded-full"
-                          style={{ width: "60%" }}
-                        ></div>
-                      </div>
-                      <div className="flex justify-between text-xs text-muted-foreground">
-                        <span>3/5 clinicians reviewed</span>
-                        <span>Est. completion: 24 hours</span>
-                      </div>
+              {activeCases.map((case_) => (
+                <Card key={case_.id} className="symedon-card border-none">
+                  <CardHeader className="pb-2">
+                    <div className="flex justify-between items-center">
+                      <CardTitle className="text-lg">{case_.title}</CardTitle>
+                      <Badge className="bg-symedon-red-gradient">
+                        In Review
+                      </Badge>
                     </div>
-
-                    <div className="grid grid-cols-2 gap-4 text-sm">
-                      <div>
-                        <span className="text-muted-foreground">
-                          Primary concern:
-                        </span>
-                        <p className="font-medium">
-                          Itchy rash on arms and torso
-                        </p>
-                      </div>
-                      <div>
-                        <span className="text-muted-foreground">Duration:</span>
-                        <p className="font-medium">2 weeks</p>
-                      </div>
-                    </div>
-
-                    <div className="flex flex-wrap gap-2">
-                      <div className="flex -space-x-2">
-                        <Avatar className="border-2 border-background h-8 w-8">
-                          <AvatarFallback className="bg-primary text-primary-foreground">
-                            DR
-                          </AvatarFallback>
-                        </Avatar>
-                        <Avatar className="border-2 border-background h-8 w-8">
-                          <AvatarFallback className="bg-secondary text-secondary-foreground">
-                            JM
-                          </AvatarFallback>
-                        </Avatar>
-                        <Avatar className="border-2 border-background h-8 w-8">
-                          <AvatarFallback className="bg-warning text-warning-foreground">
-                            KL
-                          </AvatarFallback>
-                        </Avatar>
-                        <div className="flex h-8 w-8 items-center justify-center rounded-full border-2 border-background bg-muted text-xs font-medium">
-                          +2
+                    <CardDescription>
+                      Case ID: #{case_.id} • Submitted: {case_.submissionDate}
+                    </CardDescription>
+                  </CardHeader>
+                  <CardContent>
+                    <div className="space-y-4">
+                      <div className="space-y-2">
+                        <div className="text-sm font-medium">Case Progress</div>
+                        <div className="h-2 bg-muted rounded-full overflow-hidden">
+                          <div
+                            className="h-full bg-symedon-gradient rounded-full"
+                            style={{ width: "60%" }}
+                          ></div>
+                        </div>
+                        <div className="flex justify-between text-xs text-muted-foreground">
+                          <span>0/1 clinicians reviewed</span>
+                          <span>Est. completion: 24 hours</span>
                         </div>
                       </div>
-                      <div className="text-xs text-muted-foreground flex items-center">
-                        <LucideUsers className="h-3 w-3 mr-1" />
-                        Matched with 5 clinicians
-                      </div>
-                    </div>
-                  </div>
-                </CardContent>
-                <CardFooter>
-                  <Link href="/patient/case/23789">
-                    <Button variant="outline" className="w-full rounded-full">
-                      View Case Details
-                      <LucideChevronRight className="ml-2 h-4 w-4" />
-                    </Button>
-                  </Link>
-                </CardFooter>
-              </Card>
 
-              <Card className="symedon-card border-none">
-                <CardHeader className="pb-2">
-                  <div className="flex justify-between items-center">
-                    <CardTitle className="text-lg">
-                      Recurring Headaches
-                    </CardTitle>
-                    <Badge className="bg-symedon-blue-gradient">Matching</Badge>
-                  </div>
-                  <CardDescription>
-                    Case ID: #SYM-23790 • Submitted: May 18, 2023
-                  </CardDescription>
-                </CardHeader>
-                <CardContent>
-                  <div className="space-y-4">
-                    <div className="space-y-2">
-                      <div className="text-sm font-medium">Case Progress</div>
-                      <div className="h-2 bg-muted rounded-full overflow-hidden">
-                        <div
-                          className="h-full bg-symedon-gradient rounded-full"
-                          style={{ width: "20%" }}
-                        ></div>
+                      <div className="grid grid-cols-2 gap-4 text-sm">
+                        <div>
+                          <span className="text-muted-foreground">
+                            Primary concern:
+                          </span>
+                          <p className="font-medium">{case_.primaryConcern}</p>
+                        </div>
+                        <div>
+                          <span className="text-muted-foreground">
+                            Duration:
+                          </span>
+                          <p className="font-medium">{case_.duration}</p>
+                        </div>
                       </div>
-                      <div className="flex justify-between text-xs text-muted-foreground">
-                        <span>Finding specialists</span>
-                        <span>Est. completion: 48 hours</span>
-                      </div>
-                    </div>
 
-                    <div className="grid grid-cols-2 gap-4 text-sm">
-                      <div>
-                        <span className="text-muted-foreground">
-                          Primary concern:
-                        </span>
-                        <p className="font-medium">
-                          Severe headaches with nausea
-                        </p>
-                      </div>
-                      <div>
-                        <span className="text-muted-foreground">Duration:</span>
-                        <p className="font-medium">3 months</p>
+                      <div className="flex flex-wrap gap-2">
+                        <div className="flex -space-x-2">
+                          {case_.assignedClinicians.map((clinician) => (
+                            <Avatar
+                              key={clinician.id}
+                              className="border-2 border-background h-8 w-8"
+                            >
+                              <AvatarFallback>
+                                {clinician.avatar}
+                              </AvatarFallback>
+                            </Avatar>
+                          ))}
+                        </div>
+                        <div className="text-xs text-muted-foreground flex items-center">
+                          <LucideUsers className="h-3 w-3 mr-1" />
+                          Matched with {case_.assignedClinicians.length}{" "}
+                          clinicians
+                        </div>
                       </div>
                     </div>
-
-                    <div className="flex items-center gap-2 text-xs text-muted-foreground">
-                      <LucideBrain className="h-3 w-3" />
-                      <span>
-                        AI is analyzing your case and matching with specialists
-                      </span>
-                    </div>
-                  </div>
-                </CardContent>
-                <CardFooter>
-                  <Link href="/patient/case/23790">
-                    <Button variant="outline" className="w-full rounded-full">
-                      View Case Details
-                      <LucideChevronRight className="ml-2 h-4 w-4" />
-                    </Button>
-                  </Link>
-                </CardFooter>
-              </Card>
+                  </CardContent>
+                  <CardFooter>
+                    <Link href={`/patient/case/${case_.id}`}>
+                      <Button variant="outline" className="w-full rounded-full">
+                        View Case Details
+                        <LucideChevronRight className="ml-2 h-4 w-4" />
+                      </Button>
+                    </Link>
+                  </CardFooter>
+                </Card>
+              ))}
             </TabsContent>
 
             <TabsContent value="completed" className="space-y-4">
               <div className="flex items-center justify-between">
                 <h2 className="text-xl font-semibold">Completed Cases</h2>
                 <p className="text-sm text-muted-foreground">
-                  Showing 1 completed case
+                  Showing {completedCases.length} completed cases
                 </p>
               </div>
 
-              <Card className="symedon-card border-none">
-                <CardHeader className="pb-2">
-                  <div className="flex justify-between items-center">
-                    <CardTitle className="text-lg">Lower Back Pain</CardTitle>
-                    <Badge className="bg-secondary">Completed</Badge>
-                  </div>
-                  <CardDescription>
-                    Case ID: #SYM-23456 • Completed: April 28, 2023
-                  </CardDescription>
-                </CardHeader>
-                <CardContent>
-                  <div className="space-y-4">
-                    <div className="grid grid-cols-2 gap-4 text-sm">
-                      <div>
-                        <span className="text-muted-foreground">
-                          Primary concern:
-                        </span>
-                        <p className="font-medium">Chronic lower back pain</p>
-                      </div>
-                      <div>
-                        <span className="text-muted-foreground">Duration:</span>
-                        <p className="font-medium">6 months</p>
-                      </div>
+              {completedCases.map((case_) => (
+                <Card key={case_.id} className="symedon-card border-none">
+                  <CardHeader className="pb-2">
+                    <div className="flex justify-between items-center">
+                      <CardTitle className="text-lg">{case_.title}</CardTitle>
+                      <Badge className="bg-secondary">Completed</Badge>
                     </div>
+                    <CardDescription>
+                      Case ID: #{case_.id} • Completed: {case_.submissionDate}
+                    </CardDescription>
+                  </CardHeader>
+                  <CardContent>
+                    <div className="space-y-4">
+                      <div className="grid grid-cols-2 gap-4 text-sm">
+                        <div>
+                          <span className="text-muted-foreground">
+                            Primary concern:
+                          </span>
+                          <p className="font-medium">{case_.primaryConcern}</p>
+                        </div>
+                        <div>
+                          <span className="text-muted-foreground">
+                            Duration:
+                          </span>
+                          <p className="font-medium">{case_.duration}</p>
+                        </div>
+                      </div>
 
-                    <div className="flex flex-wrap gap-2">
-                      <div className="flex -space-x-2">
-                        <Avatar className="border-2 border-background h-8 w-8">
-                          <AvatarFallback className="bg-primary text-primary-foreground">
-                            TS
-                          </AvatarFallback>
-                        </Avatar>
-                        <Avatar className="border-2 border-background h-8 w-8">
-                          <AvatarFallback className="bg-secondary text-secondary-foreground">
-                            MR
-                          </AvatarFallback>
-                        </Avatar>
-                        <Avatar className="border-2 border-background h-8 w-8">
-                          <AvatarFallback className="bg-warning text-warning-foreground">
-                            PK
-                          </AvatarFallback>
-                        </Avatar>
-                        <Avatar className="border-2 border-background h-8 w-8">
-                          <AvatarFallback className="bg-destructive text-destructive-foreground">
-                            AL
-                          </AvatarFallback>
-                        </Avatar>
-                      </div>
-                      <div className="text-xs text-muted-foreground flex items-center">
-                        <LucideUsers className="h-3 w-3 mr-1" />4 clinicians
-                        provided guidance
+                      <div className="flex flex-wrap gap-2">
+                        <div className="flex -space-x-2">
+                          {case_.assignedClinicians.map((clinician) => (
+                            <Avatar
+                              key={clinician.id}
+                              className="border-2 border-background h-8 w-8"
+                            >
+                              <AvatarFallback>
+                                {clinician.avatar}
+                              </AvatarFallback>
+                            </Avatar>
+                          ))}
+                        </div>
+                        <div className="text-xs text-muted-foreground flex items-center">
+                          <LucideUsers className="h-3 w-3 mr-1" />
+                          {case_.assignedClinicians.length} clinicians provided
+                          guidance
+                        </div>
                       </div>
                     </div>
-                  </div>
-                </CardContent>
-                <CardFooter>
-                  <Link href="/patient/case/23456">
-                    <Button variant="outline" className="w-full rounded-full">
-                      View Guidance Report
-                      <LucideChevronRight className="ml-2 h-4 w-4" />
-                    </Button>
-                  </Link>
-                </CardFooter>
-              </Card>
+                  </CardContent>
+                  <CardFooter>
+                    <Link href={`/patient/case/${case_.id}`}>
+                      <Button variant="outline" className="w-full rounded-full">
+                        View Guidance Report
+                        <LucideChevronRight className="ml-2 h-4 w-4" />
+                      </Button>
+                    </Link>
+                  </CardFooter>
+                </Card>
+              ))}
             </TabsContent>
 
             <TabsContent value="archived" className="space-y-4">

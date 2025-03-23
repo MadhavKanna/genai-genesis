@@ -4,6 +4,7 @@ import { Inter } from "next/font/google";
 import { ThemeProvider } from "@/src/components/theme-provider";
 import { SiteLanguageProvider } from "@/src/components/site-language-provider";
 import { AuthProvider } from "@/src/components/auth-provider";
+import { CaseProvider } from "@/contexts/CaseContext";
 
 // Load the Inter font
 const inter = Inter({
@@ -33,7 +34,9 @@ export default function RootLayout({
           disableTransitionOnChange
         >
           <AuthProvider>
-            <SiteLanguageProvider>{children}</SiteLanguageProvider>
+            <SiteLanguageProvider>
+              <CaseProvider>{children}</CaseProvider>
+            </SiteLanguageProvider>
           </AuthProvider>
         </ThemeProvider>
       </body>
