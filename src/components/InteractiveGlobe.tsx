@@ -1,6 +1,6 @@
 "use client";
 
-import { useRef, useEffect } from 'react';
+import { useRef, useEffect, useState } from 'react';
 import Globe from 'react-globe.gl';
 
 interface Point {
@@ -26,14 +26,33 @@ export default function InteractiveGlobe({
     className = '',
     autoRotate = true
 }: GlobeProps) {
-    const globeEl = useRef<any>();
+    const containerRef = useRef<HTMLDivElement>(null);
+    const globeEl = useRef<typeof Globe>(null);
+    const [dimensions, setDimensions] = useState({ width: 200, height: 200 });
 
     useEffect(() => {
         if (globeEl.current) {
             globeEl.current.controls().autoRotate = autoRotate;
             globeEl.current.controls().autoRotateSpeed = 0.5;
+
+            // Set initial point of view
+            globeEl.current.pointOfView({ lat: 20, lng: 30, altitude: 2.5 });
         }
     }, [autoRotate]);
+
+    // Update dimensions when container size changes
+    useEffect(() => {
+        if (containerRef.current) {
+            const updateSize = () => {
+                const { width, height } = containerRef.current!.getBoundingClientRect();
+                setDimensions({ width, height });
+            };
+
+            updateSize();
+            window.addEventListener('resize', updateSize);
+            return () => window.removeEventListener('resize', updateSize);
+        }
+    }, []);
 
     // Convert points to the format expected by react-globe.gl
     const pointsData = points.map(point => ({
@@ -46,9 +65,11 @@ export default function InteractiveGlobe({
     }));
 
     return (
-        <div className={`w-full h-full ${className}`}>
+        <div ref={containerRef} className={`relative w-full h-full ${className}`}>
             <Globe
                 ref={globeEl}
+                width={dimensions.width}
+                height={dimensions.height}
                 globeImageUrl="//unpkg.com/three-globe/example/img/earth-night.jpg"
                 pointsData={pointsData}
                 pointAltitude={0}
