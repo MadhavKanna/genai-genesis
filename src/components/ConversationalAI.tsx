@@ -9,6 +9,7 @@ import { Mic, Square, Send } from "lucide-react";
 import { functions } from "../../firebase";
 import { v4 as uuidv4 } from "uuid";
 import { useCase } from "@/src/contexts/CaseContext";
+import { useLanguage } from "@/src/contexts/LanguageContext";
 
 interface Message {
   role: "user" | "assistant" | "system";
@@ -17,7 +18,6 @@ interface Message {
 }
 
 interface ConversationalAIProps {
-  languageCode?: string;
   onFormComplete?: (formData: any) => void;
   conversationId?: string;
 }
@@ -34,10 +34,10 @@ interface SpeechRecognitionEvent {
 }
 
 export function ConversationalAI({
-  languageCode = "en-US",
   onFormComplete,
   conversationId: externalConversationId,
 }: ConversationalAIProps) {
+  const { language } = useLanguage();
   const [isRecording, setIsRecording] = useState(false);
   const [isProcessing, setIsProcessing] = useState(false);
   const [messages, setMessages] = useState<Message[]>([]);
@@ -58,10 +58,10 @@ export function ConversationalAI({
       const recognition = new (window.webkitSpeechRecognition as any)();
       recognition.continuous = false; // One utterance at a time
       recognition.interimResults = true;
-      recognition.lang = languageCode;
+      recognition.lang = language;
 
       recognition.onstart = () => {
-        console.log("Speech recognition started with language:", languageCode);
+        console.log("Speech recognition started with language:", language);
       };
 
       recognition.onend = () => {
@@ -117,22 +117,22 @@ export function ConversationalAI({
         "Speech recognition is not supported in your browser. Please use Chrome or Edge."
       );
     }
-  }, [languageCode, isProcessing]);
+  }, [language, isProcessing]);
 
-  // Update recognition language when languageCode changes
+  // Update recognition language when language changes
   useEffect(() => {
     if (recognitionRef.current) {
       try {
         // Only update language if we're not currently recording
         if (!isRecording) {
-          recognitionRef.current.lang = languageCode;
-          console.log("Updated speech recognition language to:", languageCode);
+          recognitionRef.current.lang = language;
+          console.log("Updated speech recognition language to:", language);
         }
       } catch (error) {
         console.error("Error updating recognition language:", error);
       }
     }
-  }, [languageCode, isRecording]);
+  }, [language, isRecording]);
 
   useEffect(() => {
     // Scroll to bottom when new messages are added
@@ -176,8 +176,8 @@ export function ConversationalAI({
     try {
       // Only start if we're not already recording and not processing
       if (!isRecording && !isProcessing) {
-        recognitionRef.current.lang = languageCode;
-        console.log("Starting recording with language:", languageCode);
+        recognitionRef.current.lang = language;
+        console.log("Starting recording with language:", language);
         recognitionRef.current.start();
         setIsRecording(true);
       }
@@ -217,7 +217,7 @@ export function ConversationalAI({
         },
         body: JSON.stringify({
           audioBase64: "", // Empty for text input
-          languageCode,
+          languageCode: language,
           conversationId: conversationId.current,
           textInput: text,
           messages: messages.map((msg) => ({
@@ -319,9 +319,7 @@ export function ConversationalAI({
       }
     } catch (error) {
       console.error("Error processing text:", error);
-      setError(
-        error instanceof Error ? error.message : "Error processing text"
-      );
+      setError("Failed to process text");
     } finally {
       setIsProcessing(false);
     }
@@ -346,7 +344,7 @@ export function ConversationalAI({
             },
             body: JSON.stringify({
               audioBase64: base64Data,
-              languageCode,
+              languageCode: language,
               conversationId: conversationId.current,
               messages: messages.map((msg) => ({
                 role: msg.role,

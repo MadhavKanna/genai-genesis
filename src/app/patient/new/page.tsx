@@ -39,6 +39,7 @@ import {
 } from "lucide-react";
 import { ConversationalAI } from "@/src/components/ConversationalAI";
 import { useCase } from "@/src/contexts/CaseContext";
+import { useLanguage } from "@/src/contexts/LanguageContext";
 
 export default function NewPatientCase() {
   const router = useRouter();
@@ -50,7 +51,6 @@ export default function NewPatientCase() {
   const [inputMethod, setInputMethod] = useState<"manual" | "guided">("guided");
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isConversationComplete, setIsConversationComplete] = useState(false);
-  const [languageCode, setLanguageCode] = useState("en-US");
 
   // Form data
   const [primaryConcern, setPrimaryConcern] = useState("");
@@ -158,31 +158,8 @@ export default function NewPatientCase() {
     setInputMethod("manual");
   };
 
-  const handleFormComplete = (responses: any) => {
-    console.log("Form complete with responses:", responses);
-    // Update form fields with responses
-    setPrimaryConcern(responses.primaryConcern || "");
-    setSymptomDuration(responses.symptomDuration || "");
-    setAge(responses.age || "");
-    setGender(responses.gender || "");
-    setOtherGender(responses.otherGender || "");
-    // Handle conditions array properly
-    setConditions(
-      Array.isArray(responses.preExistingConditions)
-        ? responses.preExistingConditions
-        : responses.preExistingConditions
-        ? responses.preExistingConditions.split(", ")
-        : []
-    );
-    setMedications(responses.medications || "");
-    setAllergies(responses.allergies || "");
-
-    // Mark conversation as complete
-    setIsConversationComplete(true);
-    // Set input method to manual for review
-    setInputMethod("manual");
-    // Skip step 2 and go directly to step 3 (review)
-    setStep(3);
+  const handleFormComplete = (formData: any) => {
+    router.push("/patient/review");
   };
 
   return (
@@ -192,11 +169,6 @@ export default function NewPatientCase() {
           <LucideArrowLeft className="h-4 w-4" />
           Back to home
         </Link>
-        <LanguageSelector
-          size="sm"
-          className="rounded-full"
-          onLanguageChange={setLanguageCode}
-        />
       </div>
 
       <div className="mb-8">
@@ -323,10 +295,7 @@ export default function NewPatientCase() {
                             and medical history.
                           </p>
                         </div>
-                        <ConversationalAI
-                          languageCode={languageCode}
-                          onFormComplete={handleFormComplete}
-                        />
+                        <ConversationalAI onFormComplete={handleFormComplete} />
                       </div>
                     </TabsContent>
 
