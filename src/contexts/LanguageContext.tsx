@@ -10,11 +10,24 @@ const LanguageContext = createContext<LanguageContextType | undefined>(
   undefined
 );
 
+declare global {
+  interface Window {
+    google: {
+      translate: {
+        TranslateElement: {
+          new (config: any, element: string): any;
+        };
+      };
+    };
+    googleTranslateElementInit: () => void;
+  }
+}
+
 export function LanguageProvider({ children }: { children: React.ReactNode }) {
   const [language, setLanguage] = useState("en-US");
 
   useEffect(() => {
-    // Initialize Google Translate only on the client side
+    // Initialize Google Translate
     const script = document.createElement("script");
     script.src =
       "//translate.google.com/translate_a/element.js?cb=googleTranslateElementInit";
@@ -22,41 +35,45 @@ export function LanguageProvider({ children }: { children: React.ReactNode }) {
     document.body.appendChild(script);
 
     // Define the callback function
-    (window as any).googleTranslateElementInit = function () {
-      new (window as any).google.translate.TranslateElement(
+    window.googleTranslateElementInit = function () {
+      new window.google.translate.TranslateElement(
         {
           pageLanguage: "en",
-          includedLanguages:
-            "en,hi,es,fr,de,it,ja,ko,zh,ru,pt,nl,pl,ar,tr,vi,th,id,ms,fil",
-          layout: (window as any).google.translate.TranslateElement.InlineLayout
-            .SIMPLE,
+          includedLanguages: "en,hi,es,fr,de,it,ja,ko,zh,ru",
+          autoDisplay: false,
         },
         "google_translate_element"
       );
     };
 
+    // Cleanup
     return () => {
-      // Cleanup
       document.body.removeChild(script);
-      delete (window as any).googleTranslateElementInit;
+      delete window.googleTranslateElementInit;
     };
   }, []);
 
-  useEffect(() => {
-    // Update Google Translate when language changes
-    if ((window as any).google && (window as any).google.translate) {
-      const select = document.querySelector(
-        ".goog-te-combo"
-      ) as HTMLSelectElement;
-      if (select) {
-        select.value = language;
-        select.dispatchEvent(new Event("change"));
-      }
+  // Function to handle language changes
+  const handleLanguageChange = (newLang: string) => {
+    setLanguage(newLang);
+
+    // Get the Google Translate widget
+    const googleFrame = document.querySelector(
+      ".goog-te-combo"
+    ) as HTMLSelectElement;
+    if (googleFrame) {
+      // Convert our language code to Google's format (e.g., 'en-US' to 'en')
+      const googleLang = newLang.split("-")[0];
+      googleFrame.value = googleLang;
+      googleFrame.dispatchEvent(new Event("change"));
     }
-  }, [language]);
+  };
 
   return (
-    <LanguageContext.Provider value={{ language, setLanguage }}>
+    <LanguageContext.Provider
+      value={{ language, setLanguage: handleLanguageChange }}
+    >
+      <div id="google_translate_element" style={{ display: "none" }} />
       {children}
     </LanguageContext.Provider>
   );
