@@ -29,34 +29,33 @@ export default function RootLayout({
       <body className={inter.className}>
         <ThemeProvider
           attribute="class"
-          defaultTheme="system"
-          enableSystem
+          defaultTheme="light"
+          enableSystem={false}
           disableTransitionOnChange
         >
           <AuthProvider>
             <SiteLanguageProvider>
               <LanguageProvider>
-                <header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
-                  <div className="container flex h-14 items-center">
-                    <div className="mr-4 flex">
-                      <a className="mr-6 flex items-center space-x-2" href="/">
-                        <span className="font-bold">GenAI Genesis</span>
-                      </a>
-                    </div>
-                    <div className="flex flex-1 items-center justify-between space-x-2 md:justify-end">
-                      <div className="w-full flex-1 md:w-auto md:flex-none">
-                        {/* Add your search or other header elements here */}
+                <div className="relative min-h-screen flex flex-col">
+                  <header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
+                    <div className="container flex h-14 items-center justify-between">
+                      <div className="flex items-center">
+                        <a
+                          className="mr-6 flex items-center space-x-2"
+                          href="/"
+                        >
+                          <span className="font-bold">GenAI Genesis</span>
+                        </a>
                       </div>
-                      <nav className="flex items-center space-x-2">
+                      <div className="flex items-center space-x-4">
                         <LanguageSelector />
-                        {/* Add other header elements here */}
-                      </nav>
+                      </div>
                     </div>
-                  </div>
-                </header>
-                <main className="container py-6">
-                  <CaseProvider>{children}</CaseProvider>
-                </main>
+                  </header>
+                  <main className="flex-1 container py-6">
+                    <CaseProvider>{children}</CaseProvider>
+                  </main>
+                </div>
               </LanguageProvider>
             </SiteLanguageProvider>
           </AuthProvider>

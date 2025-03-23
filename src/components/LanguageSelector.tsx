@@ -2,13 +2,6 @@
 
 import React from "react";
 import { useLanguage } from "@/src/contexts/LanguageContext";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/src/components/ui/select";
 
 const languages = [
   { code: "en-US", name: "English" },
@@ -38,18 +31,17 @@ export function LanguageSelector() {
 
   return (
     <div className="flex items-center gap-2">
-      <Select value={language} onValueChange={setLanguage}>
-        <SelectTrigger className="w-[180px]">
-          <SelectValue placeholder="Select language" />
-        </SelectTrigger>
-        <SelectContent>
-          {languages.map((lang) => (
-            <SelectItem key={lang.code} value={lang.code}>
-              {lang.name}
-            </SelectItem>
-          ))}
-        </SelectContent>
-      </Select>
+      <select
+        value={language}
+        onChange={(e) => setLanguage(e.target.value)}
+        className="h-8 rounded-md border border-input bg-background px-2 py-1 text-sm ring-offset-background focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2"
+      >
+        {languages.map((lang) => (
+          <option key={lang.code} value={lang.code}>
+            {lang.name}
+          </option>
+        ))}
+      </select>
     </div>
   );
 }

@@ -1,10 +1,10 @@
 "use client";
 import React, { createContext, useContext, useState, useEffect } from "react";
 
-interface LanguageContextType {
+type LanguageContextType = {
   language: string;
   setLanguage: (lang: string) => void;
-}
+};
 
 const LanguageContext = createContext<LanguageContextType | undefined>(
   undefined
@@ -14,24 +14,43 @@ export function LanguageProvider({ children }: { children: React.ReactNode }) {
   const [language, setLanguage] = useState("en-US");
 
   useEffect(() => {
-    // Initialize Google Translate
+    // Initialize Google Translate only on the client side
     const script = document.createElement("script");
     script.src =
       "//translate.google.com/translate_a/element.js?cb=googleTranslateElementInit";
     script.async = true;
     document.body.appendChild(script);
 
+    // Define the callback function
+    (window as any).googleTranslateElementInit = function () {
+      new (window as any).google.translate.TranslateElement(
+        {
+          pageLanguage: "en",
+          includedLanguages:
+            "en,hi,es,fr,de,it,ja,ko,zh,ru,pt,nl,pl,ar,tr,vi,th,id,ms,fil",
+          layout: (window as any).google.translate.TranslateElement.InlineLayout
+            .SIMPLE,
+        },
+        "google_translate_element"
+      );
+    };
+
     return () => {
+      // Cleanup
       document.body.removeChild(script);
+      delete (window as any).googleTranslateElementInit;
     };
   }, []);
 
   useEffect(() => {
     // Update Google Translate when language changes
-    if (window.google && window.google.translate) {
-      const translateElement = window.google.translate.TranslateElement;
-      if (translateElement) {
-        translateElement.getInstance().translate("", language);
+    if ((window as any).google && (window as any).google.translate) {
+      const select = document.querySelector(
+        ".goog-te-combo"
+      ) as HTMLSelectElement;
+      if (select) {
+        select.value = language;
+        select.dispatchEvent(new Event("change"));
       }
     }
   }, [language]);
@@ -50,22 +69,3 @@ export function useLanguage() {
   }
   return context;
 }
-
-// Add Google Translate initialization function to window
-declare global {
-  interface Window {
-    googleTranslateElementInit: () => void;
-  }
-}
-
-window.googleTranslateElementInit = function () {
-  new window.google.translate.TranslateElement(
-    {
-      pageLanguage: "en",
-      includedLanguages:
-        "hi,es,fr,de,it,ja,ko,zh,ru,pt,nl,pl,ar,tr,vi,th,id,ms,fil",
-      layout: window.google.translate.TranslateElement.InlineLayout.SIMPLE,
-    },
-    "google_translate_element"
-  );
-};
