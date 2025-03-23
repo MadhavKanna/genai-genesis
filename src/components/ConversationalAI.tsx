@@ -268,6 +268,9 @@ export function ConversationalAI({
               gender: formData.gender,
               otherGender: formData.otherGender,
               preExistingConditions: formData.preExistingConditions,
+              medications: "",
+              allergies: "",
+              images: [],
             });
             // Add a message indicating we can proceed to review
             setMessages((prev) => [
@@ -393,6 +396,9 @@ export function ConversationalAI({
                   gender: formData.gender,
                   otherGender: formData.otherGender,
                   preExistingConditions: formData.preExistingConditions,
+                  medications: "",
+                  allergies: "",
+                  images: [],
                 });
                 // Add a message indicating we can proceed to review
                 setMessages((prev) => [

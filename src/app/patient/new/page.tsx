@@ -87,6 +87,9 @@ export default function NewPatientCase() {
       gender,
       otherGender: gender === "other" ? otherGender : null,
       preExistingConditions: conditions.join(", "),
+      medications: medications || "None",
+      allergies: allergies || "None",
+      images: [],
     };
 
     // Store the case data in the global state

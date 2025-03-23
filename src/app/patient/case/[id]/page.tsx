@@ -473,23 +473,10 @@ export default function CasePage({
                       <div className="flex flex-wrap gap-2">
                         <div className="flex -space-x-2">
                           <Avatar className="border-2 border-background h-8 w-8">
-                            <AvatarFallback className="bg-primary text-primary-foreground">
-                              DR
-                            </AvatarFallback>
-                          </Avatar>
-                          <Avatar className="border-2 border-background h-8 w-8">
-                            <AvatarFallback className="bg-secondary text-secondary-foreground">
-                              JM
-                            </AvatarFallback>
-                          </Avatar>
-                          <Avatar className="border-2 border-background h-8 w-8">
                             <AvatarFallback className="bg-warning text-warning-foreground">
-                              KL
+                              TS
                             </AvatarFallback>
                           </Avatar>
-                          <div className="flex h-8 w-8 items-center justify-center rounded-full border-2 border-background bg-muted text-xs font-medium">
-                            +2
-                          </div>
                         </div>
                         <div className="text-xs text-muted-foreground flex items-center">
                           <LucideUsers className="h-3 w-3 mr-1" />

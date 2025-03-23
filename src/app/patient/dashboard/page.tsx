@@ -99,7 +99,7 @@ export default function PatientDashboard() {
           title: cases[cases.length - 1].primaryConcern,
           status: "in_progress",
           submissionDate: new Date(
-            cases[cases.length - 1].createdAt
+            cases[cases.length - 1].createdAt ?? new Date()
           ).toLocaleDateString(),
           primaryConcern: cases[cases.length - 1].primaryConcern,
           duration: `${cases[cases.length - 1].symptomDuration} ${
