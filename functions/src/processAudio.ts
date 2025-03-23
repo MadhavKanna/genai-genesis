@@ -111,6 +111,30 @@ const languageMap: { [key: string]: string } = {
   "fil-PH": "fil-PH",
 };
 
+// Map of simple language codes to their full versions
+const simpleLanguageMap: { [key: string]: string } = {
+  en: "en-US",
+  hi: "hi-IN",
+  es: "es-ES",
+  fr: "fr-FR",
+  de: "de-DE",
+  it: "it-IT",
+  ja: "ja-JP",
+  ko: "ko-KR",
+  zh: "zh-CN",
+  ru: "ru-RU",
+  pt: "pt-BR",
+  nl: "nl-NL",
+  pl: "pl-PL",
+  ar: "ar-SA",
+  tr: "tr-TR",
+  vi: "vi-VN",
+  th: "th-TH",
+  id: "id-ID",
+  ms: "ms-MY",
+  fil: "fil-PH",
+};
+
 interface Message {
   role: "user" | "assistant" | "system";
   content: string;
@@ -152,15 +176,27 @@ export const processAudio = functions.https.onRequest(async (req, res) => {
         return;
       }
 
-      if (!languageMap[languageCode]) {
+      // Try to get the full language code
+      const fullLanguageCode =
+        languageMap[languageCode] || simpleLanguageMap[languageCode];
+
+      if (!fullLanguageCode) {
         console.error("Unsupported language code:", languageCode);
         res.status(400).json({
           error: "Unsupported language",
           details: `Language code "${languageCode}" is not supported. Please use one of the supported language codes.`,
-          supportedLanguages: Object.keys(languageMap),
+          supportedLanguages: [
+            ...Object.keys(languageMap),
+            ...Object.keys(simpleLanguageMap),
+          ],
         });
         return;
       }
+
+      console.log("Using language code:", {
+        original: languageCode,
+        mapped: fullLanguageCode,
+      });
 
       let transcription = "";
 
@@ -178,7 +214,7 @@ export const processAudio = functions.https.onRequest(async (req, res) => {
           config: {
             encoding: "WEBM_OPUS",
             sampleRateHertz: 48000,
-            languageCode: languageCode,
+            languageCode: fullLanguageCode,
           },
         });
 
@@ -222,7 +258,7 @@ export const processAudio = functions.https.onRequest(async (req, res) => {
       // Create the prompt with the full conversation history
       const prompt =
         [
-          { role: "system", content: systemPrompt(languageCode) },
+          { role: "system", content: systemPrompt(fullLanguageCode) },
           ...sortedMessages.map((msg) => ({
             role: msg.role,
             content: msg.content,
@@ -273,13 +309,13 @@ export const processAudio = functions.https.onRequest(async (req, res) => {
         console.log("Preparing TTS request with text:", {
           textLength: ttsText.length,
           textPreview: ttsText.substring(0, 100) + "...",
-          languageCode: languageCode,
+          languageCode: fullLanguageCode,
         });
 
         const [ttsResponse] = await ttsClient.synthesizeSpeech({
           input: { text: ttsText },
           voice: {
-            languageCode: languageCode,
+            languageCode: fullLanguageCode,
             ssmlGender: "NEUTRAL",
           },
           audioConfig: { audioEncoding: "MP3" },
