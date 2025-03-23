@@ -9,6 +9,8 @@
     "lint": "next lint"
   },
   "dependencies": {
+    "@emotion/react": "^11.14.0",
+    "@emotion/styled": "^11.14.0",
     "@google/generative-ai": "latest",
     "@hookform/resolvers": "^3.9.1",
     "@mui/icons-material": "^6.4.8",
@@ -65,8 +67,8 @@
     "sonner": "^1.7.1",
     "tailwind-merge": "^2.5.5",
     "tailwindcss-animate": "^1.0.7",
-    "uuid": "^11.1.0",
     "three": "^0.174.0",
+    "uuid": "^11.1.0",
     "vaul": "^0.9.6",
     "zod": "^3.24.1"
   },

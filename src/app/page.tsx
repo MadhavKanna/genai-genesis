@@ -14,6 +14,7 @@ import { LucideUsers, LucideBrain, LucideActivity } from "lucide-react";
 export default function Home() {
   return (
     <div className="flex flex-col min-h-screen">
+      <div id="google_translate_element" className="fixed top-4 right-4 z-50" />
       <header className="border-b">
         <div className="container flex h-16 items-center justify-between py-4">
           <div className="flex items-center gap-2">
