@@ -9,7 +9,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/src/components/ui/ta
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/src/components/ui/select"
 import { Badge } from "@/src/components/ui/badge"
 import { Input } from "@/src/components/ui/input"
-import { InteractiveGlobe } from "@/src/components/interactive-globe"
+import InteractiveGlobe from "@/src/components/InteractiveGlobe"
 import { useAuth } from "@/src/components/auth-provider"
 import {
   LucideHeartPulse,
@@ -40,6 +40,40 @@ export default function ClinicianStatisticsPage() {
   const [zoomLevel, setZoomLevel] = useState(1)
   const [selectedLocation, setSelectedLocation] = useState<any>(null)
   const [searchQuery, setSearchQuery] = useState("")
+  const [currentPoints, setCurrentPoints] = useState([
+    {
+      lat: 33.5102,
+      lng: 36.2913,
+      color: "#ef4444",
+      size: 0.8,
+      label: "Critical medical needs in Damascus",
+      data: { type: "critical", date: "2 hours ago" }
+    },
+    {
+      lat: 31.9394,
+      lng: 35.9349,
+      color: "#9333ea",
+      size: 0.8,
+      label: "High priority needs in Amman",
+      data: { type: "high", date: "4 hours ago" }
+    },
+    {
+      lat: 33.8869,
+      lng: 35.5131,
+      color: "#3b82f6",
+      size: 0.8,
+      label: "Moderate needs in Beirut",
+      data: { type: "moderate", date: "1 hour ago" }
+    },
+    {
+      lat: 30.0444,
+      lng: 31.2357,
+      color: "#ef4444",
+      size: 0.8,
+      label: "Critical medical needs in Cairo",
+      data: { type: "critical", date: "30 minutes ago" }
+    }
+  ])
 
   const handleLogout = async () => {
     await signOut()
@@ -47,6 +81,10 @@ export default function ClinicianStatisticsPage() {
 
   const handleLocationSelect = (location: any) => {
     setSelectedLocation(location)
+  }
+
+  const handlePointHover = (point: any) => {
+    // Handle point hover if needed
   }
 
   const handleZoomIn = () => {
@@ -287,9 +325,11 @@ export default function ClinicianStatisticsPage() {
                       </div>
                       <div className="h-[600px] w-full">
                         <InteractiveGlobe
-                          zoomLevel={zoomLevel}
-                          onLocationSelect={handleLocationSelect}
-                          searchQuery={searchQuery}
+                          points={currentPoints}
+                          onPointClick={handleLocationSelect}
+                          onPointHover={handlePointHover}
+                          size="large"
+                          autoRotate={true}
                         />
                       </div>
                     </div>

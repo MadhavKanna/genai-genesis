@@ -284,6 +284,7 @@ export default function ClinicianDashboard() {
                       <InteractiveGlobe
                         points={currentPoints}
                         onPointClick={handlePointClick}
+                        size="large"
                         autoRotate={true}
                       />
                     </div>
