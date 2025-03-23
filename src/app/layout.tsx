@@ -4,7 +4,7 @@ import { Inter } from "next/font/google";
 import { ThemeProvider } from "@/src/components/theme-provider";
 import { SiteLanguageProvider } from "@/src/components/site-language-provider";
 import { AuthProvider } from "@/src/components/auth-provider";
-import { CaseProvider } from "@/contexts/CaseContext";
+import { CaseProvider } from "@/src/contexts/CaseContext";
 
 // Load the Inter font
 const inter = Inter({

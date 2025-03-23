@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, use } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { Button } from "@/src/components/ui/button";
@@ -27,6 +27,7 @@ import { LiveChat } from "@/src/components/live-chat";
 import { AIVisualAnalysis } from "@/src/components/ai-visual-analysis";
 import { MedicalTermInfo } from "@/src/components/medical-term-info";
 import { analyzeSymptoms } from "@/src/lib/gemini-api";
+import { useCase } from "@/src/contexts/CaseContext";
 
 import {
   LucideArrowLeft,
@@ -42,103 +43,182 @@ import {
 export default function ClinicianCasePage({
   params,
 }: {
-  params: { id: string };
+  params: Promise<{ id: string }>;
 }) {
+  const resolvedParams = use(params);
   const router = useRouter();
+  const { currentCase, cases } = useCase();
   const [activeTab, setActiveTab] = useState("overview");
   const [assessment, setAssessment] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isAnalyzing, setIsAnalyzing] = useState(false);
   const [aiAnalysisResult, setAiAnalysisResult] = useState<any>(null);
 
-  // Sample data - in a real app, this would come from an API
-  const caseData = {
-    id: params.id,
-    title: "Persistent Skin Rash",
-    status: "pending",
-    submittedDate: "May 15, 2023",
-    matchedDate: "May 16, 2023",
-    primaryConcern:
-      "Itchy rash on arms and torso that has been spreading over the past two weeks. The rash is red, raised, and extremely itchy, especially at night.",
-    duration: "2 weeks",
-    additionalSymptoms:
-      "Mild fever (99.5°F), fatigue, and some swelling around the rash areas. The itching worsens after showering.",
-    medicalHistory: {
-      age: 34,
-      gender: "Female",
-      conditions: ["Seasonal allergies", "Eczema (childhood)"],
-      medications: ["Loratadine 10mg as needed for allergies"],
-      allergies: ["Penicillin"],
-    },
-    images: [
-      {
-        id: 1,
-        description: "Rash on right forearm",
-        url: "/placeholder.svg?height=300&width=300",
-      },
-      {
-        id: 2,
-        description: "Rash on torso",
-        url: "/placeholder.svg?height=300&width=300",
-      },
-      {
-        id: 3,
-        description: "Close-up of rash",
-        url: "/placeholder.svg?height=300&width=300",
-      },
-    ],
-    aiAnalysis: null,
-    otherClinicians: [
-      {
-        id: 1,
-        name: "Dr. Sarah Johnson",
-        specialty: "Dermatology",
-        status: "Reviewing",
-        avatar: "SJ",
-      },
-      {
-        id: 2,
-        name: "Dr. Michael Chen",
-        specialty: "Allergy & Immunology",
-        status: "Pending",
-        avatar: "MC",
-      },
-    ],
-    recommendedTests: [
-      {
-        id: 1,
-        name: "Complete Blood Count (CBC)",
-        type: "Blood",
-        reason: "To check for signs of infection or inflammation",
-        urgency: "High",
-        status: "Recommended",
-      },
-      {
-        id: 2,
-        name: "Skin Biopsy",
-        type: "Tissue",
-        reason: "To examine skin cells for signs of specific skin conditions",
-        urgency: "Medium",
-        status: "Recommended",
-      },
-      {
-        id: 3,
-        name: "Allergy Patch Testing",
-        type: "Skin",
-        reason: "To identify potential allergens causing contact dermatitis",
-        urgency: "High",
-        status: "Recommended",
-      },
-      {
-        id: 4,
-        name: "IgE Blood Test",
-        type: "Blood",
-        reason: "To check for allergic reactions",
-        urgency: "Medium",
-        status: "Recommended",
-      },
-    ],
-  };
+  // Use context data if available, otherwise fall back to sample data
+  const caseData = currentCase
+    ? {
+        id: currentCase.id,
+        title: currentCase.primaryConcern,
+        status: "pending",
+        submittedDate: currentCase.createdAt || "May 15, 2023",
+        matchedDate: "May 16, 2023",
+        primaryConcern: currentCase.primaryConcern,
+        duration: `${currentCase.symptomDuration} ${currentCase.durationUnit}`,
+        additionalSymptoms: currentCase.additionalSymptoms,
+        medicalHistory: {
+          age: currentCase.age,
+          gender: currentCase.gender,
+          conditions: currentCase.preExistingConditions.split(","),
+          medications: currentCase.medications.split(","),
+          allergies: currentCase.allergies.split(","),
+        },
+        images: currentCase.images,
+        aiAnalysis: null,
+        otherClinicians: [
+          {
+            id: 1,
+            name: "Dr. Sarah Johnson",
+            specialty: "Dermatology",
+            status: "Reviewing",
+            avatar: "SJ",
+          },
+          {
+            id: 2,
+            name: "Dr. Michael Chen",
+            specialty: "Allergy & Immunology",
+            status: "Pending",
+            avatar: "MC",
+          },
+        ],
+        recommendedTests: [
+          {
+            id: 1,
+            name: "Complete Blood Count (CBC)",
+            type: "Blood",
+            reason: "To check for signs of infection or inflammation",
+            urgency: "High",
+            status: "Recommended",
+          },
+          {
+            id: 2,
+            name: "Skin Biopsy",
+            type: "Tissue",
+            reason:
+              "To examine skin cells for signs of specific skin conditions",
+            urgency: "Medium",
+            status: "Recommended",
+          },
+          {
+            id: 3,
+            name: "Allergy Patch Testing",
+            type: "Skin",
+            reason:
+              "To identify potential allergens causing contact dermatitis",
+            urgency: "High",
+            status: "Recommended",
+          },
+          {
+            id: 4,
+            name: "IgE Blood Test",
+            type: "Blood",
+            reason: "To check for allergic reactions",
+            urgency: "Medium",
+            status: "Recommended",
+          },
+        ],
+      }
+    : {
+        id: resolvedParams.id,
+        title: "Persistent Skin Rash",
+        status: "pending",
+        submittedDate: "May 15, 2023",
+        matchedDate: "May 16, 2023",
+        primaryConcern:
+          "Itchy rash on arms and torso that has been spreading over the past two weeks. The rash is red, raised, and extremely itchy, especially at night.",
+        duration: "2 weeks",
+        additionalSymptoms:
+          "Mild fever (99.5°F), fatigue, and some swelling around the rash areas. The itching worsens after showering.",
+        medicalHistory: {
+          age: 34,
+          gender: "Female",
+          conditions: ["Seasonal allergies", "Eczema (childhood)"],
+          medications: ["Loratadine 10mg as needed for allergies"],
+          allergies: ["Penicillin"],
+        },
+        images: [
+          {
+            id: "1",
+            description: "Rash on right forearm",
+            url: "/placeholder.svg?height=300&width=300",
+            timestamp: new Date().toISOString(),
+          },
+          {
+            id: "2",
+            description: "Rash on torso",
+            url: "/placeholder.svg?height=300&width=300",
+            timestamp: new Date().toISOString(),
+          },
+          {
+            id: "3",
+            description: "Close-up of rash",
+            url: "/placeholder.svg?height=300&width=300",
+            timestamp: new Date().toISOString(),
+          },
+        ],
+        aiAnalysis: null,
+        otherClinicians: [
+          {
+            id: 1,
+            name: "Dr. Sarah Johnson",
+            specialty: "Dermatology",
+            status: "Reviewing",
+            avatar: "SJ",
+          },
+          {
+            id: 2,
+            name: "Dr. Michael Chen",
+            specialty: "Allergy & Immunology",
+            status: "Pending",
+            avatar: "MC",
+          },
+        ],
+        recommendedTests: [
+          {
+            id: 1,
+            name: "Complete Blood Count (CBC)",
+            type: "Blood",
+            reason: "To check for signs of infection or inflammation",
+            urgency: "High",
+            status: "Recommended",
+          },
+          {
+            id: 2,
+            name: "Skin Biopsy",
+            type: "Tissue",
+            reason:
+              "To examine skin cells for signs of specific skin conditions",
+            urgency: "Medium",
+            status: "Recommended",
+          },
+          {
+            id: 3,
+            name: "Allergy Patch Testing",
+            type: "Skin",
+            reason:
+              "To identify potential allergens causing contact dermatitis",
+            urgency: "High",
+            status: "Recommended",
+          },
+          {
+            id: 4,
+            name: "IgE Blood Test",
+            type: "Blood",
+            reason: "To check for allergic reactions",
+            urgency: "Medium",
+            status: "Recommended",
+          },
+        ],
+      };
 
   // Run AI analysis when the component loads
   useEffect(() => {
@@ -560,7 +640,7 @@ export default function ClinicianCasePage({
 
               <TabsContent value="chat" className="space-y-6">
                 <LiveChat
-                  caseId={params.id}
+                  caseId={resolvedParams.id}
                   userRole="doctor"
                   userName="Dr. Thomas Smith"
                   userAvatar="TS"
