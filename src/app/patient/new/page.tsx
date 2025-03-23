@@ -159,7 +159,7 @@ export default function NewPatientCase() {
   };
 
   const handleFormComplete = (formData: any) => {
-    router.push("/patient/review");
+    setStep(3);
   };
 
   return (

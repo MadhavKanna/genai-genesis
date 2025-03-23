@@ -5,6 +5,7 @@ import cors from "cors";
 import * as dotenv from "dotenv";
 import { gemini20Flash, googleAI } from "@genkit-ai/googleai";
 import { genkit } from "genkit";
+import { CaseData } from "../types/case";
 
 // Load environment variables from .env file
 dotenv.config();
@@ -71,21 +72,47 @@ Required Information:
    - Ask about any existing medical conditions
    - List common conditions for reference
 
-When ALL required information is collected, output a JSON object with this structure:
+When ALL required information is collected:
+1. Generate a differential diagnosis based on the provided information
+2. If the user's language is not English, provide translations of key medical information
+3. Suggest next steps or areas to explore
+
+Output the final response in this JSON structure:
 {
-  "primaryConcern": "string",
-  "symptomDuration": number,
-  "durationUnit": "days",
-  "additionalSymptoms": "string",
-  "age": number,
-  "gender": "string",
-  "otherGender": "string (if applicable)",
-  "preExistingConditions": "string"
+  "caseInfo": {
+    "primaryConcern": "string",
+    "symptomDuration": number,
+    "durationUnit": "days",
+    "additionalSymptoms": "string",
+    "age": number,
+    "gender": "string",
+    "otherGender": "string (if applicable)",
+    "preExistingConditions": "string"
+  },
+  "translatedResponses": {
+    "language": "string (if not English)",
+    "primaryConcern": "string",
+    "additionalSymptoms": "string",
+    "medications": "string",
+    "allergies": "string"
+  },
+  "differentialDiagnoses": [
+    {
+      "condition": "string",
+      "confidence": "string (High/Medium/Low)",
+      "description": "string",
+      "nextSteps": ["string"]
+    }
+  ],
+  "suggestedNextSteps": ["string"]
 }
 
 Remember: 
 1. Only output the JSON when ALL required fields are filled. Otherwise, continue the conversation naturally.
-2. ALWAYS respond in the same language as the user's input (${languageCode}).`;
+2. ALWAYS respond in the same language as the user's input (${languageCode}).
+3. Include differential diagnoses based on the symptoms and medical history.
+4. If the user's language is not English, provide translations of key medical information.
+5. Suggest appropriate next steps or areas to explore based on the information provided.`;
 
 // Map of language codes to their full names for TTS
 const languageMap: { [key: string]: string } = {
@@ -336,6 +363,27 @@ export const processAudio = functions.https.onRequest(async (req, res) => {
           "base64"
         );
         const audioDataUrl = `data:audio/mp3;base64,${ttsAudioBase64}`;
+
+        // Parse the AI response
+        const aiResponseJson = JSON.parse(aiResponse);
+
+        // Update the case data with the new information
+        const updatedCase: CaseData = {
+          id: caseId,
+          primaryConcern: aiResponseJson.caseInfo.primaryConcern,
+          symptomDuration: aiResponseJson.caseInfo.symptomDuration,
+          durationUnit: aiResponseJson.caseInfo.durationUnit,
+          additionalSymptoms: aiResponseJson.caseInfo.additionalSymptoms,
+          age: aiResponseJson.caseInfo.age,
+          gender: aiResponseJson.caseInfo.gender,
+          medications: aiResponseJson.caseInfo.medications,
+          allergies: aiResponseJson.caseInfo.allergies,
+          preExistingConditions: aiResponseJson.caseInfo.preExistingConditions,
+          translatedResponses: aiResponseJson.translatedResponses,
+          differentialDiagnoses: aiResponseJson.differentialDiagnoses,
+          suggestedNextSteps: aiResponseJson.suggestedNextSteps,
+          lastUpdated: new Date().toISOString(),
+        };
 
         res.json({
           transcription,

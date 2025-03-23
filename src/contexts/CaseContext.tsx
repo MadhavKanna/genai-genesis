@@ -3,6 +3,22 @@
 import React, { createContext, useContext, useState, ReactNode } from "react";
 import { v4 as uuidv4 } from "uuid";
 
+interface TranslatedResponse {
+  language: string;
+  primaryConcern: string;
+  additionalSymptoms: string;
+  medications: string;
+  allergies: string;
+  preExistingConditions: string;
+}
+
+interface DifferentialDiagnosis {
+  condition: string;
+  confidence: string;
+  description: string;
+  nextSteps: string[];
+}
+
 interface CaseData {
   id?: string;
   createdAt?: string;
@@ -22,6 +38,9 @@ interface CaseData {
     description: string;
     timestamp: string;
   }[];
+  translatedResponses?: TranslatedResponse[];
+  differentialDiagnoses?: DifferentialDiagnosis[];
+  suggestedNextSteps?: string[];
 }
 
 interface CaseContextType {
@@ -29,6 +48,9 @@ interface CaseContextType {
   currentCase: CaseData | null;
   setCurrentCase: (data: Omit<CaseData, "id" | "createdAt">) => void;
   clearCurrentCase: () => void;
+  getTranslatedContent: (language: string) => TranslatedResponse | null;
+  getDifferentialDiagnoses: () => DifferentialDiagnosis[];
+  getSuggestedNextSteps: () => string[];
 }
 
 const CaseContext = createContext<CaseContextType | undefined>(undefined);
@@ -51,6 +73,24 @@ export function CaseProvider({ children }: { children: ReactNode }) {
     setCurrentCase(null);
   };
 
+  const getTranslatedContent = (
+    language: string
+  ): TranslatedResponse | null => {
+    if (!currentCase?.translatedResponses) return null;
+    return (
+      currentCase.translatedResponses.find((tr) => tr.language === language) ||
+      null
+    );
+  };
+
+  const getDifferentialDiagnoses = (): DifferentialDiagnosis[] => {
+    return currentCase?.differentialDiagnoses || [];
+  };
+
+  const getSuggestedNextSteps = (): string[] => {
+    return currentCase?.suggestedNextSteps || [];
+  };
+
   return (
     <CaseContext.Provider
       value={{
@@ -58,6 +98,9 @@ export function CaseProvider({ children }: { children: ReactNode }) {
         currentCase,
         setCurrentCase: addCase,
         clearCurrentCase,
+        getTranslatedContent,
+        getDifferentialDiagnoses,
+        getSuggestedNextSteps,
       }}
     >
       {children}

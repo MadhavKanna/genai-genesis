@@ -241,80 +241,51 @@ export function ConversationalAI({
         throw new Error(data.error);
       }
 
+      // Add AI response to messages
+      setMessages((prev) => [
+        ...prev,
+        { role: "assistant", content: data.aiResponse, timestamp: new Date() },
+      ]);
+
       // Check if the response contains a JSON object with all required fields
       try {
         const jsonMatch = data.aiResponse.match(/\{[\s\S]*\}/);
         if (jsonMatch) {
           const formData = JSON.parse(jsonMatch[0]);
-          // Only call onFormComplete if all required fields are present and valid
-          if (
-            formData.primaryConcern &&
-            formData.symptomDuration &&
-            formData.age &&
-            formData.gender &&
-            typeof formData.primaryConcern === "string" &&
-            typeof formData.symptomDuration === "number" &&
-            typeof formData.age === "number" &&
-            typeof formData.gender === "string"
-          ) {
-            console.log("Form data complete:", formData);
-            // Store the case data in context
+
+          // Check if we have the new response format
+          if (formData.caseInfo) {
+            // Update the case context with all the information
             setCurrentCase({
-              primaryConcern: formData.primaryConcern,
-              symptomDuration: formData.symptomDuration,
-              durationUnit: formData.durationUnit,
-              additionalSymptoms: formData.additionalSymptoms,
-              age: formData.age,
-              gender: formData.gender,
-              otherGender: formData.otherGender,
-              preExistingConditions: formData.preExistingConditions,
-              medications: "",
-              allergies: "",
-              images: [],
+              ...formData.caseInfo,
+              translatedResponses: formData.translatedResponses
+                ? [formData.translatedResponses]
+                : undefined,
+              differentialDiagnoses: formData.differentialDiagnoses,
+              suggestedNextSteps: formData.suggestedNextSteps,
             });
-            // Add a message indicating we can proceed to review
-            setMessages((prev) => [
-              ...prev,
-              {
-                role: "assistant",
-                content:
-                  "Great! I've collected all the necessary information. You can now proceed to review your case details.",
-                timestamp: new Date(),
-              },
-            ]);
-            // Call onFormComplete to trigger navigation
-            onFormComplete?.(formData);
-            return;
+          } else {
+            // Handle legacy format
+            setCurrentCase(formData);
+          }
+
+          // Call onFormComplete if provided
+          if (onFormComplete) {
+            onFormComplete(formData);
           }
         }
-      } catch (e) {
-        console.log(
-          "No valid JSON found in response or missing required fields"
-        );
+      } catch (error) {
+        console.error("Error parsing JSON from response:", error);
       }
 
-      // Add AI response to messages, but filter out any JSON content
-      const filteredResponse = data.aiResponse
-        .replace(/\{[\s\S]*\}/, "")
-        .trim();
-      if (filteredResponse) {
-        setMessages((prev) => [
-          ...prev,
-          {
-            role: "assistant",
-            content: filteredResponse,
-            timestamp: new Date(),
-          },
-        ]);
-      }
-
-      // Play the audio response
-      if (data.audioResponse) {
-        try {
-          const audio = new Audio(data.audioResponse);
-          await audio.play();
-        } catch (audioError) {
-          console.error("Error playing audio response:", audioError);
+      // Process audio response if available
+      if (data.audioContent) {
+        const audioBlob = new Blob([Buffer.from(data.audioContent, "base64")], {
+          type: "audio/mp3",
+        });
+        if (audioRef.current) {
+          audioRef.current.src = URL.createObjectURL(audioBlob);
+          await audioRef.current.play();
         }
       }
     } catch (error) {

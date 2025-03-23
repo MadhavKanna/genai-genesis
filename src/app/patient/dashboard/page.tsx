@@ -36,11 +36,21 @@ import {
 } from "lucide-react";
 import { useAuth } from "@/src/components/auth-provider";
 import { useCase } from "@/src/contexts/CaseContext";
+import { useLanguage } from "@/src/contexts/LanguageContext";
+import { useRouter } from "next/navigation";
 
 export default function PatientDashboard() {
   const [activeTab, setActiveTab] = useState("active");
   const { signOut } = useAuth();
-  const { cases } = useCase();
+  const {
+    cases,
+    currentCase,
+    getTranslatedContent,
+    getDifferentialDiagnoses,
+    getSuggestedNextSteps,
+  } = useCase();
+  const { language } = useLanguage();
+  const router = useRouter();
 
   const handleLogout = async () => {
     await signOut();
@@ -127,6 +137,26 @@ export default function PatientDashboard() {
   const completedCases = allCases.filter(
     (case_) => case_.status === "completed"
   );
+
+  const translatedContent = currentCase ? getTranslatedContent(language) : null;
+  const differentialDiagnoses = getDifferentialDiagnoses();
+  const suggestedNextSteps = getSuggestedNextSteps();
+
+  // Use translated content if available, otherwise use original content
+  const displayContent = currentCase
+    ? {
+        primaryConcern:
+          translatedContent?.primaryConcern || currentCase.primaryConcern,
+        additionalSymptoms:
+          translatedContent?.additionalSymptoms ||
+          currentCase.additionalSymptoms,
+        medications: translatedContent?.medications || currentCase.medications,
+        allergies: translatedContent?.allergies || currentCase.allergies,
+        preExistingConditions:
+          translatedContent?.preExistingConditions ||
+          currentCase.preExistingConditions,
+      }
+    : null;
 
   return (
     <div className="flex min-h-screen bg-gradient-to-br from-blue-50 to-white">
@@ -393,6 +423,15 @@ export default function PatientDashboard() {
               </div>
             </TabsContent>
           </Tabs>
+          {!currentCase && (
+            <Card>
+              <CardContent className="py-8 text-center">
+                <p className="text-muted-foreground">
+                  No active cases. Create a new case to get started.
+                </p>
+              </CardContent>
+            </Card>
+          )}
         </main>
       </div>
     </div>

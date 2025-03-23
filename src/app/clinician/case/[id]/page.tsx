@@ -732,34 +732,31 @@ export default function ClinicianCasePage({
               </CardHeader>
               <CardContent className="space-y-4">
                 <div className="space-y-3">
-                  <div className="rounded-lg border p-3">
-                    <MedicalTermInfo term="Dermatitis" className="font-medium">
-                      Contact Dermatitis
-                    </MedicalTermInfo>
-                    <p className="text-xs text-muted-foreground mt-1">
-                      Symptoms match pattern of allergic reaction to external
-                      substance
-                    </p>
-                  </div>
-
-                  <div className="rounded-lg border p-3">
-                    <MedicalTermInfo term="Eczema" className="font-medium">
-                      Atopic Dermatitis (Eczema)
-                    </MedicalTermInfo>
-                    <p className="text-xs text-muted-foreground mt-1">
-                      Patient has history of childhood eczema which may have
-                      recurred
-                    </p>
-                  </div>
-
-                  <div className="rounded-lg border p-3">
-                    <MedicalTermInfo term="Urticaria" className="font-medium">
-                      Urticaria (Hives)
-                    </MedicalTermInfo>
-                    <p className="text-xs text-muted-foreground mt-1">
-                      Raised, itchy welts consistent with allergic reaction
-                    </p>
-                  </div>
+                  {currentCase?.differentialDiagnoses?.map(
+                    (diagnosis, index) => (
+                      <div key={index} className="rounded-lg border p-3">
+                        <MedicalTermInfo
+                          term={diagnosis.condition}
+                          className="font-medium"
+                        >
+                          {diagnosis.condition} ({diagnosis.confidence})
+                        </MedicalTermInfo>
+                        <p className="text-xs text-muted-foreground mt-1">
+                          {diagnosis.description}
+                        </p>
+                        <div className="mt-2">
+                          <h5 className="text-xs font-medium">
+                            Recommended Steps:
+                          </h5>
+                          <ul className="space-y-1 ml-5 list-disc text-xs">
+                            {diagnosis.nextSteps.map((step, stepIndex) => (
+                              <li key={stepIndex}>{step}</li>
+                            ))}
+                          </ul>
+                        </div>
+                      </div>
+                    )
+                  )}
                 </div>
               </CardContent>
             </Card>
