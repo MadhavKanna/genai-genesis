@@ -31,7 +31,6 @@ import {
   LucideBrain,
   LucideCheck,
   LucideClipboard,
-  LucideMessageSquare,
   LucideFileText,
   LucideChevronRight,
   LucideLogOut,
@@ -41,6 +40,7 @@ import {
   LucideHeart,
   LucideClock,
   LucideAlertCircle,
+  LucideSettings,
 } from "lucide-react";
 
 import { LanguageSelector } from "@/src/components/language-selector";
@@ -210,17 +210,10 @@ export default function ClinicianDashboard() {
               Profile
             </Link>
             <Link
-              href="/clinician/messages"
-              className="flex items-center gap-3 rounded-lg px-3 py-2 text-muted-foreground hover:text-foreground transition-all"
-            >
-              <LucideMessageSquare className="h-4 w-4" />
-              Messages
-            </Link>
-            <Link
               href="/clinician/settings"
               className="flex items-center gap-3 rounded-lg px-3 py-2 text-muted-foreground hover:text-foreground transition-all"
             >
-              <LucideFileText className="h-4 w-4" />
+              <LucideSettings className="h-4 w-4" />
               Settings
             </Link>
           </nav>

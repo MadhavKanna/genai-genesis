@@ -28,10 +28,10 @@ import {
   LucideUsers,
   LucideBrain,
   LucideClipboard,
-  LucideMessageSquare,
   LucideFileText,
   LucideChevronRight,
   LucideLogOut,
+  LucideSettings,
   LucideAlertCircle,
 } from "lucide-react";
 import { useAuth } from "@/src/components/auth-provider";
@@ -79,17 +79,10 @@ export default function PatientDashboard() {
               Profile
             </Link>
             <Link
-              href="/patient/messages"
-              className="flex items-center gap-3 rounded-lg px-3 py-2 text-muted-foreground hover:text-foreground transition-all"
-            >
-              <LucideMessageSquare className="h-4 w-4" />
-              Messages
-            </Link>
-            <Link
               href="/patient/settings"
               className="flex items-center gap-3 rounded-lg px-3 py-2 text-muted-foreground hover:text-foreground transition-all"
             >
-              <LucideFileText className="h-4 w-4" />
+              <LucideSettings className="h-4 w-4" />
               Settings
             </Link>
           </nav>
@@ -297,10 +290,11 @@ export default function PatientDashboard() {
               <div className="flex items-center justify-between">
                 <h2 className="text-xl font-semibold">Completed Cases</h2>
                 <p className="text-sm text-muted-foreground">
-                  Showing 1 completed case
+                  Showing 3 completed cases
                 </p>
               </div>
 
+              {/* First Completed Case */}
               <Card className="symedon-card border-none">
                 <CardHeader className="pb-2">
                   <div className="flex justify-between items-center">
@@ -325,7 +319,6 @@ export default function PatientDashboard() {
                         <p className="font-medium">6 months</p>
                       </div>
                     </div>
-
                     <div className="flex flex-wrap gap-2">
                       <div className="flex -space-x-2">
                         <Avatar className="border-2 border-background h-8 w-8">
@@ -338,26 +331,118 @@ export default function PatientDashboard() {
                             MR
                           </AvatarFallback>
                         </Avatar>
-                        <Avatar className="border-2 border-background h-8 w-8">
-                          <AvatarFallback className="bg-warning text-warning-foreground">
-                            PK
-                          </AvatarFallback>
-                        </Avatar>
-                        <Avatar className="border-2 border-background h-8 w-8">
-                          <AvatarFallback className="bg-destructive text-destructive-foreground">
-                            AL
-                          </AvatarFallback>
-                        </Avatar>
                       </div>
                       <div className="text-xs text-muted-foreground flex items-center">
-                        <LucideUsers className="h-3 w-3 mr-1" />4 clinicians
-                        provided guidance
+                        <LucideUsers className="h-3 w-3 mr-1" />2 clinicians provided guidance
                       </div>
                     </div>
                   </div>
                 </CardContent>
                 <CardFooter>
                   <Link href="/patient/case/23456">
+                    <Button variant="outline" className="w-full rounded-full">
+                      View Guidance Report
+                      <LucideChevronRight className="ml-2 h-4 w-4" />
+                    </Button>
+                  </Link>
+                </CardFooter>
+              </Card>
+
+              {/* Second Completed Case */}
+              <Card className="symedon-card border-none">
+                <CardHeader className="pb-2">
+                  <div className="flex justify-between items-center">
+                    <CardTitle className="text-lg">Seasonal Allergies</CardTitle>
+                    <Badge className="bg-secondary">Completed</Badge>
+                  </div>
+                  <CardDescription>
+                    Case ID: #SYM-23457 • Completed: May 5, 2023
+                  </CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <div className="space-y-4">
+                    <div className="grid grid-cols-2 gap-4 text-sm">
+                      <div>
+                        <span className="text-muted-foreground">
+                          Primary concern:
+                        </span>
+                        <p className="font-medium">Severe seasonal allergies</p>
+                      </div>
+                      <div>
+                        <span className="text-muted-foreground">Duration:</span>
+                        <p className="font-medium">2 months</p>
+                      </div>
+                    </div>
+                    <div className="flex flex-wrap gap-2">
+                      <div className="flex -space-x-2">
+                        <Avatar className="border-2 border-background h-8 w-8">
+                          <AvatarFallback className="bg-warning text-warning-foreground">
+                            AK
+                          </AvatarFallback>
+                        </Avatar>
+                        <Avatar className="border-2 border-background h-8 w-8">
+                          <AvatarFallback className="bg-destructive text-destructive-foreground">
+                            RJ
+                          </AvatarFallback>
+                        </Avatar>
+                      </div>
+                      <div className="text-xs text-muted-foreground flex items-center">
+                        <LucideUsers className="h-3 w-3 mr-1" />2 clinicians provided guidance
+                      </div>
+                    </div>
+                  </div>
+                </CardContent>
+                <CardFooter>
+                  <Link href="/patient/case/23457">
+                    <Button variant="outline" className="w-full rounded-full">
+                      View Guidance Report
+                      <LucideChevronRight className="ml-2 h-4 w-4" />
+                    </Button>
+                  </Link>
+                </CardFooter>
+              </Card>
+
+              {/* Third Completed Case */}
+              <Card className="symedon-card border-none">
+                <CardHeader className="pb-2">
+                  <div className="flex justify-between items-center">
+                    <CardTitle className="text-lg">Migraine Management</CardTitle>
+                    <Badge className="bg-secondary">Completed</Badge>
+                  </div>
+                  <CardDescription>
+                    Case ID: #SYM-23458 • Completed: May 12, 2023
+                  </CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <div className="space-y-4">
+                    <div className="grid grid-cols-2 gap-4 text-sm">
+                      <div>
+                        <span className="text-muted-foreground">
+                          Primary concern:
+                        </span>
+                        <p className="font-medium">Frequent migraines</p>
+                      </div>
+                      <div>
+                        <span className="text-muted-foreground">Duration:</span>
+                        <p className="font-medium">4 months</p>
+                      </div>
+                    </div>
+                    <div className="flex flex-wrap gap-2">
+                      <div className="flex -space-x-2">
+                        <Avatar className="border-2 border-background h-8 w-8">
+                          <AvatarFallback className="bg-primary text-primary-foreground">
+                            NL
+                          </AvatarFallback>
+                        </Avatar>
+                      </div>
+                      <div className="text-xs text-muted-foreground flex items-center">
+                        <LucideUsers className="h-3 w-3 mr-1" />1 clinician provided guidance
+                      </div>
+                    </div>
+                  </div>
+                </CardContent>
+                <CardFooter>
+                  <Link href="/patient/case/23458">
                     <Button variant="outline" className="w-full rounded-full">
                       View Guidance Report
                       <LucideChevronRight className="ml-2 h-4 w-4" />

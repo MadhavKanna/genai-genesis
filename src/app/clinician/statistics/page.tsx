@@ -2,6 +2,7 @@
 
 import { useState } from "react"
 import Link from "next/link"
+import Image from "next/image"
 import { Button } from "@/src/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/src/components/ui/card"
 import { Avatar, AvatarFallback, AvatarImage } from "@/src/components/ui/avatar"
@@ -15,7 +16,6 @@ import {
   LucideHeartPulse,
   LucideUsers,
   LucideClipboard,
-  LucideMessageSquare,
   LucideFileText,
   LucideBarChart,
   LucideLogOut,
@@ -30,6 +30,7 @@ import {
   LucideZoomOut,
   FlaskConicalIcon as LucideFlask,
   LucideInfo,
+  LucideSettings,
 } from "lucide-react"
 
 export default function ClinicianStatisticsPage() {
@@ -102,10 +103,13 @@ export default function ClinicianStatisticsPage() {
         <div className="flex h-16 items-center border-b px-6">
           <div className="flex items-center gap-2">
             <div className="relative h-8 w-8 overflow-hidden">
-              <div className="absolute inset-0 bg-symedon-gradient rounded-full"></div>
-              <div className="absolute inset-1 bg-white rounded-full flex items-center justify-center">
-                <LucideHeartPulse className="h-5 w-5 text-primary" />
-              </div>
+              <Image
+                src="/symedon-logo.png"
+                alt="Symedon Logo"
+                width={32}
+                height={32}
+                className="object-contain"
+              />
             </div>
             <span className="text-xl font-bold">Symedon</span>
           </div>
@@ -141,17 +145,10 @@ export default function ClinicianStatisticsPage() {
               Profile
             </Link>
             <Link
-              href="/clinician/messages"
-              className="flex items-center gap-3 rounded-lg px-3 py-2 text-muted-foreground hover:text-foreground transition-all"
-            >
-              <LucideMessageSquare className="h-4 w-4" />
-              Messages
-            </Link>
-            <Link
               href="/clinician/settings"
               className="flex items-center gap-3 rounded-lg px-3 py-2 text-muted-foreground hover:text-foreground transition-all"
             >
-              <LucideFileText className="h-4 w-4" />
+              <LucideSettings className="h-4 w-4" />
               Settings
             </Link>
           </nav>
