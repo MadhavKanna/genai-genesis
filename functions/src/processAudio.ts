@@ -109,89 +109,6 @@ const languageMap: { [key: string]: string } = {
   "id-ID": "id-ID",
   "ms-MY": "ms-MY",
   "fil-PH": "fil-PH",
-  "uk-UA": "uk-UA",
-  "el-GR": "el-GR",
-  "he-IL": "he-IL",
-  "ro-RO": "ro-RO",
-  "hu-HU": "hu-HU",
-  "cs-CZ": "cs-CZ",
-  "da-DK": "da-DK",
-  "fi-FI": "fi-FI",
-  "sv-SE": "sv-SE",
-  "no-NO": "no-NO",
-  "sk-SK": "sk-SK",
-  "hr-HR": "hr-HR",
-  "ca-ES": "ca-ES",
-  "nl-BE": "nl-BE",
-  "yue-HK": "yue-HK",
-  "af-ZA": "af-ZA",
-  "am-ET": "am-ET",
-  "hy-AM": "hy-AM",
-  "az-AZ": "az-AZ",
-  "eu-ES": "eu-ES",
-  "be-BY": "be-BY",
-  "bn-IN": "bn-IN",
-  "bs-BA": "bs-BA",
-  "bg-BG": "bg-BG",
-  "my-MM": "my-MM",
-  "km-KH": "km-KH",
-  "zh-TW": "zh-TW",
-  "et-EE": "et-EE",
-  "ka-GE": "ka-GE",
-  "gu-IN": "gu-IN",
-  "ha-NG": "ha-NG",
-  "iw-IL": "iw-IL",
-  "hmn-HN": "hmn-HN",
-  "is-IS": "is-IS",
-  "ig-NG": "ig-NG",
-  "ga-IE": "ga-IE",
-  "jv-ID": "jv-ID",
-  "kn-IN": "kn-IN",
-  "kk-KZ": "kk-KZ",
-  "lo-LA": "lo-LA",
-  "lv-LV": "lv-LV",
-  "lt-LT": "lt-LT",
-  "lb-LU": "lb-LU",
-  "mk-MK": "mk-MK",
-  "mg-MG": "mg-MG",
-  "ml-IN": "ml-IN",
-  "mt-MT": "mt-MT",
-  "mi-NZ": "mi-NZ",
-  "mr-IN": "mr-IN",
-  "mn-MN": "mn-MN",
-  "ne-NP": "ne-NP",
-  "ny-MW": "ny-MW",
-  "or-IN": "or-IN",
-  "ps-AF": "ps-AF",
-  "fa-IR": "fa-IR",
-  "pa-IN": "pa-IN",
-  "sm-WS": "sm-WS",
-  "gd-GB": "gd-GB",
-  "sr-RS": "sr-RS",
-  "st-LS": "st-LS",
-  "sn-ZW": "sn-ZW",
-  "sd-PK": "sd-PK",
-  "si-LK": "si-LK",
-  "sl-SI": "sl-SI",
-  "so-SO": "so-SO",
-  "su-ID": "su-ID",
-  "sw-KE": "sw-KE",
-  "tl-PH": "tl-PH",
-  "tg-TJ": "tg-TJ",
-  "ta-IN": "ta-IN",
-  "tt-RU": "tt-RU",
-  "te-IN": "te-IN",
-  "ti-ER": "ti-ER",
-  "ts-ZA": "ts-ZA",
-  "tk-TM": "tk-TM",
-  "ur-PK": "ur-PK",
-  "ug-CN": "ug-CN",
-  "uz-UZ": "uz-UZ",
-  "cy-GB": "cy-GB",
-  "xh-ZA": "xh-ZA",
-  "yi-IL": "yi-IL",
-  "yo-NG": "yo-NG",
-  "zu-ZA": "zu-ZA",
 };
 
 interface Message {
@@ -255,26 +172,13 @@ export const processAudio = functions.https.onRequest(async (req, res) => {
         });
 
         // Speech-to-Text
-        console.log(
-          "Starting speech-to-text conversion with language:",
-          languageCode
-        );
-        const response = await speechClient.recognize({
+        console.log("Starting speech-to-text conversion");
+        const [response] = await speechClient.recognize({
           audio: { content: audioBuffer.toString("base64") },
           config: {
             encoding: "WEBM_OPUS",
             sampleRateHertz: 48000,
             languageCode: languageCode,
-            model: "default",
-            useEnhanced: true,
-            enableAutomaticPunctuation: true,
-            enableWordTimeOffsets: true,
-            enableWordConfidence: true,
-            metadata: {
-              recordingDeviceType: "SMARTPHONE",
-              recordingDeviceName: "browser",
-              originalMediaType: "AUDIO",
-            },
           },
         });
 
@@ -283,15 +187,8 @@ export const processAudio = functions.https.onRequest(async (req, res) => {
           JSON.stringify(response, null, 2)
         );
 
-        // Get the most confident alternative
-        const alternatives = response[0]?.results?.[0]?.alternatives || [];
-        const bestAlternative = alternatives.reduce((best, current) => {
-          const bestConfidence = best.confidence || 0;
-          const currentConfidence = current.confidence || 0;
-          return currentConfidence > bestConfidence ? current : best;
-        });
-
-        transcription = bestAlternative?.transcript || "";
+        transcription =
+          response.results?.[0]?.alternatives?.[0]?.transcript || "";
       } else if (textInput) {
         transcription = textInput;
       } else {
@@ -303,18 +200,18 @@ export const processAudio = functions.https.onRequest(async (req, res) => {
       }
 
       if (!transcription) {
-        console.error("No transcription was generated");
+        console.error("No transcription was generated from the audio");
         res.status(400).json({
-          error: "No transcription was generated",
-          details: "The input was empty or could not be processed",
+          error: "No transcription was generated from the audio",
+          details: "The speech-to-text service returned an empty transcription",
         });
         return;
       }
 
-      console.log("Processing input:", { transcription });
+      console.log("Speech-to-text completed", { transcription });
 
       // Process with Gemini
-      console.log("Starting Gemini processing with language:", languageCode);
+      console.log("Starting Gemini processing");
 
       // Sort messages by timestamp to ensure correct order
       const sortedMessages = [...messages].sort(
@@ -359,12 +256,9 @@ export const processAudio = functions.https.onRequest(async (req, res) => {
       });
 
       // Text-to-Speech
-      console.log(
-        "Starting text-to-speech conversion with language:",
-        languageCode
-      );
+      console.log("Starting text-to-speech conversion");
       try {
-        // Clean the text while preserving non-Latin characters
+        // Clean the text while preserving non-English characters
         const ttsText = aiResponse
           .replace(/[\u0000-\u001F\u007F-\u009F]/g, "") // Remove control characters
           .replace(/\n/g, " ") // Replace newlines with spaces
@@ -409,7 +303,7 @@ export const processAudio = functions.https.onRequest(async (req, res) => {
 
         res.json({
           transcription,
-          aiResponse: ttsText,
+          aiResponse: ttsText, // Send the cleaned text back
           audioResponse: audioDataUrl,
           conversationId, // Include the conversation ID in the response
         });
@@ -424,9 +318,9 @@ export const processAudio = functions.https.onRequest(async (req, res) => {
         });
       }
     } catch (error) {
-      console.error("Error processing request:", error);
+      console.error("Error processing audio:", error);
       res.status(500).json({
-        error: "Error processing request",
+        error: "Error processing audio",
         details: error instanceof Error ? error.message : "Unknown error",
       });
     }
