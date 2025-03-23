@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import { Button } from "@/src/components/ui/button";
@@ -38,13 +38,77 @@ import {
   LucideSearch,
   LucideFilter,
   LucideBarChart,
+  LucideHeart,
+  LucideClock,
+  LucideAlertCircle,
 } from "lucide-react";
 
 import { LanguageSelector } from "@/src/components/language-selector";
+import InteractiveGlobe from "@/src/components/InteractiveGlobe";
+import StatisticsCard from "@/src/components/StatisticsCard";
+
+// Mock data for the globe points
+const globePoints = [
+  {
+    lat: 40.7128,
+    lng: -74.0060,
+    color: "#10B981",
+    size: 0.5,
+    label: "New York: 12 cases resolved",
+    data: { cases: 12, type: "resolved" }
+  },
+  {
+    lat: 51.5074,
+    lng: -0.1278,
+    color: "#3B82F6",
+    size: 0.7,
+    label: "London: 8 active cases",
+    data: { cases: 8, type: "active" }
+  },
+  {
+    lat: -33.8688,
+    lng: 151.2093,
+    color: "#F59E0B",
+    size: 0.4,
+    label: "Sydney: 5 new cases",
+    data: { cases: 5, type: "new" }
+  },
+  {
+    lat: 35.6762,
+    lng: 139.6503,
+    color: "#6366F1",
+    size: 0.6,
+    label: "Tokyo: 15 cases in progress",
+    data: { cases: 15, type: "in_progress" }
+  },
+  {
+    lat: 1.3521,
+    lng: 103.8198,
+    color: "#EC4899",
+    size: 0.5,
+    label: "Singapore: 7 cases pending",
+    data: { cases: 7, type: "pending" }
+  }
+];
 
 export default function ClinicianDashboard() {
   const [activeTab, setActiveTab] = useState("pending");
   const { signOut } = useAuth();
+  const [savedLives, setSavedLives] = useState(0);
+  const [selectedPoint, setSelectedPoint] = useState<any>(null);
+
+  useEffect(() => {
+    // Simulate incrementing saved lives over time
+    const interval = setInterval(() => {
+      setSavedLives(prev => prev + 1);
+    }, 30000); // Add a new point every 30 seconds
+
+    return () => clearInterval(interval);
+  }, []);
+
+  const handlePointClick = (point: any) => {
+    setSelectedPoint(point);
+  };
 
   const handleLogout = async () => {
     await signOut();
@@ -140,7 +204,7 @@ export default function ClinicianDashboard() {
       {/* Main content */}
       <div className="flex-1 overflow-auto">
         <header className="sticky top-0 z-10 flex h-16 items-center gap-4 border-b bg-white px-6">
-          <h1 className="text-lg font-semibold">Case Queue</h1>
+          <h1 className="text-lg font-semibold">Global Health Impact</h1>
           <div className="ml-auto flex items-center gap-4">
             <div className="relative">
               <LucideSearch className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
@@ -159,6 +223,48 @@ export default function ClinicianDashboard() {
         </header>
 
         <main className="container py-6">
+          {/* Impact Overview Section */}
+          <div className="mb-8">
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+              <Card className="col-span-1 md:col-span-2 border-none bg-white/50 backdrop-blur-sm">
+                <CardHeader>
+                  <CardTitle className="text-lg">Global Impact Overview</CardTitle>
+                  <CardDescription>Real-time visualization of lives impacted</CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <div className="h-[400px]">
+                    <InteractiveGlobe
+                      points={globePoints}
+                      onPointClick={handlePointClick}
+                      autoRotate={true}
+                    />
+                  </div>
+                </CardContent>
+              </Card>
+
+              <div className="space-y-4">
+                <StatisticsCard
+                  title="Lives Saved"
+                  value={savedLives}
+                  description="Total patients helped through the platform"
+                  trend={{ value: 12, label: "this week", isPositive: true }}
+                />
+                <StatisticsCard
+                  title="Pending Cases"
+                  value="23"
+                  description="Cases awaiting review"
+                  trend={{ value: 5, label: "since yesterday", isPositive: false }}
+                />
+                <StatisticsCard
+                  title="New Cases"
+                  value="8"
+                  description="Cases received since last login"
+                  trend={{ value: 15, label: "increase", isPositive: true }}
+                />
+              </div>
+            </div>
+          </div>
+
           <Tabs
             defaultValue="pending"
             className="w-full"
